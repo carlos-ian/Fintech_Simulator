@@ -1,0 +1,76 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Usuário" as U
+actor "Cliente" as C
+actor "Administrador" as A
+
+C -up-|> U
+A -up-|> U
+
+usecase "Criar Perfil de Usuário" as RF01
+usecase "Encerrar Perfil de Usuário" as RF02
+usecase "Alterar Dados do Perfil" as RF03
+usecase "Visualizar Dados do Perfil" as RF04
+
+usecase "Realizar Autenticação" as RF05
+usecase "Abrir/Encerrar Conta" as RF06
+
+usecase "Realizar Autenticação \n (Como Cliente)" as RF05C
+usecase "Realizar Autenticação \n (Como Administrador)" as RF05A
+
+usecase "Realizar Transações" as RF07a
+usecase "Receber Transações" as RF07b
+usecase "Visualizar Extrato" as RF08
+usecase "Gerenciar Cartões" as RF09
+usecase "Visualizar e Ajustar Limite" as RF10
+usecase "Visualizar Investimentos" as RF11
+
+usecase "Realizar Investimentos" as RF12
+usecase "Resgatar Investimentos" as RF13
+
+usecase "Visualizar Poupança" as RF14
+usecase "Guardar na Poupança" as RF15a
+usecase "Resgatar da Poupança" as RF15b
+
+usecase "Gerenciar Contas de Usuário" as RF16
+usecase "Analisar Solicitações de Aumento de Limite" as RF17
+usecase "Visualizar Transações" as RF18
+usecase "Estornar Transações" as RF19
+usecase "Gerar Relatório Geral" as RF20
+usecase "Editar Lista de Investimentos" as RF21
+
+U -- RF01
+U -left- RF02
+U -left- RF03
+U -left- RF04
+
+RF05 <|-up- RF05C
+RF05 <|-up- RF05A
+RF01 <.. RF05 : <<include>>
+
+C -- RF05C
+A -- RF05A
+
+RF05C <.right. RF06 : <<include>>
+RF05C <.left. RF07a : <<include>>
+RF05C <.left. RF07b : <<include>>
+RF05C <.. RF08 : <<include>>
+RF05C <.. RF09 : <<include>>
+RF09 ..> RF10 : <<extend>>
+RF05C <.. RF11 : <<include>>
+RF11 ..> RF12 : <<extend>>
+RF11 ..> RF13 : <<extend>>
+RF05C <.. RF14 : <<include>>
+RF14 ..> RF15a : <<extend>>
+RF14 ..> RF15b : <<extend>>
+
+RF05A <.. RF16 : <<include>> 
+RF05A <.. RF17 : <<include>>
+RF16 .left.> RF18 : <<extend>>
+RF18 .right.> RF19 : <<extend>>
+RF05A <.. RF20 : <<include>>
+RF05A <.. RF21 : <<include>>
+
+@enduml

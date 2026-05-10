@@ -1,0 +1,128 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+abstract class Usuario {
+    # id: int
+    # nome: String
+    # cpf: String
+    # email: String
+    # senha: String
+    # dataNascimento: Date
+    # telefone: String
+    # tipoUsuario: String
+
+    + encerrarPerfil(): void
+    + alterarDados(Usuario novosDados): void
+    + visualizarDados(): Usuario
+    + autenticar(String email, String senha): boolean
+}
+
+class Cliente {
+    - statusCliente: String
+    - listaContas: List<Conta>
+
+    + abrirConta(tipo: String): void
+    + fecharConta(numeroConta: String): boolean
+}
+
+class Administrador {
+    - matricula: String
+
+    + consultarCliente(cpf: String): Cliente
+    + bloquearCliente(c: Cliente): void
+    + desbloquearCliente(c: Cliente): void
+    + analisarLimite(cartao: Cartao, novoLimite: double): boolean
+    + visualizarTransacoes(c: Cliente): List<Transacao>
+    + estornarTransacao(t: Transacao): boolean
+    + gerarRelatorioGeral(): String
+    + adicionarInvestimento(i: Investimento): void
+    + removerInvestimento(id: int): boolean
+    + editarInvestimento(i: Investimento): void
+}
+
+abstract class Conta {
+    # numeroConta: String
+    # agencia: String
+    # saldo: double
+    # tipoConta: String
+    # statusConta: String
+
+    + realizarTransacao(valor: double, destino: Conta, metodo: String): boolean
+    + receberTransacao(valor: double, origem: Conta): void
+    + visualizarExtrato(periodo: int): List<Transacao>
+}
+
+class Cartao {
+    - numeroCartao: String
+    - titular: String
+    - tipoCartao: String
+    - limiteTotal: double
+    - limiteDisponivel: double
+    - faturaAtual: double
+    - estaBloqueado: boolean
+
+    + gerarCartao(titular: String, tipo: String): void
+    + visualizarDados(): Cartao
+    + bloquearCartao(): boolean
+    + ativarCartao(): boolean
+    + visualizarLimite(): double
+    + solicitarAjusteLimite(novoLimite: double): void
+}
+
+class Transacao {
+    - idTransacao: int
+    - data: Date
+    - hora: Time
+    - valor: double
+    - categoria: String
+    - tipoFluxo: String
+    - metodoPagamento: String
+    - status: String
+    - origem: String
+    - destino: String
+}
+
+class Investimento {
+    - idInvestimento: int
+    - nomeProduto: String
+    - taxaRendimento: double
+    - valorAplicado: double
+    - dataAplicacao: Date
+    - status: String
+
+    + visualizarInvestimentos(): List<Investimento>
+    + realizarInvestimento(valor: double, produto: String): boolean
+    + resgatarInvestimento(idInvestimento: int): double
+}
+
+class Poupança {
+    - idReserva: int
+    - nomeReserva: String
+    - saldoReservado: double
+    - dataCriacao: Date
+    - valorMeta: double
+    - taxaRendimento: double
+    
+    + visualizarPoupanca(): double
+    + guardar(valor: double): boolean
+    + retirar(valor: double): boolean
+}
+
+' Heranças
+Cliente -up-|> Usuario
+Administrador -down-|> Usuario
+
+' Subclasses de Conta
+ContaCorrente -up-|> Conta
+ContaPoupanca -up-|> Conta
+ContaKids -up-|> Conta
+ContaInvestimento -up-|> Conta
+
+' Relacionamentos
+Usuario "1" o-left- "0..*" Conta 
+Conta "1" *-up- "0..*" Cartao 
+Conta "1" *-up- "0..*" Transacao
+Conta "1" -up- "0..*" Investimento : movimenta
+Conta "1" -left- "1" Poupança : reserva
+
+@enduml

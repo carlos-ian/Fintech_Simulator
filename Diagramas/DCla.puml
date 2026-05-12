@@ -52,6 +52,26 @@ abstract class Conta {
     + visualizarExtrato(periodo: int): List<Transacao>
 }
 
+class ContaCorrente {
+    - limiteChequeEspecial: double
+    + solicitarAumentoLimite(): void
+}
+
+class ContaPoupanca {
+    - taxaRendimento: double
+    + aplicarRendimento(): void
+}
+
+class ContaKids {
+    - cpfResponsavel: String
+    - limiteMensal: double
+}
+
+class ContaInvestimento {
+    - perfilRisco: String
+    + comprarAtivo(): void
+}
+
 class Cartao {
     - numeroCartao: String
     - titular: String

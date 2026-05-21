@@ -24,4 +24,7 @@ public class Transacao {
         this.origem = origem;
         this.destino = destino;
     }
+
+    public int getId () {return this.id;}
+    public void setTipoFluxo(String tipoFluxo) {this.tipoFluxo = tipoFluxo;}
 }

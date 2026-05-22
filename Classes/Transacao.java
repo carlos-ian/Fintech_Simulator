@@ -26,5 +26,13 @@ public class Transacao {
     }
 
     public int getId () {return this.id;}
+    public  String getData () {return this.data;}
+    public  String getHora () {return this.hora;}
+    public  double getValor () {return this.valor;}
+    public  String getCategoria () {return this.categoria;}
+    public  String getFluxo () {return this.tipoFluxo;}
+    public  String getMetodoPagamento () {return this.metodoPagamento;}
+    public  String getStatus () {return this.status;}
+
     public void setTipoFluxo(String tipoFluxo) {this.tipoFluxo = tipoFluxo;}
 }

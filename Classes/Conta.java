@@ -21,12 +21,12 @@ public abstract class Conta {
     Conta(String numeroConta, String agencia, double saldo, String tipoConta, String statusConta) {
         this.numeroConta = numeroConta;
         this.agencia = agencia;
-        this.saldo = 0;
+        this.saldo = saldo;
         this.tipoConta = tipoConta;
         this.statusConta = "Ativo";
     }
 
-    public boolean realizarTransacao(double valor, String metodoPagamento, String categoria, Conta destino) throws ContaInativaException, SaldoInsuficienteException, LimiteInsuficienteException {
+    public boolean realizarTransacao(double valor, String metodoPagamento, Cartao cartaoEscolhido, String categoria, Conta destino) throws ContaInativaException, SaldoInsuficienteException, LimiteInsuficienteException {
 
             // 1. Verificação de Cenários: Conta de Origem está Ativa, Conta de Destino Existe e está Ativa
             if (!this.statusConta.equalsIgnoreCase("Ativo")) {
@@ -37,34 +37,44 @@ public abstract class Conta {
             }
 
             // 2. Realização da Transferência
-            if (metodoPagamento.equalsIgnoreCase("PIX") || metodoPagamento.equalsIgnoreCase("DEBITO")) {
+            if (metodoPagamento.equalsIgnoreCase("PIX")) {
                 if (this.saldo < valor) {
-                    throw new SaldoInsuficienteException("Saldo insuficiente para realizar o " + metodoPagamento + ".");
+                    throw new SaldoInsuficienteException("Saldo insuficiente para realizar o PIX.");
                 }
                 this.saldo -= valor;
+
+            } else if (metodoPagamento.equalsIgnoreCase("DEBITO")) {
+                if (cartaoEscolhido == null) {
+                    throw new IllegalArgumentException("Transação recusada: É necessário informar o cartão para a função Débito.");
+                }
+                if (cartaoEscolhido.getEstaBloqueado()) {
+                    throw new LimiteInsuficienteException("Transação recusada: O cartão informado está bloqueado.");
+                }
+                if (!cartaoEscolhido.getTipoCartao().equalsIgnoreCase("DEBITO") && !cartaoEscolhido.getTipoCartao().equalsIgnoreCase("AMBOS")) {
+                    throw new IllegalArgumentException("Transação recusada: Este cartão não possui a função Débito.");
+                }
+
+                if (this.saldo < valor) {
+                    throw new SaldoInsuficienteException("Saldo insuficiente para realizar o Débito.");
+                }
+                this.saldo -= valor;
+
             } else if (metodoPagamento.equalsIgnoreCase("CREDITO")) {
-                // Busca  cartão válido com a função Crédito ativa e que tenha limite disponível
-                Cartao cartaoValido = null;
-
-                if (this.cartoes != null) {
-                    for (Cartao c : this.cartoes) {
-                        // Verifica se o cartão não está bloqueado e se aceita crédito
-                        if (!c.getEstaBloqueado() && (c.getTipoCartao().equalsIgnoreCase("CREDITO") || c.getTipoCartao().equalsIgnoreCase("AMBOS"))) {
-                            if (c.getLimiteDisponivel() >= valor) {
-                                cartaoValido = c;
-                                break; // Encontrou um cartão capaz de fazer a compra, para a busca
-                            }
-                        }
-                    }
+                if (cartaoEscolhido == null) {
+                    throw new IllegalArgumentException("Transação recusada: É necessário informar o cartão para a função Crédito.");
+                }
+                if (cartaoEscolhido.getEstaBloqueado()) {
+                    throw new LimiteInsuficienteException("Transação recusada: O cartão informado está bloqueado.");
+                }
+                if (!cartaoEscolhido.getTipoCartao().equalsIgnoreCase("CREDITO") && !cartaoEscolhido.getTipoCartao().equalsIgnoreCase("AMBOS")) {
+                    throw new IllegalArgumentException("Transação recusada: Este cartão não possui a função Crédito.");
+                }
+                if (cartaoEscolhido.getLimiteDisponivel() < valor) {
+                    throw new LimiteInsuficienteException("Transação Recusada: Limite insuficiente no cartão selecionado.");
                 }
 
-                // Se varreu a lista e não encontrou nenhum cartão apto
-                if (cartaoValido == null) {
-                    throw new LimiteInsuficienteException("Transação Recusada: Limite insuficiente em seus cartões de crédito ou nenhum cartão ativo encontrado.");
-                }
-
-                // Deduz o valor do limite disponível do cartão encontrado
-                cartaoValido.setLimiteDisponivel(cartaoValido.getLimiteDisponivel() - valor);
+                cartaoEscolhido.setLimiteDisponivel(cartaoEscolhido.getLimiteDisponivel() - valor);
+                System.out.println("Pagamento no CRÉDITO autorizado.");
 
             } else {
                 throw new IllegalArgumentException("Método de pagamento inválido: " + metodoPagamento);
@@ -105,18 +115,15 @@ public abstract class Conta {
 
             System.out.println("Transação registrada com sucesso ID: " + transacao.getId());
             return true;
-        }
+    }
 
-
-
-    public ArrayList<Transacao> visualizarExtrato(String fluxo, String metodoPagamento, String categoria, Integer diasPeriodo,  String dataEspecifica) {
+    public void visualizarExtrato(String fluxo, String metodoPagamento, String categoria, Integer diasPeriodo,  String dataEspecifica) {
 
         ArrayList<Transacao> transacoesFiltradas = new ArrayList<>();
 
         // 1. Verificação de Extrato Nulo ou Vazio
         if (this.extrato == null || this.extrato.isEmpty()) {
             System.out.println("Nenhuma transação encontrada para esta conta.");
-            return transacoesFiltradas;
         }
 
         // 2. Pega a Data Atual para Cálculo do Período
@@ -178,13 +185,10 @@ public abstract class Conta {
             System.out.println("Nenhuma transação corresponde aos critérios.");
         } else {
             for (Transacao t : transacoesFiltradas) {
-                System.out.printf("[%s %s] %s | %s | %s | Valor: R$ %.2f | Status: %s\n",
-                        t.getData(), t.getHora(), t.getFluxo(), t.getMetodoPagamento(), t.getCategoria(), t.getValor(), t.getStatus());
+                t.visualizarTransacao();
             }
         }
         System.out.println("======================================\n");
-
-        return transacoesFiltradas;
     }
 
 }

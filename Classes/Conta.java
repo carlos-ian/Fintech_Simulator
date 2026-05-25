@@ -26,7 +26,7 @@ public abstract class Conta {
         this.statusConta = "Ativo";
     }
 
-    public boolean realizarTransacao(double valor, String metodoPagamento, String categoria, Conta destino) throws ContaInativaException, SaldoInsuficienteException {
+    public boolean realizarTransacao(double valor, String metodoPagamento, String categoria, Conta destino) throws ContaInativaException, SaldoInsuficienteException, LimiteInsuficienteException {
 
             // 1. Verificação de Cenários: Conta de Origem está Ativa, Conta de Destino Existe e está Ativa
             if (!this.statusConta.equalsIgnoreCase("Ativo")) {
@@ -42,10 +42,30 @@ public abstract class Conta {
                     throw new SaldoInsuficienteException("Saldo insuficiente para realizar o " + metodoPagamento + ".");
                 }
                 this.saldo -= valor;
-            }
-            else if (metodoPagamento.equalsIgnoreCase("CREDITO")) {
-                System.out.println("Processando pagamento via Crédito (validando limite do cartão)...");
-                // Implementação da Lógica de Limite depois
+            } else if (metodoPagamento.equalsIgnoreCase("CREDITO")) {
+                // Busca  cartão válido com a função Crédito ativa e que tenha limite disponível
+                Cartao cartaoValido = null;
+
+                if (this.cartoes != null) {
+                    for (Cartao c : this.cartoes) {
+                        // Verifica se o cartão não está bloqueado e se aceita crédito
+                        if (!c.getEstaBloqueado() && (c.getTipoCartao().equalsIgnoreCase("CREDITO") || c.getTipoCartao().equalsIgnoreCase("AMBOS"))) {
+                            if (c.getLimiteDisponivel() >= valor) {
+                                cartaoValido = c;
+                                break; // Encontrou um cartão capaz de fazer a compra, para a busca
+                            }
+                        }
+                    }
+                }
+
+                // Se varreu a lista e não encontrou nenhum cartão apto
+                if (cartaoValido == null) {
+                    throw new LimiteInsuficienteException("Transação Recusada: Limite insuficiente em seus cartões de crédito ou nenhum cartão ativo encontrado.");
+                }
+
+                // Deduz o valor do limite disponível do cartão encontrado
+                cartaoValido.setLimiteDisponivel(cartaoValido.getLimiteDisponivel() - valor);
+
             } else {
                 throw new IllegalArgumentException("Método de pagamento inválido: " + metodoPagamento);
             }
@@ -87,8 +107,7 @@ public abstract class Conta {
             return true;
         }
 
-        // public boolean receberTransacao(double valor, Conta origem, Conta destino) {}
-        // public ArrayList<Transacao> visualizarExtrato(int periodo) {}
+
 
     public ArrayList<Transacao> visualizarExtrato(String fluxo, String metodoPagamento, String categoria, Integer diasPeriodo,  String dataEspecifica) {
 

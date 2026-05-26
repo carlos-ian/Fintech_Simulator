@@ -16,23 +16,23 @@ public abstract class Conta {
     protected String agencia;
     protected double saldo;
     protected String tipoConta;
-    protected String statusConta;
+    protected Status statusConta;
 
     Conta(String numeroConta, String agencia, double saldo, String tipoConta, String statusConta) {
         this.numeroConta = numeroConta;
         this.agencia = agencia;
         this.saldo = saldo;
         this.tipoConta = tipoConta;
-        this.statusConta = "Ativo";
+        this.statusConta = Status.ATIVO;
     }
 
     public boolean realizarTransacao(double valor, String metodoPagamento, Cartao cartaoEscolhido, String categoria, Conta destino) throws ContaInativaException, SaldoInsuficienteException, LimiteInsuficienteException {
 
             // 1. Verificação de Cenários: Conta de Origem está Ativa, Conta de Destino Existe e está Ativa
-            if (!this.statusConta.equalsIgnoreCase("Ativo")) {
+            if (this.statusConta != Status.ATIVO) {
                 throw new ContaInativaException("Transação recusada: Sua conta não está ativa.");
             }
-            if (destino != null && !destino.statusConta.equalsIgnoreCase("Ativo")) {
+            if (destino != null && destino.statusConta != Status.ATIVO) {
                 throw new ContaInativaException("Transação recusada: A conta de destino não está ativa.");
             }
 

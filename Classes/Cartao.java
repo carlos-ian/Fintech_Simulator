@@ -92,15 +92,7 @@ public class Cartao {
             return;
         }
 
-        // 3. Simulação do envio para o Administrador
-        // boolean resultadoAnalise = admin.analisarPedidoLimite(this, novoLimiteSolicitado);
-        // if (resultadoAnalise) {
-        //     System.out.println("[SISTEMA] Notificação para o cliente: Seu novo limite já está disponível!");
-        // } else {
-        //     System.out.println("[SISTEMA] Notificação para o cliente: Sua solicitação foi recusada pelo Administrador.");
-        // }
-
-        // 4. Mostra se a Solicitação é de Aumento ou de Diminuição
+        // 3. Mostra se a Solicitação é de Aumento ou de Diminuição
         if (novoLimiteSolicitado > this.limiteTotal) {
             System.out.println("Tipo de Pedido: Aumento de Limite");
         } else if (novoLimiteSolicitado < this.limiteTotal) {
@@ -108,6 +100,17 @@ public class Cartao {
         } else {
             System.out.println("Tipo de Pedido: Manter Limite Igual");
         }
+
+        // 4. Envio de Solicitação para Administrador
+        boolean resultadoAnalise = admin.analisarPedidoLimite(this, novoLimiteSolicitado);
+        if (resultadoAnalise) {
+            System.out.println("[SISTEMA] Notificação para o cliente: Seu novo limite já está disponível!");
+            this.limiteTotal = novoLimiteSolicitado;
+            this.setLimiteDisponivel(novoLimiteSolicitado - this.limiteDisponivel);
+        } else {
+             System.out.println("[SISTEMA] Notificação para o cliente: Sua solicitação foi recusada pelo Administrador.");
+        }
+
     }
 
     public String getTipoCartao() {return this.tipoCartao;}

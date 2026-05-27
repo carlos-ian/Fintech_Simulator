@@ -1,8 +1,12 @@
+package Classes;
+
 import javax.swing.*;
-import java.awt.*;
+import java.util.ArrayList;
 import java.util.ArrayList;
 
-public class Principal {
+public class AplicacaoBancaria {
+    public static ArrayList<Investimento> produtosDisponiveis;
+
     public static void main(String[] args) {
 
         int opcao1 = 0;

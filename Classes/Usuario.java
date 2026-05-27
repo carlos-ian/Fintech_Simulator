@@ -1,3 +1,5 @@
+package Classes;
+
 public abstract class Usuario {
 
     protected int id = 0;
@@ -41,5 +43,4 @@ public abstract class Usuario {
                 "\nTELEFONE: " + telefone +
                 "\nTIPO DO USUÁRIO: " + tipoUsuario;
     }
-
 }

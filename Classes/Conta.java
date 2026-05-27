@@ -1,16 +1,18 @@
+package Classes;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import Exceptions.*;
+import Classes.Exceptions.*;
 
 public abstract class Conta {
     protected ArrayList<Transacao> extrato;
     protected ArrayList<Cartao> cartoes;
-    // protected ArrayList<Investimentos> listaInvestimentos;
-    // protected Poupanca poupanca;
+    protected ArrayList<Investimento> listaInvestimentos;
+    protected Poupanca poupanca;
 
     protected String numeroConta;
     protected String agencia;

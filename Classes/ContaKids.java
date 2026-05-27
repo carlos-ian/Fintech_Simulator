@@ -1,3 +1,5 @@
+package Classes;
+
 public class ContaKids extends Conta{
 
     private String cpfResponsavel;

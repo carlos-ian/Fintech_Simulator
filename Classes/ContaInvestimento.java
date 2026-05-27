@@ -1,3 +1,5 @@
+package Classes;
+
 public class ContaInvestimento extends Conta{
 
     private String perfilRisco;
@@ -7,9 +9,4 @@ public class ContaInvestimento extends Conta{
         super(numeroConta, agencia, saldo, tipoConta, statusConta);
         this.perfilRisco = perfilRisco;
     }
-
-    public void comprarAtivo(){
-
-    }
-
 }

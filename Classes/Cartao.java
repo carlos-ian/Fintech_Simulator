@@ -79,7 +79,7 @@ public class Cartao {
         System.out.println("==============================================");
     }
 
-    public void solicitarAjusteLimite(double novoLimiteSolicitado) {
+    public void solicitarAjusteLimite(double novoLimiteSolicitado, Administrador admin, Conta contaVinculada) {
         // 1. Validação para Cartão de Débito
         if (this.tipoCartao.equalsIgnoreCase("DEBITO")) {
             System.out.println("Erro: Não é possível solicitar limite de crédito para um cartão puramente de DÉBITO.");
@@ -102,17 +102,19 @@ public class Cartao {
         }
 
         // 4. Envio de Solicitação para Administrador
-        boolean resultadoAnalise = admin.analisarPedidoLimite(this, novoLimiteSolicitado);
+        boolean resultadoAnalise = admin.analisarPedidoLimite(this, contaVinculada, novoLimiteSolicitado);
         if (resultadoAnalise) {
             System.out.println("[SISTEMA] Notificação para o cliente: Seu novo limite já está disponível!");
+            double limiteUtilizado = this.limiteTotal - this.limiteDisponivel;
             this.limiteTotal = novoLimiteSolicitado;
-            this.setLimiteDisponivel(novoLimiteSolicitado - this.limiteDisponivel);
+            this.setLimiteDisponivel(this.limiteTotal - limiteUtilizado);     
         } else {
              System.out.println("[SISTEMA] Notificação para o cliente: Sua solicitação foi recusada pelo Administrador.");
         }
 
     }
 
+    public double getLimiteTotal() { return this.limiteTotal; }
     public String getTipoCartao() {return this.tipoCartao;}
     public double getLimiteDisponivel() {return limiteDisponivel;}
     public boolean getEstaBloqueado() {return this.estaBloqueado;}

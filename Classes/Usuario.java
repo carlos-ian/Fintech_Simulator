@@ -21,9 +21,11 @@ public abstract class Usuario {
     }
 
     public void encerrarPerfil() {
+
     }
 
     public void alterarDados(){
+
     }
 
     public boolean autenticar() {

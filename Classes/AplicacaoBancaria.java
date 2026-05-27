@@ -73,13 +73,13 @@ public class AplicacaoBancaria {
                         String email = emailField.getText();
                         String senha = new String(senhaField.getPassword()); // Senhas são char[] por segurança
                         String tipoUsuario = "Cliente";
-                        String statusUsuario = "Ativo";
+                        Status statusCliente = Status.ATIVO;
 
                         if (nome.isEmpty() || cpf.isEmpty() || telefone.isEmpty() || dataNascimento.isEmpty() || email.isEmpty() || senha.isEmpty()) {
                             JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos", "Erro", JOptionPane.ERROR_MESSAGE);
 
                         } else {
-                            Cliente cliente = new Cliente(nome, cpf, telefone, dataNascimento, email, senha, tipoUsuario, statusUsuario);
+                            Cliente cliente = new Cliente(nome, cpf, telefone, dataNascimento, email, senha, tipoUsuario, statusCliente);
                             ListaClientes.add(cliente);
                             opcao1 = 0;
 

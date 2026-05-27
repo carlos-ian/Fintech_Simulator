@@ -24,14 +24,89 @@ public abstract class Usuario {
 
     public void encerrarPerfil() {
 
+
+
     }
 
-    public void alterarDados(){
+    public void alterarDados(String tipoDado){
+
+        if ("Nome".equals(tipoDado)) {
+            setNome(nome);
+
+        } else if ("CPF".equals(tipoDado)) {
+            setCpf(cpf);
+
+        } else if ("Email".equals(tipoDado)) {
+            setEmail(email);
+
+        } else if ("Senha".equals(tipoDado)) {
+            setSenha(senha);
+
+        } else if ("Telefone".equals(tipoDado)) {
+            setTelefone(telefone);
+
+        }
 
     }
 
     public boolean autenticar() {
         return false;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public void setDataNascimento(String dataNascimento) {
+        this.dataNascimento = dataNascimento;
+    }
+
+    public void setTipoUsuario(String tipoUsuario) {
+        this.tipoUsuario = tipoUsuario;
+    }
+
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getSenha() {
+        return senha;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public String getDataNascimento() {
+        return dataNascimento;
+    }
+
+    public String getTipoUsuario() {
+        return tipoUsuario;
     }
 
     public String visualizarDados(){

@@ -1,6 +1,8 @@
+package Classes;
+
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
-import Exceptions.*;
+import Classes.Exceptions.*;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;

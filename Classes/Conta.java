@@ -1,16 +1,17 @@
-import java.lang.reflect.Array;
+package Classes;
+
 import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import Exceptions.*;
+import Classes.Exceptions.*;
 
 public abstract class Conta {
     protected ArrayList<Transacao> extrato;
     protected ArrayList<Cartao> cartoes;
-    // protected ArrayList<Investimentos> listaInvestimentos;
-    // protected Poupanca poupanca;
+    protected ArrayList<Investimento> listaInvestimentos;
+    protected Poupanca poupanca;
 
     protected String numeroConta;
     protected String agencia;
@@ -18,7 +19,7 @@ public abstract class Conta {
     protected String tipoConta;
     protected Status statusConta;
 
-    Conta(String numeroConta, String agencia, double saldo, String tipoConta, String statusConta) {
+    Conta(String numeroConta, String agencia, double saldo, String tipoConta) {
         this.numeroConta = numeroConta;
         this.agencia = agencia;
         this.saldo = saldo;
@@ -28,7 +29,6 @@ public abstract class Conta {
 
     public boolean realizarTransacao(double valor, String metodoPagamento, Cartao cartaoEscolhido, String categoria, Conta destino) throws ContaInativaException, SaldoInsuficienteException, LimiteInsuficienteException {
 
-            // 1. Verificação de Cenários: Conta de Origem está Ativa, Conta de Destino Existe e está Ativa
             if (this.statusConta != Status.ATIVO) {
                 throw new ContaInativaException("Transação recusada: Sua conta não está ativa.");
             }
@@ -36,7 +36,6 @@ public abstract class Conta {
                 throw new ContaInativaException("Transação recusada: A conta de destino não está ativa.");
             }
 
-            // 2. Realização da Transferência
             if (metodoPagamento.equalsIgnoreCase("PIX")) {
                 if (this.saldo < valor) {
                     throw new SaldoInsuficienteException("Saldo insuficiente para realizar o PIX.");
@@ -80,7 +79,6 @@ public abstract class Conta {
                 throw new IllegalArgumentException("Método de pagamento inválido: " + metodoPagamento);
             }
 
-            // 3. Recebimento da Transferência
             if (destino != null && (metodoPagamento.equalsIgnoreCase("PIX") || metodoPagamento.equalsIgnoreCase("DEBITO"))) {
                 destino.saldo += valor;
             }
@@ -93,7 +91,6 @@ public abstract class Conta {
             DateTimeFormatter formatadorHora = DateTimeFormatter.ofPattern("HH:mm:ss");
             String horaAtual = horaAgora.format(formatadorHora);
 
-            // 4. Instaciação da Transferência
             Transacao transacao = new Transacao(
                     dataAtual,
                     horaAtual,
@@ -106,7 +103,6 @@ public abstract class Conta {
                     destino
             );
 
-            // 5. Adiciona Transação ao Extrato de Ambos
             this.extrato.add(transacao);
             if (destino != null) {
                 transacao.setTipoFluxo("ENTRADA");
@@ -121,37 +117,27 @@ public abstract class Conta {
 
         ArrayList<Transacao> transacoesFiltradas = new ArrayList<>();
 
-        // 1. Verificação de Extrato Nulo ou Vazio
         if (this.extrato == null || this.extrato.isEmpty()) {
             System.out.println("Nenhuma transação encontrada para esta conta.");
         }
 
-        // 2. Pega a Data Atual para Cálculo do Período
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate hoje = LocalDate.now();
 
         for (Transacao t : this.extrato) {
-            boolean filtro = true; // Todas Começam dentro do Filtro
-            // Saem do filtro se a opção do filtro não foi selecionada ou se for diferente do filtro selecionado
+            boolean filtro = true;
 
-            // 1. Filtro por Fluxo
-            if (fluxo != null && !fluxo.isEmpty() && !t.getFluxo().equalsIgnoreCase(fluxo)) {
-                filtro = false;
-            }
+            if (fluxo != null && !fluxo.isEmpty() && !t.getFluxo().equalsIgnoreCase(fluxo)) {filtro = false;}
 
-            // 2. Filtro por Metodo de Pagamento
             if (filtro && metodoPagamento != null && !metodoPagamento.isEmpty() && !t.getMetodoPagamento().equalsIgnoreCase(metodoPagamento)) {
                 filtro = false;
             }
 
-            // 3. Filtro por Categoria
             if (filtro && categoria != null && !categoria.isEmpty() && !t.getCategoria().equalsIgnoreCase(categoria)) {
                 filtro = false;
             }
 
-            // Tratamento de exceções de data
             try {
-                // 4. Filtro por Período (7, 14 ou 30 dias)
                 if (filtro && diasPeriodo != null && diasPeriodo > 0) {
                     LocalDate dataTransacao = LocalDate.parse(t.getData(), formatter);
                     long diferencaDias = ChronoUnit.DAYS.between(dataTransacao, hoje);
@@ -161,7 +147,6 @@ public abstract class Conta {
                     }
                 }
 
-                // 5. Filtro por Data Específica
                 if (filtro && dataEspecifica != null && !dataEspecifica.isEmpty()) {
                     LocalDate dataTransacao = LocalDate.parse(t.getData(), formatter);
                     LocalDate dataBusca = LocalDate.parse(dataEspecifica, formatter);
@@ -190,5 +175,4 @@ public abstract class Conta {
         }
         System.out.println("======================================\n");
     }
-
 }

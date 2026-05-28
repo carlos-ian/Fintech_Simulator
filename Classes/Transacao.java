@@ -1,3 +1,5 @@
+package Classes;
+
 public class Transacao {
     private static int codigoSequencial = 0;
 

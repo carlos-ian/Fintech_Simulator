@@ -1,4 +1,4 @@
-package Exceptions;
+package Classes.Exceptions;
 
 public class LimiteInsuficienteException extends Exception {
     public LimiteInsuficienteException(String mensagem) {

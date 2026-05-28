@@ -1,4 +1,4 @@
-package Exceptions;
+package Classes.Exceptions;
 
 public class ContaInativaException extends Exception {
     public ContaInativaException(String mensagem) {

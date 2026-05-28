@@ -1,6 +1,7 @@
+package Classes;
+
 public enum Status {
     ATIVO,
-    PENDENTE,
+    INATIVO,
     BLOQUEADO,
-    ENCERRADO
 }

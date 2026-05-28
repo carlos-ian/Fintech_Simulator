@@ -1,6 +1,20 @@
 @startuml
 skinparam classAttributeIconSize 0
 
+enum Status {
+    ATIVO
+    INATIVO
+    BLOQUEADO
+}
+
+class AplicacaoBancaria {
+    {static} + produtosDisponiveis: ArrayList<Investimento>
+    - usuarios: ArrayList<Usuario>
+}
+
+AplicacaoBancaria "1" *-- "0..*" Usuario : gerencia >
+AplicacaoBancaria "1" --> "0..*" Investimento : disponibiliza >
+
 abstract class Usuario {
     # id: int
     # nome: String
@@ -45,21 +59,19 @@ abstract class Conta {
     # agencia: String
     # saldo: double
     # tipoConta: String
-    # statusConta: String
+    # statusConta: Status
 
-    + realizarTransacao(valor: double, destino: Conta, metodo: String): boolean
-    + receberTransacao(valor: double, origem: Conta): void
-    + visualizarExtrato(periodo: int): List<Transacao>
+    + Conta(numeroConta: String, agencia: String, saldo: double, tipoConta: String): void
+    + realizarTransacao(valor: double, metodoPagamento: String, cartaoEscolhido: Cartao, categoria: String, destino: Conta): boolean
+    + visualizarExtrato(fluxo: String, metodoPagamento: String, categoria: String, diasPeriodo: Integer,  dataEspecifica: String): void
 }
 
 class ContaCorrente {
     - limiteChequeEspecial: double
-    + solicitarAumentoLimite(): void
 }
 
 class ContaPoupanca {
     - taxaRendimento: double
-    + aplicarRendimento(): void
 }
 
 class ContaKids {
@@ -69,7 +81,6 @@ class ContaKids {
 
 class ContaInvestimento {
     - perfilRisco: String
-    + comprarAtivo(): void
 }
 
 class Cartao {
@@ -81,15 +92,22 @@ class Cartao {
     - faturaAtual: double
     - estaBloqueado: boolean
 
-    + gerarCartao(titular: String, tipo: String): void
-    + visualizarDados(): Cartao
-    + bloquearCartao(): boolean
-    + ativarCartao(): boolean
-    + visualizarLimite(): double
-    + solicitarAjusteLimite(novoLimite: double): void
+    +Cartao(numeroCartao: String, titular: String, tipoCartao: String, limiteTotal: double, limiteDisponivel: double): void
+    +visualizarDados(): void
+    +bloquearCartao(): boolean
+    +ativarCartao(): boolean
+    +visualizarLimite(): void
+    +solicitarAjusteLimite(novoLimiteSolicitado: double): void
+
+    + getTipoCartao(): String
+    + getLimiteDisponivel(): double
+    + getEstaBloqueado(): boolean
+    + setLimiteDisponivel(limiteDisponivel: double): void
+
 }
 
 class Transacao {
+    {static} - codigoSequencial: int = 0
     - idTransacao: int
     - data: Date
     - hora: Time
@@ -100,6 +118,15 @@ class Transacao {
     - status: String
     - origem: String
     - destino: String
+
+    + Transacao(data: String, hora: String, valor: String, categoria: String, tipoFluxo: String, metodoPagamento: String, status: String, origem: Conta, destino: Conta): voida
+    + visualizarTransacao(): void
+    + getId(): int
+    + getData(): String
+    + getCategoria(): String
+    + getFluxo(): String
+    + getMetodoPagamento(): String
+    + setTipoFluxo(tipoFluxo: String): void
 }
 
 class Investimento {
@@ -110,20 +137,25 @@ class Investimento {
     - dataAplicacao: Date
     - status: String
 
-    + visualizarInvestimentos(): List<Investimento>
-    + realizarInvestimento(valor: double, produto: String): boolean
-    + resgatarInvestimento(idInvestimento: int): double
+    + Investimento(nomeProduto: String, taxaRendimento: double, valorAplicado: double, dataAplicacao: String, Status: String)
+    + toString(): String
+    + visualizarInvestimentosFeitos(conta: Conta): void
+    + visualizarInvestimentosDisponiveis(): void
+    + realizarInvestimento(conta: Conta, produtoSelecionado: Investimento, valorParaInvestir: double, dataAtual: String): boolean
+    + resgatarInvestimento(conta: Conta, idInvestimento: int): boolean
 }
 
 class Poupança {
+    {static} - contador: int
     - idReserva: int
     - nomeReserva: String
     - saldoReservado: double
     - dataCriacao: Date
     - valorMeta: double
     - taxaRendimento: double
-    
-    + visualizarPoupanca(): double
+
+    + Poupanca(nomeReserva: String, saldoReservado: double, dataCriacao: String, valorMeta: double, taxaRendimento: double)
+    + visualizarPoupanca(): String
     + guardar(valor: double): boolean
     + retirar(valor: double): boolean
 }
@@ -144,5 +176,26 @@ Conta "1" *-up- "0..*" Cartao
 Conta "1" *-up- "0..*" Transacao
 Conta "1" -up- "0..*" Investimento : movimenta
 Conta "1" -left- "1" Poupança : reserva
+
+Conta ..> Status : usa
+
+class Exception {
+}
+
+class ContaInativaException <<exception>> {
+  + ContaInativaException(mensagem: String)
+}
+
+class SaldoInsuficienteException <<exception>> {
+  + SaldoInsuficienteException(mensagem: String)
+}
+
+class LimiteInsuficienteException <<exception>> {
+  + LimiteInsuficienteException(mensagem: String)
+}
+
+Exception <|-- ContaInativaException
+Exception <|-- SaldoInsuficienteException
+Exception <|-- LimiteInsuficienteException
 
 @enduml

@@ -1,48 +1,57 @@
+package Classes;
+
 import java.util.ArrayList;
 
 public class Cliente extends Usuario {
     ArrayList<Conta> listaContas = new ArrayList<>();
 
-    private String statusCliente;
+    private Status statusCliente;
 
-    public Cliente(String nome, String cpf, String email, String senha, String dataNascimento, String telefone, String tipoUsuario, String statusCliente) {
+    public Cliente(String nome, String cpf, String email, String senha, String dataNascimento, String telefone, String tipoUsuario, Status statusCliente) {
         super(nome, cpf, email, senha, dataNascimento, telefone, tipoUsuario);
         this.statusCliente = statusCliente;
-        this.id = id+1;
     }
 
-    /*public void abrirConta() {
+    public void abrirConta(String numeroConta, String agencia, double saldo, String tipoConta, String statusConta, double limiteChequeEspecial, double taxaRendimento, String cpfResponsavel, double limiteMensal, String perfilRisco) {
 
-        int opcaoConta;
-        String tipoConta;
+        if (tipoConta == "Conta Corrente") {
 
-        if (opcaoConta == 1) {
+            ContaCorrente contaCorrente = new ContaCorrente(numeroConta, agencia, saldo, tipoConta, statusConta, limiteChequeEspecial);
 
-            tipoConta = "Conta Corrente";
+            listaContas.add(contaCorrente);
 
-            contaCorrente contapoupanca = new contaCorrente();
+        } else if (tipoConta == "Conta Poupança") {
 
-        } else if (opcaoConta == 2) {
-            tipoConta = "Conta Poupança";
+            ContaPoupanca contaPoupanca = new ContaPoupanca(numeroConta, agencia, saldo, tipoConta,
+                    statusConta, taxaRendimento);
 
-            contaPoupanca contapoupanca = new contaPoupanca();
+            listaContas.add(contaPoupanca);
 
-        } else if (opcaoConta == 3) {
-            tipoConta = "Conta Kids";
+        } else if (tipoConta == "Conta Kids") {
 
-            contaKids contacorrente = new contaKids();
+            ContaKids contaKids = new ContaKids(numeroConta, agencia, saldo, tipoConta,
+                    statusConta, cpfResponsavel, limiteMensal);
 
-        } else if (opcaoConta == 4) {
-            tipoConta = "Conta Investimento";
+            listaContas.add(contaKids);
 
-            contaInvestimento contaInvestimento = new contaInvestimento();
+        } else if (tipoConta == "Conta Investimento") {
+
+            ContaInvestimento contaInvestimento = new ContaInvestimento(numeroConta, agencia, saldo, tipoConta,
+                    statusConta, perfilRisco);
+
+            listaContas.add(contaInvestimento);
 
         }
 
     }
-*/
-    public boolean fecharConta() {
-        return false;
-    }
 
+    public boolean fecharConta(Conta conta) {
+        for (int i = 0; i < listaContas.size(); i++) {
+            if (listaContas.get(i) == conta) {
+
+                listaContas.remove(conta);
+            }
+        }
+    return true;
     }
+}

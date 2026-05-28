@@ -1,8 +1,12 @@
+package Classes;
+
 import javax.swing.*;
-import java.awt.*;
+import java.util.ArrayList;
 import java.util.ArrayList;
 
-public class Principal {
+public class AplicacaoBancaria {
+    public static ArrayList<Investimento> produtosDisponiveis;
+
     public static void main(String[] args) {
 
         int opcao1 = 0;
@@ -69,13 +73,13 @@ public class Principal {
                         String email = emailField.getText();
                         String senha = new String(senhaField.getPassword()); // Senhas são char[] por segurança
                         String tipoUsuario = "Cliente";
-                        String statusUsuario = "Ativo";
+                        Status statusCliente = Status.ATIVO;
 
                         if (nome.isEmpty() || cpf.isEmpty() || telefone.isEmpty() || dataNascimento.isEmpty() || email.isEmpty() || senha.isEmpty()) {
                             JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos", "Erro", JOptionPane.ERROR_MESSAGE);
 
                         } else {
-                            Cliente cliente = new Cliente(nome, cpf, telefone, dataNascimento, email, senha, tipoUsuario, statusUsuario);
+                            Cliente cliente = new Cliente(nome, cpf, telefone, dataNascimento, email, senha, tipoUsuario, statusCliente);
                             ListaClientes.add(cliente);
                             opcao1 = 0;
 

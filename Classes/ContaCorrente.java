@@ -1,3 +1,5 @@
+package Classes;
+
 public class ContaCorrente extends Conta{
 
     private double limiteChequeEspecial;
@@ -6,9 +8,5 @@ public class ContaCorrente extends Conta{
                   String statusConta, double limiteChequeEspecial) {
         super(numeroConta, agencia, saldo, tipoConta, statusConta);
         this.limiteChequeEspecial = limiteChequeEspecial;
-    }
-
-    public void solicitarAumentoLimite(){
-
     }
 }

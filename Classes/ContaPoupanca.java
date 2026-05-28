@@ -1,3 +1,5 @@
+package Classes;
+
 public class ContaPoupanca extends Conta{
 
     private double taxaRendimento;
@@ -7,9 +9,4 @@ public class ContaPoupanca extends Conta{
         super(numeroConta, agencia, saldo, tipoConta, statusConta);
         this.taxaRendimento = taxaRendimento;
     }
-
-    public void aplicarRendimento(){
-
-    }
-
 }

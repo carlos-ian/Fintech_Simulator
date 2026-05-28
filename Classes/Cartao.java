@@ -98,7 +98,7 @@ public class Cartao {
         }
 
         // 4. Envio de Solicitação para Administrador
-        boolean resultadoAnalise = admin.analisarPedidoLimite(this, contaVinculada, novoLimiteSolicitado);
+       /* boolean resultadoAnalise = admin.analisarPedidoLimite(this, contaVinculada, novoLimiteSolicitado);
         if (resultadoAnalise) {
             System.out.println("[SISTEMA] Notificação para o cliente: Seu novo limite já está disponível!");
             double limiteUtilizado = this.limiteTotal - this.limiteDisponivel;
@@ -106,7 +106,7 @@ public class Cartao {
             this.setLimiteDisponivel(this.limiteTotal - limiteUtilizado);     
         } else {
              System.out.println("[SISTEMA] Notificação para o cliente: Sua solicitação foi recusada pelo Administrador.");
-        }
+        }*/
 
     }
 

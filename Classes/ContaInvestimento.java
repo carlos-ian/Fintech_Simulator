@@ -6,7 +6,7 @@ public class ContaInvestimento extends Conta{
 
     ContaInvestimento(String numeroConta, String agencia, double saldo, String tipoConta,
                       String statusConta, String perfilRisco) {
-        super(numeroConta, agencia, saldo, tipoConta, statusConta);
+        super(numeroConta, agencia, saldo, tipoConta);
         this.perfilRisco = perfilRisco;
     }
 }

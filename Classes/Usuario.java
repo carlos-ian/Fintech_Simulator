@@ -1,8 +1,13 @@
 package Classes;
 
-public abstract class Usuario {
+import javax.swing.*;
+import java.util.ArrayList;
+import org.mindrot.jbcrypt.BCrypt;
 
-    protected int id = 0;
+public abstract class Usuario {
+    private static int cod_sequencial = 0;
+
+    protected int id;
     protected String nome;
     protected String cpf;
     protected String email;
@@ -19,16 +24,15 @@ public abstract class Usuario {
         this.dataNascimento = dataNascimento;
         this.telefone = telefone;
         this.tipoUsuario = tipoUsuario;
-        this.id++; // Não esquece de corrigir o código e o id, man
+        this.id = cod_sequencial++;
     }
 
-    public boolean autenticar() { // Parâmetros: Email/CPF (Identificador) e senha descriptograda
         // 1. Busca Usuário na lista de Usuários da Aplicação Bancária baseado no identificador (CPF/Email)
         // Se quiser, divide em lista de cliente e lista de administradores, mas você que sabe
 
         // 2. Se o Usuário foi encontrado, verifica se a senha enviada é igual a senha criptograda do usuário
         // encontrado
-        // if (BCrypt.checkpw(senha enviada, senha criptografada do usuário)) {return true}
+        // if (BCrypt.checkpw(senha enviada, senha criptografada do usuário)) {return true;}
 
         // Retorna false, se não encontrar usuário ou senha estiver diferente
 
@@ -37,7 +41,19 @@ public abstract class Usuario {
 
         // OBS: Não esqueça do import org.mindrot.jbcrypt.BCrypt;
 
-        return false;
+    public static boolean autenticar(String cpf, String senha) { // Parâmetros: Email/CPF (Identificador) e senha descriptograda
+
+        Usuario encontrado = null;
+        for (Usuario u : AplicacaoBancaria1.ListaUsuarios) {
+            if (u.getCpf().equals(cpf)) {
+                encontrado = u;
+                break;
+            }
+
+        }
+
+        return BCrypt.checkpw(senha, encontrado.getSenha());
+
     }
 
     public void encerrarPerfil() { // Parâmetros: Perfil do Usuário e talvez, CPF/Email e senha

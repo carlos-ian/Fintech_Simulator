@@ -19,7 +19,7 @@ public class Administrador extends Usuario {
         super(nome, cpf, email, senha, dataNascimento, telefone, tipoUsuario);
         this.matricula = matricula;
     }
-
+/*
     // ========================================================================
     // RF16 - Gerenciamento de Contas e Perfis
     // ========================================================================
@@ -186,7 +186,7 @@ public class Administrador extends Usuario {
 
     /**
      * Salva a lista atual de investimentos no arquivo CSV.
-     */
+
     public void salvarVitrineCSV(ArrayList<Investimento> vitrine) {
         String caminhoArquivo = "vitrine_investimentos.csv";
 
@@ -215,7 +215,7 @@ public class Administrador extends Usuario {
 
     /**
      * Carrega os dados do arquivo CSV e preenche a lista do sistema ao iniciar.
-     */
+
     public void carregarVitrineCSV(ArrayList<Investimento> vitrine) {
         String caminhoArquivo = "vitrine_investimentos.csv";
         vitrine.clear(); // Limpa a lista atual para evitar duplicação
@@ -473,4 +473,5 @@ public class Administrador extends Usuario {
         }
         return null;
     }
+*/
 }

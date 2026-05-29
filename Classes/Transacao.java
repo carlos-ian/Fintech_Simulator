@@ -32,6 +32,10 @@ public class Transacao {
     public  String getCategoria () {return this.categoria;}
     public  String getFluxo () {return this.tipoFluxo;}
     public  String getMetodoPagamento () {return this.metodoPagamento;}
+    public  String getStatus () {return this.status;}
+    public  Conta getOrigem () {return this.origem;}
+    public  Conta getDestino () {return this.destino;}
+    public double getValor () {return this.valor;}
 
     public void setTipoFluxo(String tipoFluxo) {this.tipoFluxo = tipoFluxo;}
 

@@ -102,4 +102,8 @@ public class Investimento {
                 "\nData aplicação: " + dataAplicacao +
                 "\nStatus: " + Status + "\n";
     }
+
+    public void setNomeProduto(String nomeProduto) {this.nomeProduto = nomeProduto;}
+    public void setTaxaRendimento(double taxaRendimento) {this.taxaRendimento = taxaRendimento;}
+    public void setStatus(String status) {this.Status = status;}
 }

@@ -6,31 +6,52 @@ import org.mindrot.jbcrypt.BCrypt;
 
 public class AplicacaoBancaria1 {
         public static ArrayList<Usuario> ListaUsuarios = new ArrayList<>();
+        public static ArrayList<Investimento> produtosDisponiveis = new ArrayList<>();
+
     public static void main(String[] args) {
 
-        // Opções:
-        // 1. Fazer Login
-        // 2. Criar Nova Conta de Usuário
-        // 3. Sair
-
         int menu = 0;
-
         while (menu == 0) {
-            menu = Integer.parseInt(JOptionPane.showInputDialog
-                    ("===============================\n" +
+            String stringMenu = JOptionPane.showInputDialog(
+                    "===============================\n" +
                             "SEJA BEM VINDO AO NOSSO SISTEMA\n" +
                             "===============================\n" +
                             "1 - Fazer Login\n" +
                             "2 - Criar uma conta\n" +
-                            "3 - Sair\n"));
+                            "3 - Sair\n");
+
+            if (stringMenu == null) {
+                System.out.println("Sistema encerrado pelo usuário.");
+                return;
+            }
+
+            try {
+                menu = Integer.parseInt(stringMenu);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Opção inválida! Digite apenas números.");
+                menu = 0;
+                continue;
+            }
 
             if (menu == 1) {
-                int login;
-
-                login = Integer.parseInt(JOptionPane.showInputDialog("Quem é você?\n" +
+                String stringLogin = JOptionPane.showInputDialog("Quem é você?\n" +
                         "1 - Sou Cliente\n" +
                         "2 - Sou Administrador\n" +
-                        "3 - Voltar"));
+                        "3 - Voltar");
+
+                if (stringLogin == null) {
+                    menu = 0;
+                    continue;
+                }
+
+                int login;
+                try {
+                    login = Integer.parseInt(stringLogin);
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(null, "Opção inválida!");
+                    menu = 0;
+                    continue;
+                }
 
                 if (login == 1) {
                     JTextField cpfField = new JTextField();
@@ -40,38 +61,32 @@ public class AplicacaoBancaria1 {
                             "Realizando Login...\n",
                             "CPF:", cpfField,
                             "Senha:", senhaField
-
                     };
 
                     while (login == 1) {
-                    int opcao = JOptionPane.showConfirmDialog(null, loginCliente, "Cadastro", JOptionPane.OK_CANCEL_OPTION);
+                        int opcao = JOptionPane.showConfirmDialog(null, loginCliente, "Cadastro", JOptionPane.OK_CANCEL_OPTION);
 
-                    if (opcao == JOptionPane.OK_OPTION) {
-                        String cpf = cpfField.getText();
-                        String senha = senhaField.getText();
+                        if (opcao == JOptionPane.OK_OPTION) {
+                            String cpf = cpfField.getText();
+                            String senha = new String(senhaField.getPassword());
 
-                        if (cpf.isEmpty() || senha.isEmpty()) {
-                            JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos", "Erro", JOptionPane.ERROR_MESSAGE);
-                        } else {
-                            // Realizar autenticação + levar ao menu
-
-                            if (Usuario.autenticar(cpf, senha)){
-                                JOptionPane.showMessageDialog(null, "Sucesso");
-
-                                AplicacaoBancaria1.menuPrincipalCliente();
-
+                            if (cpf.isEmpty() || senha.isEmpty()) {
+                                JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos", "Erro", JOptionPane.ERROR_MESSAGE);
                             } else {
-                                JOptionPane.showMessageDialog(null, "Senha/CPF Inválidos, Try again");
+                                if (Usuario.autenticar(cpf, senha)) {
+                                    JOptionPane.showMessageDialog(null, "Sucesso");
+                                    AplicacaoBancaria1.menuPrincipalCliente();
+                                    menu = 0;
+                                    break;
+                                } else {
+                                    JOptionPane.showMessageDialog(null, "Senha/CPF Inválidos, Try again");
+                                }
                             }
-
-                            }
-
                         } else {
-
-                        System.out.println("Login cancelado.");
-                        menu = 0;
-
-                    }
+                            System.out.println("Login cancelado.");
+                            menu = 0;
+                            break;
+                        }
                     }
 
                 } else if (login == 2) {
@@ -82,53 +97,63 @@ public class AplicacaoBancaria1 {
                             "Realizando Login...\n",
                             "CPF:", cpfField,
                             "Senha:", senhaField
-
                     };
 
                     while (login == 2) {
-                    int opcao = JOptionPane.showConfirmDialog(null, loginADM, "Cadastro", JOptionPane.OK_CANCEL_OPTION);
+                        int opcao = JOptionPane.showConfirmDialog(null, loginADM, "Cadastro", JOptionPane.OK_CANCEL_OPTION);
 
                         if (opcao == JOptionPane.OK_OPTION) {
                             String cpf = cpfField.getText();
-                            String senha = senhaField.getText();
+                            String senha = new String(senhaField.getPassword());
 
                             if (cpf.isEmpty() || senha.isEmpty()) {
                                 JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos", "Erro", JOptionPane.ERROR_MESSAGE);
                             } else {
-                                // Realizar autenticação + levar ao menu
-
-                                if (Usuario.autenticar(cpf, senha)){
+                                if (Usuario.autenticar(cpf, senha)) {
                                     JOptionPane.showMessageDialog(null, "Sucesso");
                                     AplicacaoBancaria1.menuPrincipalAdministrador();
-
+                                    menu = 0;
+                                    break;
                                 } else {
                                     JOptionPane.showMessageDialog(null, "Senha/CPF Inválidos, Try again");
                                 }
                             }
                         } else {
-
                             System.out.println("Login cancelado.");
                             menu = 0;
-
+                            break;
                         }
                     }
 
                 } else if (login == 3) {
                     JOptionPane.showMessageDialog(null, "Voltando...");
                     menu = 0;
-
+                } else {
+                    JOptionPane.showMessageDialog(null, "Opção inválida!");
+                    menu = 0;
                 }
 
             } else if (menu == 2) {
-                int cadastro;
-
-                cadastro = Integer.parseInt(JOptionPane.showInputDialog("Qual perfil deseja-se criar??\n" +
+                String stringCadastro = JOptionPane.showInputDialog("Qual perfil deseja-se criar??\n" +
                         "1 - Perfil para cliente\n" +
                         "2 - Perfil para Administrador\n" +
-                        "3 - Voltar"));
+                        "3 - Voltar");
+
+                if (stringCadastro == null) {
+                    menu = 0;
+                    continue;
+                }
+
+                int cadastro;
+                try {
+                    cadastro = Integer.parseInt(stringCadastro);
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(null, "Opção inválida!");
+                    menu = 0;
+                    continue;
+                }
 
                 if (cadastro == 1) {
-
                     JTextField nomeField = new JTextField();
                     JTextField cpfField = new JTextField();
                     JTextField telefoneField = new JTextField();
@@ -137,7 +162,7 @@ public class AplicacaoBancaria1 {
                     JTextField dataNascimentoField = new JTextField();
 
                     Object[] mensagem = {
-                            "Vamos Criar sua conta, porfavor preencha os campos:\n",
+                            "Vamos Criar sua conta, por favor preencha os campos:\n",
                             "Nome: ", nomeField,
                             "CPF: ", cpfField,
                             "Telefone: ", telefoneField,
@@ -147,7 +172,6 @@ public class AplicacaoBancaria1 {
                     };
 
                     while (cadastro == 1) {
-
                         int opcao = JOptionPane.showConfirmDialog(null, mensagem, "Cadastro", JOptionPane.OK_CANCEL_OPTION);
 
                         if (opcao == JOptionPane.OK_OPTION) {
@@ -156,32 +180,28 @@ public class AplicacaoBancaria1 {
                             String telefone = telefoneField.getText();
                             String dataNascimento = dataNascimentoField.getText();
                             String email = emailField.getText();
-                            String senha = new String(senhaField.getPassword()); // Senhas são char[] por segurança
+                            String senha = new String(senhaField.getPassword());
                             String tipoUsuario = "Cliente";
                             Status statusCliente = Status.ATIVO;
 
                             if (nome.isEmpty() || cpf.isEmpty() || telefone.isEmpty() || dataNascimento.isEmpty() || email.isEmpty() || senha.isEmpty()) {
                                 JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos", "Erro", JOptionPane.ERROR_MESSAGE);
-
                             } else {
                                 String senhaCriptografada = BCrypt.hashpw(senha, BCrypt.gensalt(12));
-                                Cliente cliente = new Cliente(nome, cpf, telefone, dataNascimento, email, senhaCriptografada, tipoUsuario, statusCliente);
+                                Cliente cliente = new Cliente(nome, cpf, email, senhaCriptografada, dataNascimento, telefone, tipoUsuario, statusCliente);
                                 AplicacaoBancaria1.ListaUsuarios.add(cliente);
                                 cadastro = 0;
                                 menu = 0;
-
-                                continue;
+                                break;
                             }
-
                         } else {
                             System.out.println("Cadastro cancelado.");
+                            cadastro = 0;
                             menu = 0;
-
                         }
-                        }
+                    }
 
                 } else if (cadastro == 2) {
-
                     JTextField nomeField = new JTextField();
                     JTextField cpfField = new JTextField();
                     JTextField telefoneField = new JTextField();
@@ -191,7 +211,7 @@ public class AplicacaoBancaria1 {
                     JTextField matriculaField = new JTextField();
 
                     Object[] mensagem = {
-                            "Vamos Criar sua conta, porfavor preencha os campos:\n",
+                            "Vamos Criar sua conta, por favor preencha os campos:\n",
                             "Nome: ", nomeField,
                             "CPF: ", cpfField,
                             "Telefone: ", telefoneField,
@@ -202,7 +222,6 @@ public class AplicacaoBancaria1 {
                     };
 
                     while (cadastro == 2) {
-
                         int opcao = JOptionPane.showConfirmDialog(null, mensagem, "Cadastro", JOptionPane.OK_CANCEL_OPTION);
 
                         if (opcao == JOptionPane.OK_OPTION) {
@@ -211,115 +230,111 @@ public class AplicacaoBancaria1 {
                             String telefone = telefoneField.getText();
                             String dataNascimento = dataNascimentoField.getText();
                             String email = emailField.getText();
-                            String senha = new String(senhaField.getPassword()); // Senhas são char[] por segurança
-                            String tipoUsuario = "Cliente";
+                            String senha = new String(senhaField.getPassword());
+                            String tipoUsuario = "Administrador";
                             String matricula = matriculaField.getText();
 
                             if (nome.isEmpty() || cpf.isEmpty() || telefone.isEmpty() || dataNascimento.isEmpty() || email.isEmpty() || senha.isEmpty() || matricula.isEmpty()) {
                                 JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos", "Erro", JOptionPane.ERROR_MESSAGE);
-
                             } else {
                                 String senhaCriptografada = BCrypt.hashpw(senha, BCrypt.gensalt(12));
-                                Administrador administrador = new Administrador(nome, cpf, telefone, dataNascimento, email, senhaCriptografada, tipoUsuario, matricula);
+                                Administrador administrador = new Administrador(nome, cpf, email, senhaCriptografada, dataNascimento, telefone, tipoUsuario, matricula);
                                 ListaUsuarios.add(administrador);
                                 cadastro = 0;
                                 menu = 0;
-
-                                continue;
+                                break;
                             }
-
                         } else {
                             System.out.println("Cadastro cancelado.");
+                            cadastro = 0;
                             menu = 0;
-
                         }
                     }
 
                 } else if (cadastro == 3) {
                     JOptionPane.showMessageDialog(null, "Voltando...");
-                    menu =0;
+                    menu = 0;
+                } else {
+                    JOptionPane.showMessageDialog(null, "Opção inválida!");
+                    menu = 0;
                 }
 
             } else if (menu == 3) {
                 JOptionPane.showMessageDialog(null, "...ENCERRANDO O SISTEMA...");
                 return;
+            } else {
+                JOptionPane.showMessageDialog(null, "Opção inválida!");
+                menu = 0;
             }
-                }
-                // Se for opção 1, mostre a opção de Login como Cliente, Login como Admnistrador e Voltar
-                // O Login deve ser feito usando Email/CPF (escolha um) e senha
-                // Chame o metodo de autenticar para validar e direcione para o menu correspodente ao usuário
-                // se a validação for true
-
-                // Se for opção 2, mostra a opção de Criar Conta como Cliente, Criar Conta como Administrador e Voltar
-                // Criar conta deve ter os campos relacionados as informações do perfil de usuário
-                // Para o administrador, adicione um campo em que deve ser enviado a matrícula para validar se
-                // ele pode ser realmente criado
-                // A senha deve ser salva de forma criptografa, para isso no construtor do Usuário ou no menu antes
-                // de enviar a senha, faça: senhaCriptografada = BCrypt.hashpw(senha, BCrypt.gensalt(12));
-                // No final, enviei as informações coletadas para o construtor e adicione o usuário a lista da Aplicação
-
-                // OBS: Não esqueça do import org.mindrot.jbcrypt.BCrypt;
-
-            } // Menu de Entrada -> Autenticação e Criação de Perfil
-
-            public static void menuPrincipalCliente () {
-                // Menu Principal com Funcionalidades do Cliente
-
-                int mpC = 0;
-                mpC = Integer.parseInt(JOptionPane.showInputDialog("1 - Configuração ou Perfil\n" +
-                        "2 - Realizar Transação\n" +
-                        "3 - Visualizar Extrato\n" +
-                        "4 - Gestão de Cartões\n" +
-                        "5 - Investimentos e Poupança\n" +
-                        "6 - Sair"));
-            }
-
-            public static void menuPrincipalAdministrador () {
-
-                int mpADM = 0;
-
-                mpADM = Integer.parseInt(JOptionPane.showInputDialog("1- Configuração ou Perfil\n" +
-                        "2 - Consultar Cliente\n" +
-                        "3 - Analisar Solicitações de Ajuste de Limite\n" +
-                        "4 - Manutenção de Investimentos\n" +
-                        "5 - Relatório Geral\n" +
-                        "6 - Sair"));
-
-            } // Menu Principal com Funcionalidades do Administrador
-
-            // Dentro do Menu do Cliente, terá as opções:
-            // 1. Configuração ou Perfil
-            // 2. Realizar Transação
-            // 3. Visualizar Extrato
-            // 4. Gestão de Cartões
-            // 5. Investimentos e Poupança
-
-            // Dentro do Menu do Administrador, terá as opções:
-            // 1. Configuração ou Perfil
-            // 2. Consultar/Buscar Cliente --> Bloquear Perfil, Desbloquear Perfil, Bloquear Conta,
-            // Desbloquear Conta, Historico de Transacoes, Estornar Transacao
-            // 3. Analisar Solicitações de Ajuste de Limite
-            // 4. Manutenção de Investimentos --> Adição, Remoção ou Edição
-            // 5. Relatório Geral
-
-            public void configuracoes () {
-
-            int config =0;
-
-            Integer.parseInt(JOptionPane.showInputDialog("1 - Excluir Perfil\n" +
-                    "2 - Alterar Dados do Perfil\n" +
-                    "3 - Visualizar Dados do Perfil\n" +
-                    "4 - Voltar"));
-
-            } // Menu de Configurações do Cliente
-
-            // Opções:
-            // 1. Excluir Perfil
-            // 3. Alterar Dados do Perfil
-            // 4. Visualizar Dados do Perfil
-            // 5. Voltar
-            // Para cada opção, colete os dados necessarios e chame os metodos necessarios
-            // Mostre mensagem de confirmacao da operacao no final
         }
+    }
 
+    public static void menuPrincipalCliente () {
 
+        int mpC = 0;
+        mpC = Integer.parseInt(JOptionPane.showInputDialog("1 - Configuração ou Perfil\n" +
+                "2 - Realizar Transação\n" +
+                "3 - Visualizar Extrato\n" +
+                "4 - Gestão de Cartões\n" +
+                "5 - Investimentos e Poupança\n" +
+                "6 - Sair"));
+
+        // Opção 1 -> Leva ao menu de configuracoes (dessa classe)
+
+        // Opção 2 -> Coleta informações necessárias para realizar transação e chama metodo de
+        // realizar transação da classe Conta (OBS: uma conta instaciada deve chamar esse metodo,
+        // ou seja, conta1.realizarTranscao(), logo, pergunte qual conta da lista será utilizada
+        // Para isso, pode chamar um metodo de listar contas
+
+        // Opção 3 -> Apenas chama metodo de visualizar extrato, de modo que a conta instaciada
+        // que deve também chamar esse metodo
+
+        // OBS: Para facilitar, se quiser, no menu principal de cliente liste todas as contas
+        // do cliente e pergunte qual será usada, permitindo voltar e trocar a conta com alguma opção
+        // Creio que assim é mais fácil
+
+        // Opção 4 -> Leva ao menu de Gestão de Cartões (dessa classe)
+
+        // Opção 5 -> Leva ao menu de Investimentos e Poupança (dessa classe)
+
+        // Opção 6 -> Volta para Menu Inicial de Login
+    }
+
+    public static void menuPrincipalAdministrador () {
+
+        int mpADM = 0;
+
+        mpADM = Integer.parseInt(JOptionPane.showInputDialog("1- Configuração ou Perfil\n" +
+                "2 - Consultar Cliente\n" +
+                "3 - Analisar Solicitações de Ajuste de Limite\n" +
+                "4 - Manutenção de Investimentos\n" +
+                "5 - Relatório Geral\n" +
+                "6 - Sair"));
+
+        // Opção 1 -> Leva ao menu de configuracoes (dessa classe)
+
+        // Opção 2 -> Leva ao menu de consultarCliente (dessa classe)
+
+        // Opção 3 -> Chama metodo de Analisar Solicitacoes de Ajuste de Limite
+
+        // Opção 4 -> Leva ao menu de manutencaInvestimentos (dessa classe)
+
+        // Opção 5 -> Chama metodo de Relatorio Geral
+
+        // Opção 6 -> Volta para Menu Inicial de Login
+    }
+
+    public void configuracoes () {
+
+        int config =0;
+        Integer.parseInt(JOptionPane.showInputDialog("1 - Excluir Perfil\n" +
+                "2 - Alterar Dados do Perfil\n" +
+                "3 - Visualizar Dados do Perfil\n" +
+                "4 - Voltar"));
+
+        // Opção 1 -> Chama metodo de Excluir Perfil
+        // Opção 2 -> Chama metodo de Alterar Dados
+        // Opção 3 -> Chama metodo de Visualizar Dados
+
+    }
+}

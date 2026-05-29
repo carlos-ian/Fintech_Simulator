@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 public class Cliente extends Usuario {
     ArrayList<Conta> listaContas = new ArrayList<>();
-
     private Status statusCliente;
 
     public Cliente(String nome, String cpf, String email, String senha, String dataNascimento, String telefone, String tipoUsuario, Status statusCliente) {
@@ -12,46 +11,57 @@ public class Cliente extends Usuario {
         this.statusCliente = statusCliente;
     }
 
-    public void abrirConta(String numeroConta, String agencia, double saldo, String tipoConta, String statusConta, double limiteChequeEspecial, double taxaRendimento, String cpfResponsavel, double limiteMensal, String perfilRisco) {
+    @Override
+    public void alterarDados(String tipoDado, String novoValor) {
+        if ("Contas".equalsIgnoreCase(tipoDado) || "Status".equalsIgnoreCase(tipoDado)) {
+            throw new IllegalArgumentException("Não é permitido alterar as contas ou o status do cliente por este método.");
+        }
+        super.alterarDados(tipoDado, novoValor);
+    }
 
-        if (tipoConta == "Conta Corrente") {
+    @Override
+    public String visualizarDados() {
+        String dadosBasicos = super.visualizarDados();
 
-            ContaCorrente contaCorrente = new ContaCorrente(numeroConta, agencia, saldo, tipoConta, statusConta, limiteChequeEspecial);
+        String dadosContas = "";
+        if (this.listaContas == null || this.listaContas.isEmpty()) {
+            dadosContas = "\nCONTAS: Nenhuma conta vinculada.";
+        } else {
+            dadosContas = "\nCONTAS ATIVAS:";
+            for (Conta c : this.listaContas) {
+                dadosContas += "\n  - Agência: " + c.getAgencia() + " | Número: " + c.getNumeroConta() + " | Saldo: R$ " + c.getSaldo();
+            }
+        }
+        return dadosBasicos +
+                "\nSTATUS DO CLIENTE: " + this.statusCliente + dadosContas;
+    }
 
+    public void abrirConta(String numeroConta, String agencia, double saldo, String tipoConta,
+                           double limiteChequeEspecial, double taxaRendimento, String cpfResponsavel,
+                           double limiteMensal, String perfilRisco) {
+
+        if (tipoConta.equalsIgnoreCase("Conta Corrente")) {
+            ContaCorrente contaCorrente = new ContaCorrente(numeroConta, agencia, saldo, tipoConta, limiteChequeEspecial);
             listaContas.add(contaCorrente);
 
-        } else if (tipoConta == "Conta Poupança") {
-
-            ContaPoupanca contaPoupanca = new ContaPoupanca(numeroConta, agencia, saldo, tipoConta,
-                    statusConta, taxaRendimento);
-
+        } else if (tipoConta.equalsIgnoreCase("Conta Poupança")) {
+            ContaPoupanca contaPoupanca = new ContaPoupanca(numeroConta, agencia, saldo, tipoConta, taxaRendimento);
             listaContas.add(contaPoupanca);
 
-        } else if (tipoConta == "Conta Kids") {
-
-            ContaKids contaKids = new ContaKids(numeroConta, agencia, saldo, tipoConta,
-                    statusConta, cpfResponsavel, limiteMensal);
-
+        } else if (tipoConta.equalsIgnoreCase("Conta Kids")) {
+            ContaKids contaKids = new ContaKids(numeroConta, agencia, saldo, tipoConta, cpfResponsavel, limiteMensal);
             listaContas.add(contaKids);
 
-        } else if (tipoConta == "Conta Investimento") {
-
-            ContaInvestimento contaInvestimento = new ContaInvestimento(numeroConta, agencia, saldo, tipoConta,
-                    statusConta, perfilRisco);
-
+        } else if (tipoConta.equalsIgnoreCase("Conta Investimento")) {
+            ContaInvestimento contaInvestimento = new ContaInvestimento(numeroConta, agencia, saldo, tipoConta, perfilRisco);
             listaContas.add(contaInvestimento);
-
         }
-
     }
 
     public boolean fecharConta(Conta conta) {
-        for (int i = 0; i < listaContas.size(); i++) {
-            if (listaContas.get(i) == conta) {
-
-                listaContas.remove(conta);
-            }
-        }
-    return true;
+        return listaContas.remove(conta);
     }
+
+    public ArrayList<Conta> obterContas() {return this.listaContas;}
+
 }

@@ -27,78 +27,70 @@ public abstract class Usuario {
         this.id = cod_sequencial++;
     }
 
-        // 1. Busca Usuário na lista de Usuários da Aplicação Bancária baseado no identificador (CPF/Email)
-        // Se quiser, divide em lista de cliente e lista de administradores, mas você que sabe
+    public static Usuario autenticar(String cpf, String senha) {
 
-        // 2. Se o Usuário foi encontrado, verifica se a senha enviada é igual a senha criptograda do usuário
-        // encontrado
-        // if (BCrypt.checkpw(senha enviada, senha criptografada do usuário)) {return true;}
-
-        // Retorna false, se não encontrar usuário ou senha estiver diferente
-
-        // OBS: Se quiser, pode fazer esse processo verificando primeiro na lista de clientes
-        // E depois repitir o código com a lista de admnistradores.
-
-        // OBS: Não esqueça do import org.mindrot.jbcrypt.BCrypt;
-
-    public static boolean autenticar(String cpf, String senha) { // Parâmetros: Email/CPF (Identificador) e senha descriptograda
-
-        Usuario encontrado = null;
         for (Usuario u : AplicacaoBancaria1.ListaUsuarios) {
             if (u.getCpf().equals(cpf)) {
-                encontrado = u;
-                break;
+                if(BCrypt.checkpw(senha, u.getSenha())) {
+                    return u;
+                }
+            }
+        }
+        return null;
+    }
+
+    public void encerrarPerfil(Usuario u, String senha) {
+
+        if (!u.getSenha().equals(senha)) {
+            throw new IllegalArgumentException("Falha na confirmação: Credenciais inválidas.");
+        }
+
+        if (u instanceof Cliente) {
+            Cliente cliente = (Cliente) u;
+            double saldoTotal = 0;
+
+            for (Conta conta : cliente.listaContas) {
+                saldoTotal += conta.getSaldo();
             }
 
+            if (saldoTotal != 0) {
+                throw new IllegalStateException("Não é possível encerrar: o cliente possui saldo em conta.");
+            }
         }
-
-        return BCrypt.checkpw(senha, encontrado.getSenha());
-
+        AplicacaoBancaria1.ListaUsuarios.remove(u);
     }
 
-    public void encerrarPerfil() { // Parâmetros: Perfil do Usuário e talvez, CPF/Email e senha
-        // 1. Antes de encerrar ou excluir o perfil do usuário, verifique se ele é cliente ou não
-        // Se for cliente, só poderá excluir se o saldo de todas suas contas = 0
+    public void alterarDados(String tipoDado, String novoValor) {
 
-        // 2. Após essa verificação, implemente uma forma de confirmação da exclusão
-        // Ou seja, utilize o cpf/email e a senha do que o usuário deve passar para confirmar que ele
-        // quer excluir, verificando se essas credenciais é de seu perfil mesmo
-        // Entretanto, se quiser, pode apenas fazer uma confirmação simples sem CPF/Email e senha
-        // O importante é ter a confirmação de alguma forma
-
-        // 3. Por fim, remove o usuário da lista de usuários da aplicação
-    }
-
-    public void desativarAtivarPerfil() {
-        // 1. Muda o status do perfil do usuário para inativo ou ativo
-        // 2. Muda o status das contas do usuário, se for cliente, para inativo ou ativo
-
-        // Pense em como você quer representar esses estados, ou seja, quais restrições o
-        // usuário vai ter com o perfil desativado
-        // A minha ideia é que ele pudesse logar e ver seus dados de perfil normalmente
-        // Mas não poderia realizar nada além de suas configurações de perfil
-    } // Isso é apenas uma ideia, se quiser pular essa parte por enquanto, fale comigo
-
-    public void alterarDados(String tipoDado){ // Parâmetros: Tipo de Dado e Novo Valor
-        // A forma como você fez está certa, mas acho que poderia adicionar data de nascimento também
-        // Pode ser que a pessoa acabe colocando a data errada ou sla
-        if ("Nome".equals(tipoDado)) {
-            setNome(nome); // em vez de passar nome, passe o Novo Valor setNome(novoValor) por exemplo
-
-        } else if ("CPF".equals(tipoDado)) {
-            setCpf(cpf);
-
-        } else if ("Email".equals(tipoDado)) {
-            setEmail(email);
-
-        } else if ("Senha".equals(tipoDado)) {
-            setSenha(senha); // Não esquece de criptografar a nova senha, nesse caso
-
-        } else if ("Telefone".equals(tipoDado)) {
-            setTelefone(telefone);
-
+        if ("Nome".equalsIgnoreCase(tipoDado)) {
+            this.setNome(novoValor);
+        } else if ("CPF".equalsIgnoreCase(tipoDado)) {
+            this.setCpf(novoValor);
+        } else if ("Email".equalsIgnoreCase(tipoDado)) {
+            this.setEmail(novoValor);
+        } else if ("Senha".equalsIgnoreCase(tipoDado)) {
+            String senhaCriptografada = BCrypt.hashpw(novoValor, BCrypt.gensalt(12));
+            this.setSenha(senhaCriptografada);
+        } else if ("Telefone".equalsIgnoreCase(tipoDado)) {
+            this.setTelefone(novoValor);
+        } else if ("DataNascimento".equalsIgnoreCase(tipoDado)) {
+            this.setDataNascimento(novoValor);
+        } else {
+            throw new IllegalArgumentException("Tipo de dado inválido");
         }
     }
+
+    public String visualizarDados() {
+        return "\n=== DADOS DO PERFIL ===" +
+                "\nUSUÁRIO: " + this.nome +
+                "\nCPF: " + this.cpf +
+                "\nE-MAIL: " + this.email +
+                "\nSENHA: **********" +
+                "\nDATA DE NASCIMENTO: " + this.dataNascimento +
+                "\nTELEFONE: " + this.telefone;
+    }
+
+
 
     public void setTelefone(String telefone) {
         this.telefone = telefone;
@@ -157,19 +149,4 @@ public abstract class Usuario {
         return tipoUsuario;
     }
 
-    public String visualizarDados(){ // Se quiser, já printa aqui em vez de retornar a string
-        return "\nUSUÁRIO: " + nome +
-                "\nCPF: " + cpf +
-                "\nE-MAIL: " + email +
-                "\nSENHA: ********" + // Pode mostrar a os primeiros digitos se quiser
-                "\nDATA DE NASCIMENTO: " + dataNascimento +
-                "\nTELEFONE: " + telefone +
-                "\nTIPO DO USUÁRIO: " + tipoUsuario; // Pode tirar esse aqui
-    } // Você tem duas formas de fazer esse de visualizar os Dados:
-    // 1. Polimorfismo: Usuário tem esse metodo de visualizar os dados já implementado (com esse código aí)
-    // Os filhos de usuário (Cliente e Administrador), vai fazer a sobrescrita (override) desse metodo
-    // chamando o super e adicionando os seus atributos depois
-
-    // 2. Metodo Abstrato: Coloque esse metodo com abstrato e não coloque nenhum codigo dentro
-    // Os filhos vão implementa-lo obrigatoriamente mostrando todos seus dados
 }

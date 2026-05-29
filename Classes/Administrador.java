@@ -11,14 +11,36 @@ import java.io.IOException;
 
 
 public class Administrador extends Usuario {
-
     private String matricula;
 
-    // O construtor deve seguir a mesma assinatura da superclasse Usuario.java
     public Administrador(String nome, String cpf, String email, String senha, String dataNascimento, String telefone, String tipoUsuario, String matricula) {
         super(nome, cpf, email, senha, dataNascimento, telefone, tipoUsuario);
         this.matricula = matricula;
     }
+
+    public void alterarDados(String tipoDado, String novoValor) {
+        if ("Matricula".equalsIgnoreCase(tipoDado)) {
+            this.setMatricula(novoValor);
+        } else {
+            super.alterarDados(tipoDado, novoValor);
+        }
+    }
+
+    @Override
+    public String visualizarDados() {
+        return super.visualizarDados() +
+                "\nTIPO: Administrador" +
+                "\nMATRÍCULA: " + this.matricula;
+    }
+
+    public void setMatricula(String matricula) {this.matricula = matricula;}
+
+
+
+
+
+
+
 /*
     // ========================================================================
     // RF16 - Gerenciamento de Contas e Perfis

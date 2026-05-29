@@ -27,98 +27,14 @@ public abstract class Conta {
         this.statusConta = Status.ATIVO;
     }
 
-    public boolean realizarTransacao(double valor, String metodoPagamento, Cartao cartaoEscolhido, String categoria, Conta destino) throws ContaInativaException, SaldoInsuficienteException, LimiteInsuficienteException {
+    public abstract boolean realizarTransacao(double valor, String metodoPagamento, Cartao cartaoEscolhido, String category, Conta destino)
+            throws ContaInativaException, SaldoInsuficienteException, LimiteInsuficienteException;
 
-            if (this.statusConta != Status.ATIVO) {
-                throw new ContaInativaException("Transação recusada: Sua conta não está ativa.");
-            }
-            if (destino != null && destino.statusConta != Status.ATIVO) {
-                throw new ContaInativaException("Transação recusada: A conta de destino não está ativa.");
-            }
-
-            if (metodoPagamento.equalsIgnoreCase("PIX")) {
-                if (this.saldo < valor) {
-                    throw new SaldoInsuficienteException("Saldo insuficiente para realizar o PIX.");
-                }
-                this.saldo -= valor;
-
-            } else if (metodoPagamento.equalsIgnoreCase("DEBITO")) {
-                if (cartaoEscolhido == null) {
-                    throw new IllegalArgumentException("Transação recusada: É necessário informar o cartão para a função Débito.");
-                }
-                if (cartaoEscolhido.getEstaBloqueado()) {
-                    throw new LimiteInsuficienteException("Transação recusada: O cartão informado está bloqueado.");
-                }
-                if (!cartaoEscolhido.getTipoCartao().equalsIgnoreCase("DEBITO") && !cartaoEscolhido.getTipoCartao().equalsIgnoreCase("AMBOS")) {
-                    throw new IllegalArgumentException("Transação recusada: Este cartão não possui a função Débito.");
-                }
-
-                if (this.saldo < valor) {
-                    throw new SaldoInsuficienteException("Saldo insuficiente para realizar o Débito.");
-                }
-                this.saldo -= valor;
-
-            } else if (metodoPagamento.equalsIgnoreCase("CREDITO")) {
-                if (cartaoEscolhido == null) {
-                    throw new IllegalArgumentException("Transação recusada: É necessário informar o cartão para a função Crédito.");
-                }
-                if (cartaoEscolhido.getEstaBloqueado()) {
-                    throw new LimiteInsuficienteException("Transação recusada: O cartão informado está bloqueado.");
-                }
-                if (!cartaoEscolhido.getTipoCartao().equalsIgnoreCase("CREDITO") && !cartaoEscolhido.getTipoCartao().equalsIgnoreCase("AMBOS")) {
-                    throw new IllegalArgumentException("Transação recusada: Este cartão não possui a função Crédito.");
-                }
-                if (cartaoEscolhido.getLimiteDisponivel() < valor) {
-                    throw new LimiteInsuficienteException("Transação Recusada: Limite insuficiente no cartão selecionado.");
-                }
-
-                cartaoEscolhido.setLimiteDisponivel(cartaoEscolhido.getLimiteDisponivel() - valor);
-                System.out.println("Pagamento no CRÉDITO autorizado.");
-
-            } else {
-                throw new IllegalArgumentException("Método de pagamento inválido: " + metodoPagamento);
-            }
-
-            if (destino != null && (metodoPagamento.equalsIgnoreCase("PIX") || metodoPagamento.equalsIgnoreCase("DEBITO"))) {
-                destino.saldo += valor;
-            }
-
-            LocalDate dataHoje = LocalDate.now();
-            DateTimeFormatter formatadorData = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            String dataAtual = dataHoje.format(formatadorData);
-
-            LocalTime horaAgora = LocalTime.now();
-            DateTimeFormatter formatadorHora = DateTimeFormatter.ofPattern("HH:mm:ss");
-            String horaAtual = horaAgora.format(formatadorHora);
-
-            Transacao transacao = new Transacao(
-                    dataAtual,
-                    horaAtual,
-                    valor,
-                    categoria,
-                    "SAÍDA",
-                    metodoPagamento,
-                    "CONCLUIDO",
-                    this,
-                    destino
-            );
-
-            this.extrato.add(transacao);
-            if (destino != null) {
-                transacao.setTipoFluxo("ENTRADA");
-                destino.extrato.add(transacao);
-            }
-
-            System.out.println("Transação registrada com sucesso ID: " + transacao.getId());
-            return true;
-    }
-
-    public void visualizarExtrato(String fluxo, String metodoPagamento, String categoria, Integer diasPeriodo,  String dataEspecifica) {
-
+    public ArrayList<Transacao> visualizarExtrato(String fluxo, String metodoPagamento, String categoria, Integer diasPeriodo, String dataEspecifica) {
         ArrayList<Transacao> transacoesFiltradas = new ArrayList<>();
 
         if (this.extrato == null || this.extrato.isEmpty()) {
-            System.out.println("Nenhuma transação encontrada para esta conta.");
+            return transacoesFiltradas;
         }
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -127,7 +43,9 @@ public abstract class Conta {
         for (Transacao t : this.extrato) {
             boolean filtro = true;
 
-            if (fluxo != null && !fluxo.isEmpty() && !t.getFluxo().equalsIgnoreCase(fluxo)) {filtro = false;}
+            if (fluxo != null && !fluxo.isEmpty() && !t.getFluxo().equalsIgnoreCase(fluxo)) {
+                filtro = false;
+            }
 
             if (filtro && metodoPagamento != null && !metodoPagamento.isEmpty() && !t.getMetodoPagamento().equalsIgnoreCase(metodoPagamento)) {
                 filtro = false;
@@ -156,7 +74,6 @@ public abstract class Conta {
                     }
                 }
             } catch (Exception e) {
-                System.err.println("Erro ao processar data da transação ID: " + t.getId() + ". Desconsiderada.");
                 filtro = false;
             }
 
@@ -165,14 +82,24 @@ public abstract class Conta {
             }
         }
 
-        System.out.println("\n========== EXTRATO DE CONTA ==========");
-        if (transacoesFiltradas.isEmpty()) {
-            System.out.println("Nenhuma transação corresponde aos critérios.");
-        } else {
-            for (Transacao t : transacoesFiltradas) {
-                t.visualizarTransacao();
-            }
-        }
-        System.out.println("======================================\n");
+        return transacoesFiltradas;
     }
+
+    public String visualizarDadosConta() {
+        return String.format(
+                "=== DADOS DA CONTA ===\n" +
+                        "Agência: %s\n" +
+                        "Número: %s\n" +
+                        "Tipo: %s\n" +
+                        "Status: %s\n" +
+                        "Saldo: R$ %.2f\n",
+                this.agencia, this.numeroConta, this.tipoConta, this.statusConta, this.saldo
+        );
+    }
+
+
+    public double getSaldo() {return saldo;}
+    public String getAgencia() {return agencia;}
+    public String getNumeroConta() {return numeroConta;}
+
 }

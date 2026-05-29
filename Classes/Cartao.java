@@ -17,7 +17,7 @@ public class Cartao {
         this.estaBloqueado = false;
     }
 
-    public void visualizarDados() {
+    public String visualizarDados() {
         String numeroMascarado = "**** **** **** ";
         if (this.numeroCartao != null && this.numeroCartao.length() >= 4) {
             numeroMascarado += this.numeroCartao.substring(this.numeroCartao.length() - 4);
@@ -27,87 +27,70 @@ public class Cartao {
 
         String status = this.estaBloqueado ? "BLOQUEADO" : "ATIVO";
 
-        System.out.println("\n============== INFORMAÇÕES DO CARTÃO ==============");
-        System.out.printf("Titular:          %s\n", this.titular);
-        System.out.printf("Número do Cartão: %s\n", numeroMascarado);
-        System.out.printf("Tipo de Cartão:   %s\n", this.tipoCartao.toUpperCase());
-        System.out.printf("Status Atual:     %s\n", status);
+        String dados = "\n============== INFORMAÇÕES DO CARTÃO ==============\n";
+        dados += "Titular:           " + this.titular + "\n";
+        dados += "Número do Cartão:  " + numeroMascarado + "\n";
+        dados += "Tipo de Cartão:    " + this.tipoCartao.toUpperCase() + "\n";
+        dados += "Status Atual:      " + status + "\n";
 
         if (this.tipoCartao.equalsIgnoreCase("CREDITO") || this.tipoCartao.equalsIgnoreCase("AMBOS")) {
-            System.out.printf("Limite Total:     R$ %.2f\n", this.limiteTotal);
-            System.out.printf("Limite Disponível: R$ %.2f\n", this.limiteDisponivel);
+            dados += String.format("Limite Total:      R$ %.2f\n", this.limiteTotal);
+            dados += String.format("Limite Disponível: R$ %.2f\n", this.limiteDisponivel);
         }
-        System.out.println("===================================================");
+        dados += "===================================================";
+
+        return dados;
     }
 
     public boolean bloquearCartao() {
-        if (this.estaBloqueado) {
-            System.out.println("Aviso: Este cartão já está bloqueado!");
-            return false;
-        }
+        if (this.estaBloqueado) {return false;}
         this.estaBloqueado = true;
-        System.out.println("Sucesso: O cartão foi bloqueado com sucesso.");
         return true;
     }
 
     public boolean ativarCartao() {
-        if (!this.estaBloqueado) {
-            System.out.println("Aviso: Este cartão já está ativo e pronto para uso!");
-            return false;
-        }
+        if (!this.estaBloqueado) {return false;}
         this.estaBloqueado = false;
-        System.out.println("Sucesso: O cartão foi ativado e desbloqueado.");
         return true;
     }
 
-    public void visualizarLimite() {
+    public String visualizarLimites() {
         if (this.tipoCartao.equalsIgnoreCase("DEBITO")) {
-            System.out.println("\n============== LIMITE DO CARTÃO ==============");
-            System.out.println("Este cartão possui apenas a função DÉBITO.");
-            System.out.println("O saldo utilizável depende diretamente do saldo da conta.");
-            System.out.println("==============================================");
-            return;
+            return "\n============== LIMITE DO CARTÃO ==============\n" +
+                    "Este cartão possui apenas a função DÉBITO.\n" +
+                    "O saldo utilizável depende diretamente do saldo da conta.\n" +
+                    "==============================================";
         }
 
-        System.out.println("\n============== LIMITE DO CARTÃO ==============");
-        System.out.printf("Titular:           %s\n", this.titular);
-        System.out.printf("Limite Total:      R$ %.2f\n", this.limiteTotal);
-        System.out.printf("Limite Disponível: R$ %.2f\n", this.limiteDisponivel);
-        System.out.printf("Limite Utilizado:  R$ %.2f\n", (this.limiteTotal - this.limiteDisponivel));
-        System.out.println("==============================================");
+        double limiteUtilizado = this.limiteTotal - this.limiteDisponivel;
+        String textoLimite = String.format(
+                "\n============== LIMITE DO CARTÃO ==============\n" +
+                        "Titular:           %s\n" +
+                        "Limite Total:      R$ %.2f\n" +
+                        "Limite Disponível: R$ %.2f\n" +
+                        "Limite Utilizado:  R$ %.2f\n" +
+                        "==============================================",
+                this.titular, this.limiteTotal, this.limiteDisponivel, limiteUtilizado
+        );
+        return textoLimite;
     }
 
-    public void solicitarAjusteLimite(double novoLimiteSolicitado, Administrador admin, Conta contaVinculada) {
-        // 1. Validação para Cartão de Débito
+    public boolean solicitarAjusteLimite(double novoLimiteSolicitado, Administrador admin, Conta contaVinculada) {
         if (this.tipoCartao.equalsIgnoreCase("DEBITO")) {
-            System.out.println("Erro: Não é possível solicitar limite de crédito para um cartão puramente de DÉBITO.");
-            return;
+            throw new IllegalArgumentException("Não é possivel solicitar ajuste de limite com cartão Débito");
         }
 
-        if (novoLimiteSolicitado <= 0) {
-            System.out.println("Erro: O valor do limite solicitado deve ser maior que R$ 0,00.");
-            return;
-        }
+        if (novoLimiteSolicitado == 0) {return false;}
 
-        if (novoLimiteSolicitado > this.limiteTotal) {
-            System.out.println("Tipo de Pedido: Aumento de Limite");
-        } else if (novoLimiteSolicitado < this.limiteTotal) {
-            System.out.println("Tipo de Pedido: Redução de Limite");
-        } else {
-            System.out.println("Tipo de Pedido: Manter Limite Igual");
-        }
-
-        // 4. Envio de Solicitação para Administrador
-       /* boolean resultadoAnalise = admin.analisarPedidoLimite(this, contaVinculada, novoLimiteSolicitado);
+        boolean resultadoAnalise = admin.analisarPedidoLimite(this, contaVinculada, novoLimiteSolicitado);
         if (resultadoAnalise) {
-            System.out.println("[SISTEMA] Notificação para o cliente: Seu novo limite já está disponível!");
             double limiteUtilizado = this.limiteTotal - this.limiteDisponivel;
             this.limiteTotal = novoLimiteSolicitado;
-            this.setLimiteDisponivel(this.limiteTotal - limiteUtilizado);     
-        } else {
-             System.out.println("[SISTEMA] Notificação para o cliente: Sua solicitação foi recusada pelo Administrador.");
-        }*/
+            this.limiteDisponivel = this.limiteTotal - limiteUtilizado;
+            return true;
+        }
 
+        return false;
     }
 
     public double getLimiteTotal() { return this.limiteTotal; }

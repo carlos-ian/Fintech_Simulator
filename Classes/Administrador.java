@@ -41,7 +41,7 @@ public class Administrador extends Usuario {
 
 
 
-/*
+
     // ========================================================================
     // RF16 - Gerenciamento de Contas e Perfis
     // ========================================================================
@@ -495,5 +495,5 @@ public class Administrador extends Usuario {
         }
         return null;
     }
-*/
+
 }

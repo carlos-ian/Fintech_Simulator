@@ -1,6 +1,7 @@
 package Classes;
 
 import Classes.Exceptions.*;
+import java.util.ArrayList;
 
 public class Investimento {
     private static int contador = 0;
@@ -22,28 +23,18 @@ public class Investimento {
         this.Status = Status;
     }
 
-    public void visualizarInvestimentosFeitos(Conta conta) {
-        System.out.println("\n==== Lista de Investimentos Realizados ====");
-
+    public ArrayList<Investimento> visualizarInvestimentosFeitos(Conta conta) {
         if (conta.listaInvestimentos == null || conta.listaInvestimentos.isEmpty()) {
-            System.out.println("Nenhum investimento encontrado para esta conta. ");
-        } else {
-            for (Investimento inv : conta.listaInvestimentos) {
-                System.out.println(inv);
-            }
+            return null;
         }
+        return conta.listaInvestimentos;
     }
 
-    public void visualizarInvestimentosDisponiveis() {
-        System.out.println("\n==== Lista de Investimentos Disponíveis ====");
-
+    public static ArrayList<Investimento> visualizarInvestimentosDisponiveis() {
         if (AplicacaoBancaria.produtosDisponiveis == null || AplicacaoBancaria.produtosDisponiveis.isEmpty()) {
-            System.out.println("Nenhum investimento encontrado para esta conta. ");
-        } else {
-            for (Investimento inv : AplicacaoBancaria.produtosDisponiveis) {
-                System.out.println(inv);
-            }
+            return null;
         }
+        return AplicacaoBancaria.produtosDisponiveis;
     }
 
     public boolean realizarInvestimento(Conta conta, Investimento produtoSelecionado, double valorParaInvestir, String dataAtual) throws SaldoInsuficienteException {

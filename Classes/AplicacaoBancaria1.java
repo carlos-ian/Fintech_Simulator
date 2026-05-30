@@ -1,6 +1,7 @@
 package Classes;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -79,7 +80,7 @@ public class AplicacaoBancaria1 {
                                 } else {
                                     if (encontrado.tipoUsuario.equalsIgnoreCase("Cliente")) {
                                         JOptionPane.showMessageDialog(null, "Sucesso");
-                                        AplicacaoBancaria1.menuPrincipalCliente(encontrado);
+                                        AplicacaoBancaria1.menuPrincipalCliente((Cliente)encontrado);
                                     } else {
                                         JOptionPane.showMessageDialog(null, "Credenciais inválidas para este tipo de Usuário");
                                     }
@@ -118,7 +119,7 @@ public class AplicacaoBancaria1 {
                                 } else {
                                     if (encontrado.tipoUsuario.equalsIgnoreCase("Administrador")) {
                                         JOptionPane.showMessageDialog(null, "Sucesso");
-                                        AplicacaoBancaria1.menuPrincipalAdministrador(encontrado);
+                                        AplicacaoBancaria1.menuPrincipalAdministrador((Administrador)encontrado);
                                     } else {
                                         JOptionPane.showMessageDialog(null, "Credenciais inválidas para este tipo de Usuário");
                                     }
@@ -276,38 +277,147 @@ public class AplicacaoBancaria1 {
         }
     }
 
-    public static void menuPrincipalCliente (Usuario encontrado) {
+    public static void menuPrincipalCliente (Cliente encontrado) {
 
         int mpC = 0;
-        mpC = Integer.parseInt(JOptionPane.showInputDialog("1 - Configuração ou Perfil\n" +
-                "2 - Realizar Transação\n" +
-                "3 - Visualizar Extrato\n" +
-                "4 - Gestão de Cartões\n" +
-                "5 - Investimentos e Poupança\n" +
-                "6 - Sair"));
 
-        // Opção 1 -> Leva ao menu de configuracoes (dessa classe)
+        while (mpC == 0) {
 
-        // Opção 2 -> Coleta informações necessárias para realizar transação e chama metodo de
-        // realizar transação da classe Conta (OBS: uma conta instaciada deve chamar esse metodo,
-        // ou seja, conta1.realizarTranscao(), logo, pergunte qual conta da lista será utilizada
-        // Para isso, pode chamar um metodo de listar contas
+        mpC = Integer.parseInt(JOptionPane.showInputDialog("1 - Listar Contas\n" +
+                "2 - Abrir Nova Conta\n" +
+                "3 - Fechar Conta\n" +
+                "4 - Entrar com Conta\n" +
+                "5 - Sair"));
 
-        // Opção 3 -> Apenas chama metodo de visualizar extrato, de modo que a conta instaciada
-        // que deve também chamar esse metodo
+        if (mpC == 1) {
+            ArrayList<Conta> Contas = encontrado.obterContas();
+            for (Conta c : Contas) {
+                String x = c.visualizarDadosConta();
+                JOptionPane.showMessageDialog(null, x);
+            }
 
-        // OBS: Para facilitar, se quiser, no menu principal de cliente liste todas as contas
-        // do cliente e pergunte qual será usada, permitindo voltar e trocar a conta com alguma opção
-        // Creio que assim é mais fácil
+        } else if (mpC == 2) {
+            String[] opcoes = {"Conta Corrente", "Conta Poupança", "Conta Kids", "Conta Investimento"};
+            String tipo = (String) JOptionPane.showInputDialog(null, "Selecione o tipo de conta:",
+                    "Abertura de Conta", JOptionPane.QUESTION_MESSAGE, null, opcoes, opcoes[0]);
 
-        // Opção 4 -> Leva ao menu de Gestão de Cartões (dessa classe)
+            if (tipo == null) return;
 
-        // Opção 5 -> Leva ao menu de Investimentos e Poupança (dessa classe)
+            JPanel painel = new JPanel(new GridLayout(0, 2, 10, 10));
 
-        // Opção 6 -> Volta para Menu Inicial de Login
+            JTextField txtNumero = new JTextField();
+            JTextField txtAgencia = new JTextField();
+            JTextField txtSaldo = new JTextField();
+
+            painel.add(new JLabel("Número da Conta:")); painel.add(txtNumero);
+            painel.add(new JLabel("Agência:")); painel.add(txtAgencia);
+            painel.add(new JLabel("Saldo Inicial:")); painel.add(txtSaldo);
+
+            JTextField txtEspecial = new JTextField();
+            JTextField txtTaxa = new JTextField();
+            JTextField txtCPFResp = new JTextField();
+            JTextField txtLimiteMes = new JTextField();
+            JTextField txtRisco = new JTextField();
+
+            if (tipo.equals("Conta Corrente")) {
+                painel.add(new JLabel("Limite Cheque Especial:"));
+                painel.add(txtEspecial);
+            } else if (tipo.equals("Conta Poupança")) {
+                painel.add(new JLabel("Taxa de Rendimento:"));
+                painel.add(txtTaxa);
+            } else if (tipo.equals("Conta Kids")) {
+                painel.add(new JLabel("CPF Responsável:"));
+                painel.add(txtCPFResp);
+                painel.add(new JLabel("Limite Mensal:"));
+                painel.add(txtLimiteMes);
+            } else if (tipo.equals("Conta Investimento")) {
+                painel.add(new JLabel("Perfil de Risco:"));
+                painel.add(txtRisco);
+            }
+
+            int confirmacao = JOptionPane.showConfirmDialog(null, painel,
+                    "Dados - " + tipo, JOptionPane.OK_CANCEL_OPTION);
+
+            if (confirmacao == JOptionPane.OK_OPTION) {
+                try {
+                    String num = txtNumero.getText();
+                    String ag = txtAgencia.getText();
+                    double sal = Double.parseDouble(txtSaldo.getText().replace(",", "."));
+
+
+                    if (tipo.equalsIgnoreCase("Conta Corrente")) {
+                        double limite = Double.parseDouble(txtEspecial.getText().replace(",", "."));
+                        encontrado.abrirConta(num, ag, sal, tipo, limite, 0, null,  0, null);
+
+                    } else if (tipo.equalsIgnoreCase("Conta Poupança")) {
+                        double taxa = Double.parseDouble(txtTaxa.getText().replace(",", "."));
+                        encontrado.abrirConta(num, ag, sal, tipo, 0, taxa, null,  0, null);
+
+                    } else if (tipo.equalsIgnoreCase("Conta Kids")) {
+                        String cpf = txtCPFResp.getText();
+                        double limMes = Double.parseDouble(txtLimiteMes.getText().replace(",", "."));
+                        encontrado.abrirConta(num, ag, sal, tipo, 0, 0, cpf,  limMes, null);
+
+                    } else if (tipo.equalsIgnoreCase("Conta Investimento")) {
+                        String risco = txtRisco.getText();
+                        encontrado.abrirConta(num, ag, sal, tipo, 0, 0, null, 0, risco);
+                    }
+
+                    JOptionPane.showMessageDialog(null, "Conta criada com sucesso!");
+
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(null, "Erro: Verifique os campos numéricos.");
+                }
+            }
+
+        } else if (mpC == 3) {
+
+            ArrayList<Conta> Contas = encontrado.obterContas();
+
+            for (Conta c : Contas) {
+                String x = c.visualizarDadosConta();
+                JOptionPane.showMessageDialog(null, x);
+            }
+
+            int id;
+
+            id = Integer.parseInt(JOptionPane.showInputDialog("Qual o id da conta que deseja-se excluir?"));
+            boolean resultado = encontrado.fecharConta(Contas.get(id));
+
+            if (resultado) {
+                JOptionPane.showMessageDialog(null, "Sucesso");
+            } else {
+                JOptionPane.showMessageDialog(null, "Falha ao remover");
+            }
+
+        } else if (mpC == 4) {
+
+            ArrayList<Conta> Contas = encontrado.obterContas();
+
+            for (Conta c : Contas) {
+                String x = c.visualizarDadosConta();
+                JOptionPane.showMessageDialog(null, x);
+            }
+
+            int id;
+
+            id = Integer.parseInt(JOptionPane.showInputDialog("Qual o id da conta que deseja-se entrar?"));
+            Conta conta = Contas.get(id);
+            dashboardCliente(conta, encontrado);
+
+        } else if (mpC == 5) {
+            return;
+        }
+
+
+        }
+
+    }
+    public static void dashboardCliente (Conta conta, Cliente encontrado) {
+
     }
 
-    public static void menuPrincipalAdministrador (Usuario encontrado) {
+    public static void menuPrincipalAdministrador (Administrador encontrado) {
 
         int mpADM = 0;
 

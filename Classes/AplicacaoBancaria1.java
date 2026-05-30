@@ -73,13 +73,16 @@ public class AplicacaoBancaria1 {
                             if (cpf.isEmpty() || senha.isEmpty()) {
                                 JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos", "Erro", JOptionPane.ERROR_MESSAGE);
                             } else {
-                                if (Usuario.autenticar(cpf, senha)) {
-                                    JOptionPane.showMessageDialog(null, "Sucesso");
-                                    AplicacaoBancaria1.menuPrincipalCliente();
-                                    menu = 0;
-                                    break;
+                                Usuario encontrado = Usuario.autenticar(cpf, senha);
+                                if (encontrado == null) {
+                                    JOptionPane.showMessageDialog(null, "CPF ou Senha incorretos");
                                 } else {
-                                    JOptionPane.showMessageDialog(null, "Senha/CPF Inválidos, Try again");
+                                    if (encontrado.tipoUsuario.equalsIgnoreCase("Cliente")) {
+                                        JOptionPane.showMessageDialog(null, "Sucesso");
+                                        AplicacaoBancaria1.menuPrincipalCliente(encontrado);
+                                    } else {
+                                        JOptionPane.showMessageDialog(null, "Credenciais inválidas para este tipo de Usuário");
+                                    }
                                 }
                             }
                         } else {
@@ -109,14 +112,18 @@ public class AplicacaoBancaria1 {
                             if (cpf.isEmpty() || senha.isEmpty()) {
                                 JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos", "Erro", JOptionPane.ERROR_MESSAGE);
                             } else {
-                                if (Usuario.autenticar(cpf, senha)) {
-                                    JOptionPane.showMessageDialog(null, "Sucesso");
-                                    AplicacaoBancaria1.menuPrincipalAdministrador();
-                                    menu = 0;
-                                    break;
+                                Usuario encontrado = Usuario.autenticar(cpf, senha);
+                                if (encontrado == null) {
+                                    JOptionPane.showMessageDialog(null, "CPF ou Senha incorretos");
                                 } else {
-                                    JOptionPane.showMessageDialog(null, "Senha/CPF Inválidos, Try again");
+                                    if (encontrado.tipoUsuario.equalsIgnoreCase("Administrador")) {
+                                        JOptionPane.showMessageDialog(null, "Sucesso");
+                                        AplicacaoBancaria1.menuPrincipalAdministrador(encontrado);
+                                    } else {
+                                        JOptionPane.showMessageDialog(null, "Credenciais inválidas para este tipo de Usuário");
+                                    }
                                 }
+
                             }
                         } else {
                             System.out.println("Login cancelado.");
@@ -269,7 +276,7 @@ public class AplicacaoBancaria1 {
         }
     }
 
-    public static void menuPrincipalCliente () {
+    public static void menuPrincipalCliente (Usuario encontrado) {
 
         int mpC = 0;
         mpC = Integer.parseInt(JOptionPane.showInputDialog("1 - Configuração ou Perfil\n" +
@@ -300,7 +307,7 @@ public class AplicacaoBancaria1 {
         // Opção 6 -> Volta para Menu Inicial de Login
     }
 
-    public static void menuPrincipalAdministrador () {
+    public static void menuPrincipalAdministrador (Usuario encontrado) {
 
         int mpADM = 0;
 

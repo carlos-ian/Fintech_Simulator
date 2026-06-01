@@ -164,7 +164,7 @@ public class AplicacaoBancaria {
         while (opcaoDash != 7) {
             String stringDash = JOptionPane.showInputDialog(
                     "==================================\n" +
-                            "       DASHBOARD DA CONTA         \n" +
+                            "               DASHBOARD DA CONTA         \n" +
                             "==================================\n" +
                             "Conta: " + conta.getNumeroConta() + " | Saldo: R$ " + String.format("%.2f", conta.getSaldo()) + "\n" +
                             "==================================\n" +
@@ -344,7 +344,7 @@ public class AplicacaoBancaria {
                     break;
 
                 case 2:
-                    String tipoDado = SwingUtil.exibirMenuSelecao("Mapeador Cadastral", "Selecione o dado que deseja modificar:", "Email", "Senha", "Telefone");
+                    String tipoDado = SwingUtil.exibirMenuSelecao("Alteração Cadastral", "Selecione a informação que deseja modificar:", "Nome", "CPF", "Email", "Senha", "Telefone", "DataNascimento");
                     if (tipoDado == null) break;
 
                     String[] novoValForm = SwingUtil.exibirFormulario("Atualização cadastral", null, "Digite o novo valor para " + tipoDado + ":");
@@ -369,7 +369,7 @@ public class AplicacaoBancaria {
                     break;
 
                 case 4:
-                    String statusEscolhido = SwingUtil.exibirMenuSelecao("Chaveamento de Acesso", "Escolha o novo estado operacional do perfil:", "ATIVO", "INATIVO");
+                    String statusEscolhido = SwingUtil.exibirMenuSelecao("Desativar/Ativar Perfil", "Escolha o Novo Status do Perfil:", "ATIVO", "INATIVO");
                     if (statusEscolhido == null) break;
 
                     try {
@@ -742,11 +742,11 @@ public class AplicacaoBancaria {
                     if (acaoConta == 0) {
                         String justificativa = JOptionPane.showInputDialog("Digite a justificativa para o bloqueio:");
                         if (justificativa != null && !justificativa.isBlank()) {
-                            boolean ok = admin.bloquearConta(contaAlvo, justificativa);
+                            boolean ok = admin.desativarConta(contaAlvo, justificativa);
                             JOptionPane.showMessageDialog(null, ok ? "Conta bloqueada com sucesso." : "A conta já está bloqueada.");
                         }
                     } else if (acaoConta == 1) {
-                        boolean ok = admin.desbloquearConta(contaAlvo);
+                        boolean ok = admin.ativarConta(contaAlvo);
                         JOptionPane.showMessageDialog(null, ok ? "Conta desbloqueada com sucesso." : "A conta não estava bloqueada.");
                     } else if (acaoConta == 2) {
                         ArrayList<Transacao> historico = admin.visualizarHistoricoConta(contaAlvo);

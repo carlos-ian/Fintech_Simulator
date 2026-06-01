@@ -12,8 +12,10 @@ public class Administrador extends Usuario {
     }
 
     public void alterarDados(String tipoDado, String novoValor) {
-        if ("Matricula".equalsIgnoreCase(tipoDado)) {
-            this.setMatricula(novoValor);
+        if ("Status".equalsIgnoreCase(tipoDado)) {
+            throw new IllegalArgumentException("Não é permitido alterar o status do admnistrador por este método.");
+        } else if ("Matricula".equalsIgnoreCase(tipoDado)) {
+            this.matricula = novoValor;
         } else {
             super.alterarDados(tipoDado, novoValor);
         }
@@ -37,16 +39,16 @@ public class Administrador extends Usuario {
         return null;
     }
 
-    public boolean bloquearConta(Conta conta, String justificativa) {
-        if (conta.statusConta != Status.BLOQUEADO && justificativa != null) {
-            conta.statusConta = Status.BLOQUEADO;
+    public boolean desativarConta(Conta conta, String justificativa) {
+        if (conta.statusConta != Status.INATIVO && justificativa != null) {
+            conta.statusConta = Status.INATIVO;
             return true;
         }
         return false;
     }
 
-    public boolean desbloquearConta(Conta conta) {
-        if (conta.statusConta == Status.BLOQUEADO) {
+    public boolean ativarConta(Conta conta) {
+        if (conta.statusConta == Status.INATIVO) {
             conta.statusConta = Status.ATIVO;
             return true;
         }
@@ -124,7 +126,7 @@ public class Administrador extends Usuario {
 
         if (todosUsuarios != null) {
             for (Cliente cliente : todosUsuarios) {
-                if (cliente.getStatus() == Status.BLOQUEADO) {
+                if (cliente.getStatus() == Status.INATIVO) {
                     usuariosBloqueados++;
                 } else {
                     usuariosAtivos++;

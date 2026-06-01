@@ -61,19 +61,18 @@ public abstract class Usuario {
     }
 
     public void alterarDados(String tipoDado, String novoValor) {
-
         if ("Nome".equalsIgnoreCase(tipoDado)) {
-            this.setNome(novoValor);
+            this.nome = novoValor;
         } else if ("CPF".equalsIgnoreCase(tipoDado)) {
-            this.setCpf(novoValor);
+            this.cpf = novoValor;
         } else if ("Email".equalsIgnoreCase(tipoDado)) {
-            this.setEmail(novoValor);
+            this.email = novoValor;
         } else if ("Senha".equalsIgnoreCase(tipoDado)) {
             this.senha = BCrypt.hashpw(novoValor, BCrypt.gensalt());
         } else if ("Telefone".equalsIgnoreCase(tipoDado)) {
-            this.setTelefone(novoValor);
+            this.telefone = novoValor;
         } else if ("DataNascimento".equalsIgnoreCase(tipoDado)) {
-            this.setDataNascimento(novoValor);
+            this.dataNascimento = novoValor;
         } else {
             throw new IllegalArgumentException("Tipo de dado inválido");
         }
@@ -89,60 +88,15 @@ public abstract class Usuario {
                 "\nTELEFONE: " + this.telefone;
     }
 
-
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
-    }
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-    public void setSenha(String senha) {
-        String senhaCriptografada = BCrypt.hashpw(senha, BCrypt.gensalt(12));
-        this.senha = senhaCriptografada;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
-
-    public void setDataNascimento(String dataNascimento) {
-        this.dataNascimento = dataNascimento;
-    }
-
-    public void setTipoUsuario(String tipoUsuario) {this.tipoUsuario = tipoUsuario;}
-
-    public String getTelefone() {
-        return telefone;
-    }
-
     public String getNome() {
         return nome;
     }
-
     public String getSenha() {
         return senha;
     }
-
-    public String getEmail() {
-        return email;
-    }
-
     public String getCpf() {
         return cpf;
     }
-
-    public String getDataNascimento() {
-        return dataNascimento;
-    }
-
-    public String getTipoUsuario() {
-        return tipoUsuario;
-    }
-
     public Status getStatus() {return this.statusPerfil;}
     public void setStatus(Status statusCliente) {this.statusPerfil = statusCliente;}
 

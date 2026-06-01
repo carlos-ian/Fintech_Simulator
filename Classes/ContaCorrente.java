@@ -56,6 +56,7 @@ public class ContaCorrente extends Conta {
             }
 
             cartaoEscolhido.setLimiteDisponivel(cartaoEscolhido.getLimiteDisponivel() - valor);
+            destino.saldo += valor;
 
         } else {
             throw new IllegalArgumentException("Método de pagamento inválido: " + metodoPagamento);

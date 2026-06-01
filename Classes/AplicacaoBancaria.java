@@ -400,6 +400,131 @@ public class AplicacaoBancaria {
             }
         }
     }
+    private static void gestaoCartoes(Conta conta, Cliente encontrado) {
+        int opcaoCartao = 0;
+
+        while (opcaoCartao != 7) {
+            String stringCartao = JOptionPane.showInputDialog(
+                    "==================================\n" +
+                            "         GESTÃO DE CARTÕES        \n" +
+                            "==================================\n" +
+                            "1 - Criar Novo Cartão\n" +
+                            "2 - Visualizar Dados do Cartão\n" +
+                            "3 - Bloquear Cartão\n" +
+                            "4 - Desbloquear Cartão\n" +
+                            "5 - Visualizar Limite\n" +
+                            "6 - Solicitar Ajuste de Limite\n" +
+                            "7 - Voltar\n");
+
+            if (stringCartao == null) return;
+
+            try {
+                opcaoCartao = Integer.parseInt(stringCartao);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Opção inválida! Digite apenas números.");
+                continue;
+            }
+
+            Cartao cartaoSelecionado = null;
+            if (opcaoCartao >= 2 && opcaoCartao <= 6) {
+                cartaoSelecionado = SwingUtil.exibirSeletorCartoes(conta.getCartoes());
+                if (cartaoSelecionado == null) continue;
+            }
+
+            switch (opcaoCartao) {
+                case 1:
+                    String[] dadosNovoCartao = SwingUtil.exibirFormularioCriarCartao();
+                    if (dadosNovoCartao == null) break;
+
+                    String numero = dadosNovoCartao[0];
+                    String tipo = dadosNovoCartao[1];
+                    String limiteStr = dadosNovoCartao[2];
+
+                    if (numero.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "O número do cartão é obrigatório.", "Erro", JOptionPane.WARNING_MESSAGE);
+                        break;
+                    }
+
+                    try {
+                        double limiteInput = Double.parseDouble(limiteStr.replace(",", "."));
+                        double limiteInicial = tipo.equalsIgnoreCase("DEBITO") ? 0.0 : limiteInput;
+
+                        Cartao novoCartao = new Cartao(numero, encontrado.getNome(), tipo, limiteInicial, limiteInicial);
+                        conta.getCartoes().add(novoCartao);
+
+                        JOptionPane.showMessageDialog(null, "Cartão gerado e vinculado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (NumberFormatException e) {
+                        JOptionPane.showMessageDialog(null, "Erro: Insira um valor numérico válido para o limite.", "Erro", JOptionPane.ERROR_MESSAGE);
+                    }
+                    break;
+
+                case 2:
+                    JOptionPane.showMessageDialog(null, cartaoSelecionado.visualizarDados(), "Informações do Cartão", JOptionPane.INFORMATION_MESSAGE);
+                    break;
+
+                case 3:
+                    if (cartaoSelecionado.bloquearCartao()) {
+                        JOptionPane.showMessageDialog(null, "O cartão foi bloqueado com sucesso.", "Status", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Este cartão já se encontra bloqueado.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                    }
+                    break;
+
+                case 4:
+                    if (cartaoSelecionado.ativarCartao()) {
+                        JOptionPane.showMessageDialog(null, "O cartão foi ativado/desbloqueado com sucesso.", "Status", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Este cartão já está ativo no sistema.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                    }
+                    break;
+
+                case 5:
+                    JOptionPane.showMessageDialog(null, cartaoSelecionado.visualizarLimites(), "Limites Comerciais", JOptionPane.INFORMATION_MESSAGE);
+                    break;
+
+                case 6:
+                    String novoLimiteStr = SwingUtil.exibirFormularioAjusteLimite();
+                    if (novoLimiteStr == null) break;
+
+                    try {
+                        double novoLimite = Double.parseDouble(novoLimiteStr.replace(",", "."));
+
+                        Administrador admSistema = null;
+                        for (Usuario u : AplicacaoBancaria.ListaUsuarios) {
+                            if (u instanceof Administrador) {
+                                admSistema = (Administrador) u;
+                                break;
+                            }
+                        }
+
+                        if (admSistema == null) {
+                            JOptionPane.showMessageDialog(null, "Operação indisponível: Nenhum Administrador ativo no sistema para homologar a análise.", "Erro do Sistema", JOptionPane.ERROR_MESSAGE);
+                            break;
+                        }
+
+                        if (cartaoSelecionado.solicitarAjusteLimite(novoLimite, admSistema, conta)) {
+                            JOptionPane.showMessageDialog(null, "Ajuste aprovado pelo Administrador!\nNovo limite estabelecido com sucesso.", "Análise Concluída", JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Ajuste recusado após análise de perfil de crédito ou valor inválido.", "Análise Concluída", JOptionPane.WARNING_MESSAGE);
+                        }
+
+                    } catch (NumberFormatException e) {
+                        JOptionPane.showMessageDialog(null, "Erro: Valor informado de forma incorreta.", "Erro", JOptionPane.ERROR_MESSAGE);
+                    } catch (IllegalArgumentException e) {
+                        JOptionPane.showMessageDialog(null, e.getMessage(), "Operação Inválida", JOptionPane.ERROR_MESSAGE);
+                    }
+                    break;
+
+                case 7:
+                    JOptionPane.showMessageDialog(null, "Voltando ao Dashboard...");
+                    break;
+
+                default:
+                    JOptionPane.showMessageDialog(null, "Opção inválida!");
+                    break;
+            }
+        }
+    }
 
     private static void Login() {
         String stringLogin = JOptionPane.showInputDialog("Quem é você?\n" +
@@ -584,6 +709,5 @@ public class AplicacaoBancaria {
 
 
     private static void investimentosEPoupanca(Conta conta, Cliente encontrado) {}
-    private static void gestaoCartoes(Conta conta, Cliente encontrado) {}
     public static void menuPrincipalAdministrador (Administrador encontrado) {}
 }

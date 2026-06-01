@@ -25,6 +25,9 @@ public abstract class Conta {
         this.saldo = saldo;
         this.tipoConta = tipoConta;
         this.statusConta = Status.ATIVO;
+
+        this.cartoes = new ArrayList<Cartao>();
+        this.extrato = new ArrayList<>();
     }
 
     public abstract boolean realizarTransacao(double valor, String metodoPagamento, Cartao cartaoEscolhido, String category, Conta destino)

@@ -271,4 +271,63 @@ public class SwingUtil {
                 statusOpcoes,
                 statusOpcoes[0].equals(statusAtual) ? statusOpcoes[0] : statusOpcoes[1]);
     }
+    public static Cartao exibirSeletorCartoes(ArrayList<Cartao> cartoesDaConta) {
+        if (cartoesDaConta == null || cartoesDaConta.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Esta conta não possui nenhum cartão vinculado.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return null;
+        }
+
+        String[] opcoesCartoes = new String[cartoesDaConta.size()];
+        for (int i = 0; i < cartoesDaConta.size(); i++) {
+            String num = cartoesDaConta.get(i).getNumeroCartao();
+            opcoesCartoes[i] = "Cartão **** " + (num.length() >= 4 ? num.substring(num.length() - 4) : num);
+        }
+
+        String escolha = (String) JOptionPane.showInputDialog(null, "Selecione o cartão:",
+                "Cartões Vinculados", JOptionPane.QUESTION_MESSAGE, null, opcoesCartoes, opcoesCartoes[0]);
+
+        if (escolha == null) return null;
+
+        for (int i = 0; i < opcoesCartoes.length; i++) {
+            if (opcoesCartoes[i].equals(escolha)) {
+                return cartoesDaConta.get(i);
+            }
+        }
+        return null;
+    }
+    public static String[] exibirFormularioCriarCartao() {
+        JTextField txtNumero = new JTextField();
+        JComboBox<String> comboTipo = new JComboBox<>(new String[]{"DEBITO", "CREDITO", "AMBOS"});
+        JTextField txtLimite = new JTextField("0.00");
+
+        Object[] formularioCriar = {
+                "Número do Cartão (16 dígitos):", txtNumero,
+                "Tipo do Cartão:", comboTipo,
+                "Limite de Crédito (Caso aplicável):", txtLimite
+        };
+
+        int result = JOptionPane.showConfirmDialog(null, formularioCriar, "Solicitar Novo Cartão", JOptionPane.OK_CANCEL_OPTION);
+
+        if (result == JOptionPane.OK_OPTION) {
+            return new String[]{
+                    txtNumero.getText().trim(),
+                    (String) comboTipo.getSelectedItem(),
+                    txtLimite.getText().trim()
+            };
+        }
+        return null;
+    }
+    public static String exibirFormularioAjusteLimite() {
+        JTextField txtNovoLimite = new JTextField();
+        Object[] formularioLimite = {
+                "Informe o novo limite total desejado:", txtNovoLimite
+        };
+
+        int result = JOptionPane.showConfirmDialog(null, formularioLimite, "Solicitação de Crédito", JOptionPane.OK_CANCEL_OPTION);
+
+        if (result == JOptionPane.OK_OPTION) {
+            return txtNovoLimite.getText().trim();
+        }
+        return null;
+    }
 }

@@ -41,8 +41,8 @@ public abstract class Usuario {
 
     public void encerrarPerfil(Usuario u, String senha) {
 
-        if (!u.getSenha().equals(senha)) {
-            throw new IllegalArgumentException("Falha na confirmação: Credenciais inválidas.");
+        if (!BCrypt.checkpw(senha, u.getSenha())) {
+            throw new IllegalArgumentException("Senha incorreta! Não foi possível excluir o perfil.");
         }
 
         if (u instanceof Cliente) {
@@ -69,8 +69,7 @@ public abstract class Usuario {
         } else if ("Email".equalsIgnoreCase(tipoDado)) {
             this.setEmail(novoValor);
         } else if ("Senha".equalsIgnoreCase(tipoDado)) {
-            String senhaCriptografada = BCrypt.hashpw(novoValor, BCrypt.gensalt(12));
-            this.setSenha(senhaCriptografada);
+            this.senha = BCrypt.hashpw(novoValor, BCrypt.gensalt());
         } else if ("Telefone".equalsIgnoreCase(tipoDado)) {
             this.setTelefone(novoValor);
         } else if ("DataNascimento".equalsIgnoreCase(tipoDado)) {
@@ -101,7 +100,8 @@ public abstract class Usuario {
     }
 
     public void setSenha(String senha) {
-        this.senha = senha;
+        String senhaCriptografada = BCrypt.hashpw(senha, BCrypt.gensalt(12));
+        this.senha = senhaCriptografada;
     }
 
     public void setEmail(String email) {
@@ -116,10 +116,7 @@ public abstract class Usuario {
         this.dataNascimento = dataNascimento;
     }
 
-    public void setTipoUsuario(String tipoUsuario) {
-        // Acho que você pode remover os get e set que não tá usando
-        this.tipoUsuario = tipoUsuario;
-    }
+    public void setTipoUsuario(String tipoUsuario) {this.tipoUsuario = tipoUsuario;}
 
     public String getTelefone() {
         return telefone;
@@ -148,5 +145,10 @@ public abstract class Usuario {
     public String getTipoUsuario() {
         return tipoUsuario;
     }
+
+    public Status getStatus() {return this.statusPerfil;}
+    public void setStatus(Status statusCliente) {this.statusPerfil = statusCliente;}
+
+
 
 }

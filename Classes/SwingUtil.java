@@ -199,4 +199,76 @@ public class SwingUtil {
         }
         return null;
     }
+    public static String exibirConfirmacaoExclusao() {
+        JPasswordField senhaExcluirField = new JPasswordField();
+        Object[] formulario = {
+                "Para excluir seu perfil, confirme sua senha.\n" +
+                        "ATENÇÃO: Esta ação é irreversível e exige saldo zerado em todas as contas.\n\n",
+                "Senha Atual:", senhaExcluirField
+        };
+
+        int confirmacao = JOptionPane.showConfirmDialog(null, formulario, "Excluir Perfil",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+
+        if (confirmacao == JOptionPane.OK_OPTION) {
+            return new String(senhaExcluirField.getPassword());
+        }
+        return null;
+    }
+    public static String[] exibirFormularioAlterarDados() {
+        String[] camposDisponiveis = {"Nome", "CPF", "Email", "Senha", "Telefone", "DataNascimento"};
+
+        String tipoDadoEscolhido = (String) JOptionPane.showInputDialog(null,
+                "Selecione o dado que deseja alterar:",
+                "Alterar Dados do Perfil",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                camposDisponiveis,
+                camposDisponiveis[0]);
+
+        if (tipoDadoEscolhido == null) {
+            return null;
+        }
+
+        JComponent inputField;
+        if ("Senha".equalsIgnoreCase(tipoDadoEscolhido)) {
+            inputField = new JPasswordField();
+        } else {
+            inputField = new JTextField();
+        }
+
+        Object[] formularioAlterar = {
+                "Digite o novo valor para [" + tipoDadoEscolhido + "]:", inputField
+        };
+
+        int confirmacaoAlterar = JOptionPane.showConfirmDialog(null,
+                formularioAlterar,
+                "Alterar " + tipoDadoEscolhido,
+                JOptionPane.OK_CANCEL_OPTION);
+
+        if (confirmacaoAlterar == JOptionPane.OK_OPTION) {
+            String novoValor;
+
+            if (inputField instanceof JPasswordField) {
+                novoValor = new String(((JPasswordField) inputField).getPassword());
+            } else {
+                novoValor = ((JTextField) inputField).getText().trim();
+            }
+
+            return new String[]{ tipoDadoEscolhido, novoValor };
+        }
+
+        return null;
+    }
+    public static String exibirSeletorStatus(String statusAtual) {
+        String[] statusOpcoes = {"ATIVO", "INATIVO"};
+
+        return (String) JOptionPane.showInputDialog(null,
+                "O seu perfil está atualmente: " + statusAtual + "\nSelecione o novo status desejado:",
+                "Gerenciar Status do Perfil",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                statusOpcoes,
+                statusOpcoes[0].equals(statusAtual) ? statusOpcoes[0] : statusOpcoes[1]);
+    }
 }

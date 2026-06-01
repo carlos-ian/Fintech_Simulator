@@ -54,18 +54,18 @@ public class Administrador extends Usuario {
     }
 
     public boolean desativarPerfilCliente(Cliente cliente) {
-        if (cliente.getStatusCliente() == Status.INATIVO) {
+        if (cliente.getStatus() == Status.INATIVO) {
             return false;
         }
-        cliente.setStatusCliente(Status.INATIVO);
+        cliente.setStatus(Status.INATIVO);
         return true;
     }
 
     public boolean ativarPerfilCliente(Cliente cliente) {
-        if (cliente.getStatusCliente() == Status.ATIVO) {
+        if (cliente.getStatus() == Status.ATIVO) {
             return false;
         }
-        cliente.setStatusCliente(Status.ATIVO);
+        cliente.setStatus(Status.ATIVO);
         return true;
     }
 
@@ -124,7 +124,7 @@ public class Administrador extends Usuario {
 
         if (todosUsuarios != null) {
             for (Cliente cliente : todosUsuarios) {
-                if (cliente.getStatusCliente() == Status.BLOQUEADO) {
+                if (cliente.getStatus() == Status.BLOQUEADO) {
                     usuariosBloqueados++;
                 } else {
                     usuariosAtivos++;

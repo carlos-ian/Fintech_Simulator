@@ -186,7 +186,7 @@ public class AplicacaoBancaria {
 
             switch (opcaoDash) {
                 case 1:
-                    AplicacaoBancaria.configuracoes((Usuario )encontrado);
+                    AplicacaoBancaria.configuracoes((Usuario) encontrado);
                     break;
 
                 case 2:
@@ -296,6 +296,102 @@ public class AplicacaoBancaria {
 
                 case 7:
                     JOptionPane.showMessageDialog(null, "Voltando ao menu de contas...");
+                    break;
+
+                default:
+                    JOptionPane.showMessageDialog(null, "Opção inválida!");
+                    break;
+            }
+        }
+    }
+    public static void configuracoes(Usuario encontrado) {
+        int config = 0;
+
+        while (config != 5) {
+            String stringConfig = JOptionPane.showInputDialog(
+                    "==================================\n" +
+                            "       CONFIGURAÇÕES DE PERFIL    \n" +
+                            "==================================\n" +
+                            "1 - Excluir Perfil\n" +
+                            "2 - Alterar Dados do Perfil\n" +
+                            "3 - Visualizar Dados do Perfil\n" +
+                            "4 - Ativar / Desativar Perfil \n" +
+                            "5 - Voltar\n");
+
+            if (stringConfig == null) return;
+
+            try {
+                config = Integer.parseInt(stringConfig);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Opção inválida! Digite apenas números.");
+                continue;
+            }
+
+            switch (config) {
+                case 1:
+                    String senhaDigitada = SwingUtil.exibirConfirmacaoExclusao();
+                    if (senhaDigitada == null) break;
+
+                    try {
+                        encontrado.encerrarPerfil(encontrado, senhaDigitada);
+                        JOptionPane.showMessageDialog(null, "Perfil excluído com sucesso. Desconectando do sistema...", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                        System.exit(0);
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(null, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                    }
+                    break;
+
+                case 2:
+                    String[] dadosAlteracao = SwingUtil.exibirFormularioAlterarDados();
+                    if (dadosAlteracao == null) break;
+
+                    String tipoDado = dadosAlteracao[0];
+                    String novoValor = dadosAlteracao[1];
+
+                    if (novoValor.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "O campo não pode ser vazio.", "Erro", JOptionPane.WARNING_MESSAGE);
+                        break;
+                    }
+
+                    try {
+                        encontrado.alterarDados(tipoDado, novoValor);
+                        JOptionPane.showMessageDialog(null, tipoDado + " atualizado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (IllegalArgumentException e) {
+                        JOptionPane.showMessageDialog(null, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                    }
+                    break;
+
+                case 3: // VISUALIZAR DADOS
+                    JOptionPane.showMessageDialog(null, encontrado.visualizarDados(), "Dados do Perfil", JOptionPane.INFORMATION_MESSAGE);
+                    break;
+
+                case 4:
+                    String statusAtual = (encontrado.getStatus() != null) ? encontrado.getStatus().toString() : "DESCONHECIDO";
+                    String statusEscolhido = SwingUtil.exibirSeletorStatus(statusAtual);
+                    if (statusEscolhido == null) break;
+
+                    try {
+                        Status novoStatus = Status.valueOf(statusEscolhido);
+
+                        if (encontrado.getStatus() == novoStatus) {
+                            JOptionPane.showMessageDialog(null, "O perfil já possui este status.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
+                            break;
+                        }
+
+                        encontrado.setStatus(novoStatus);
+                        JOptionPane.showMessageDialog(null, "Status alterado para " + statusEscolhido + " com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+
+                        if (novoStatus == Status.INATIVO) {
+                            JOptionPane.showMessageDialog(null, "Como seu perfil foi inativado, você será desconectado.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                            System.exit(0);
+                        }
+                    } catch (IllegalArgumentException e) {
+                        JOptionPane.showMessageDialog(null, "Erro ao processar alteração de status.", "Erro", JOptionPane.ERROR_MESSAGE);
+                    }
+                    break;
+
+                case 5:
+                    JOptionPane.showMessageDialog(null, "Voltando ao Dashboard...");
                     break;
 
                 default:
@@ -489,7 +585,6 @@ public class AplicacaoBancaria {
 
     private static void investimentosEPoupanca(Conta conta, Cliente encontrado) {}
     private static void gestaoCartoes(Conta conta, Cliente encontrado) {}
-    private static void configuracoes(Usuario encontrado) {}
     public static void menuPrincipalAdministrador (Administrador encontrado) {}
 }
 

@@ -62,7 +62,4 @@ public class Cliente extends Usuario {
 
     public ArrayList<Conta> obterContas() {return this.listaContas;}
 
-    public Status getStatusCliente() {return this.statusPerfil;}
-    public void setStatusCliente(Status statusCliente) {this.statusPerfil = statusCliente;}
-
 }

@@ -48,6 +48,115 @@ public class AplicacaoBancaria {
             }
         }
     }
+    public static void menuPrincipalCliente(Cliente encontrado) {
+        int mpC = 0;
+
+        while (mpC == 0) {
+            String stringMenu = JOptionPane.showInputDialog(
+                    "1 - Listar Contas\n" +
+                            "2 - Abrir Nova Conta\n" +
+                            "3 - Fechar Conta\n" +
+                            "4 - Entrar com Conta\n" +
+                            "5 - Sair"
+            );
+
+            if (stringMenu == null) return;
+
+            try {
+                mpC = Integer.parseInt(stringMenu);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Opção inválida! Digite apenas números.");
+                mpC = 0;
+                continue;
+            }
+
+            ArrayList<Conta> contas = encontrado.obterContas();
+
+            switch (mpC) {
+                case 1:
+                    if (contas.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "Você não possui contas cadastradas.");
+                    } else {
+                        for (Conta c : contas) {
+                            JOptionPane.showMessageDialog(null, c.visualizarDadosConta());
+                        }
+                    }
+                    mpC = 0;
+                    break;
+
+                case 2:
+                    AberturaConta(encontrado);
+                    mpC = 0;
+                    break;
+
+                case 3:
+                    if (contas.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "Você não possui contas para fechar.");
+                        mpC = 0;
+                        break;
+                    }
+
+                    for (int i = 0; i < contas.size(); i++) {
+                        JOptionPane.showMessageDialog(null, "ID: " + i + "\n" + contas.get(i).visualizarDadosConta());
+                    }
+
+                    try {
+                        String idStr = JOptionPane.showInputDialog("Qual o id da conta que deseja-se excluir?");
+                        if (idStr == null) { mpC = 0; break; }
+
+                        int id = Integer.parseInt(idStr);
+                        boolean resultado = encontrado.fecharConta(contas.get(id));
+
+                        if (resultado) {
+                            JOptionPane.showMessageDialog(null, "Sucesso");
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Falha ao remover");
+                        }
+                    } catch (NumberFormatException e) {
+                        JOptionPane.showMessageDialog(null, "ID inválido! Digite apenas números.");
+                    } catch (IndexOutOfBoundsException e) {
+                        JOptionPane.showMessageDialog(null, "ID não encontrado na lista.");
+                    }
+                    mpC = 0;
+                    break;
+
+                case 4:
+                    if (contas.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "Você não possui contas. Abra uma primeiro.");
+                        mpC = 0;
+                        break;
+                    }
+
+                    for (int i = 0; i < contas.size(); i++) {
+                        JOptionPane.showMessageDialog(null, "ID: " + i + "\n" + contas.get(i).visualizarDadosConta());
+                    }
+
+                    try {
+                        String idStr = JOptionPane.showInputDialog("Qual o id da conta que deseja-se entrar?");
+                        if (idStr == null) { mpC = 0; break; }
+
+                        int id = Integer.parseInt(idStr);
+                        Conta contaSelecionada = contas.get(id);
+
+                        dashboardCliente(contaSelecionada, encontrado);
+                    } catch (NumberFormatException e) {
+                        JOptionPane.showMessageDialog(null, "ID inválido! Digite apenas números.");
+                    } catch (IndexOutOfBoundsException e) {
+                        JOptionPane.showMessageDialog(null, "ID não encontrado.");
+                    }
+                    mpC = 0;
+                    break;
+
+                case 5:
+                    return;
+
+                default:
+                    JOptionPane.showMessageDialog(null, "Opção inválida!");
+                    mpC = 0;
+                    break;
+            }
+        }
+    }
 
     private static void Login() {
         String stringLogin = JOptionPane.showInputDialog("Quem é você?\n" +
@@ -185,12 +294,56 @@ public class AplicacaoBancaria {
         }
     }
 
+    private static void AberturaConta(Cliente encontrado) {
+        String tipo = SwingUtil.exibirSeletorTipoConta();
+        if (tipo == null) return;
+
+        String[] dados = SwingUtil.exibirFormularioConta(tipo);
+        if (dados == null) return;
+
+        try {
+            String num = dados[0];
+            String ag = dados[1];
+            String saldoStr = dados[2];
+
+            if (num.isEmpty() || ag.isEmpty() || saldoStr.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Erro: Todos os campos básicos devem ser preenchidos.");
+                return;
+            }
+
+            double sal = Double.parseDouble(saldoStr.replace(",", "."));
+
+            if (tipo.equalsIgnoreCase("Conta Corrente")) {
+                double limite = Double.parseDouble(dados[3].replace(",", "."));
+                encontrado.abrirConta(num, ag, sal, tipo, limite, 0, null, 0, null);
+
+            } else if (tipo.equalsIgnoreCase("Conta Poupança")) {
+                double taxa = Double.parseDouble(dados[3].replace(",", "."));
+                encontrado.abrirConta(num, ag, sal, tipo, 0, taxa, null, 0, null);
+
+            } else if (tipo.equalsIgnoreCase("Conta Kids")) {
+                String cpfResp = dados[3];
+                double limMes = Double.parseDouble(dados[4].replace(",", "."));
+                encontrado.abrirConta(num, ag, sal, tipo, 0, 0, cpfResp, limMes, null);
+
+            } else if (tipo.equalsIgnoreCase("Conta Investimento")) {
+                String risco = dados[3];
+                encontrado.abrirConta(num, ag, sal, tipo, 0, 0, null, 0, risco);
+            }
+
+            JOptionPane.showMessageDialog(null, "Conta criada com sucesso!");
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Erro: Verifique os campos numéricos.");
+        }
+    }
 
 
 
 
-    public static void menuPrincipalCliente (Cliente encontrado) {}
+
     public static void menuPrincipalAdministrador (Administrador encontrado) {}
+    public static void dashboardCliente(Conta contaSelecionada, Cliente encontrado) {}
 }
 
 

@@ -89,4 +89,53 @@ public class SwingUtil {
         }
         return null;
     }
+    public static String exibirSeletorTipoConta() {
+        String[] opcoes = {"Conta Corrente", "Conta Poupança", "Conta Kids", "Conta Investimento"};
+        return (String) JOptionPane.showInputDialog(null, "Selecione o tipo de conta:",
+                "Abertura de Conta", JOptionPane.QUESTION_MESSAGE, null, opcoes, opcoes[0]);
+    }
+    public static String[] exibirFormularioConta(String tipoConta) {
+        JPanel painel = new JPanel(new GridLayout(0, 2, 10, 10));
+
+        JTextField txtNumero = new JTextField();
+        JTextField txtAgencia = new JTextField();
+        JTextField txtSaldo = new JTextField();
+
+        painel.add(new JLabel("Número da Conta:")); painel.add(txtNumero);
+        painel.add(new JLabel("Agência:")); painel.add(txtAgencia);
+        painel.add(new JLabel("Saldo Inicial:")); painel.add(txtSaldo);
+
+        // Campos específicos de cada tipo
+        JTextField txtEspecifico1 = new JTextField();
+        JTextField txtEspecifico2 = new JTextField();
+
+        if (tipoConta.equals("Conta Corrente")) {
+            painel.add(new JLabel("Limite Cheque Especial:"));
+            painel.add(txtEspecifico1);
+        } else if (tipoConta.equals("Conta Poupança")) {
+            painel.add(new JLabel("Taxa de Rendimento:"));
+            painel.add(txtEspecifico1);
+        } else if (tipoConta.equals("Conta Kids")) {
+            painel.add(new JLabel("CPF Responsável:"));
+            painel.add(txtEspecifico1);
+            painel.add(new JLabel("Limite Mensal:"));
+            painel.add(txtEspecifico2);
+        } else if (tipoConta.equals("Conta Investimento")) {
+            painel.add(new JLabel("Perfil de Risco:"));
+            painel.add(txtEspecifico1);
+        }
+
+        int confirmacao = JOptionPane.showConfirmDialog(null, painel, "Dados - " + tipoConta, JOptionPane.OK_CANCEL_OPTION);
+
+        if (confirmacao == JOptionPane.OK_OPTION) {
+            return new String[] {
+                    txtNumero.getText(),
+                    txtAgencia.getText(),
+                    txtSaldo.getText(),
+                    txtEspecifico1.getText(),
+                    txtEspecifico2.getText()
+            };
+        }
+        return null;
+    }
 }

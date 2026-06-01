@@ -31,10 +31,10 @@ public class Investimento {
     }
 
     public static ArrayList<Investimento> visualizarInvestimentosDisponiveis() {
-        if (AplicacaoBancaria.produtosDisponiveis == null || AplicacaoBancaria.produtosDisponiveis.isEmpty()) {
+        if (AplicacaoBancaria.investimentosDisponiveis == null || AplicacaoBancaria.investimentosDisponiveis.isEmpty()) {
             return null;
         }
-        return AplicacaoBancaria.produtosDisponiveis;
+        return AplicacaoBancaria.investimentosDisponiveis;
     }
 
     public boolean realizarInvestimento(Conta conta, Investimento produtoSelecionado, double valorParaInvestir, String dataAtual) throws SaldoInsuficienteException {

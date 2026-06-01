@@ -6,26 +6,26 @@ import org.mindrot.jbcrypt.BCrypt;
 
 public class AplicacaoBancaria {
     public static ArrayList<Usuario> ListaUsuarios = new ArrayList<>();
-    public static ArrayList<Investimento> produtosDisponiveis = new ArrayList<>();
+    public static ArrayList<Investimento> investimentosDisponiveis = new ArrayList<>();
 
     public static void main(String[] args) {
-        AplicacaoBancaria.produtosDisponiveis.add(new Investimento("CDB Pós-Fixado", 11.5, 6, "Renda Fixa", "Garantido pelo FGC"));
-        AplicacaoBancaria.produtosDisponiveis.add(new Investimento("LCI Isento", 9.8, 12, "Renda Fixa", "Isento de Imposto de Renda"));
-        AplicacaoBancaria.produtosDisponiveis.add(new Investimento("Tesouro IPCA+", 6.2, 24, "Título Público", "Proteção contra a inflação"));
-        AplicacaoBancaria.produtosDisponiveis.add(new Investimento("Fundo de Ações", 18.5, 0, "Renda Variável", "Maior risco e maior potencial"));
-        AplicacaoBancaria.produtosDisponiveis.add(new Investimento("Poupança", 6.17, 0, "Renda Fixa", "Liquidez diária garantida"));
+        AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("CDB Pós-Fixado", 11.5, 6, "Renda Fixa", "Garantido pelo FGC"));
+        AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("LCI Isento", 9.8, 12, "Renda Fixa", "Isento de Imposto de Renda"));
+        AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("Tesouro IPCA+", 6.2, 24, "Título Público", "Proteção contra a inflação"));
+        AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("Fundo de Ações", 18.5, 0, "Renda Variável", "Maior risco e maior potencial"));
+        AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("Poupança", 6.17, 0, "Renda Fixa", "Liquidez diária garantida"));
 
         int menu = 0;
         while (menu == 0) {
             String stringMenu = JOptionPane.showInputDialog(
                     "===============================\n" +
-                            "SEJA BEM VINDO AO NOSSO SISTEMA\n" +
+                            "                   SEJA BEM VINDO\n" +
                             "===============================\n" +
                             "1 - Fazer Login\n" +
                             "2 - Criar uma conta\n" +
                             "3 - Sair\n");
 
-            if (stringMenu == null) { System.out.println("Sistema encerrado pelo usuário."); return; }
+            if (stringMenu == null) { System.out.println("...ENCERRANDO O SISTEMA..."); return; }
 
             try {
                 menu = Integer.parseInt(stringMenu);
@@ -36,14 +36,8 @@ public class AplicacaoBancaria {
             }
 
             switch (menu) {
-                case 1:
-                    Login();
-                    menu = 0;
-                    break;
-                case 2:
-                    Cadastro();
-                    menu = 0;
-                    break;
+                case 1: Login(); menu = 0; break;
+                case 2: Cadastro(); menu = 0; break;
                 case 3:
                     JOptionPane.showMessageDialog(null, "...ENCERRANDO O SISTEMA...");
                     return;
@@ -598,9 +592,9 @@ public class AplicacaoBancaria {
                     break;
 
                 case 2:
-                    String[] opcoesCat = new String[produtosDisponiveis.size()];
-                    for (int i = 0; i < produtosDisponiveis.size(); i++) {
-                        opcoesCat[i] = "ID: " + i + " | " + produtosDisponiveis.get(i).getNomeProduto() + " (" + produtosDisponiveis.get(i).getTaxaRendimento() + "% a.a.)";
+                    String[] opcoesCat = new String[investimentosDisponiveis.size()];
+                    for (int i = 0; i < investimentosDisponiveis.size(); i++) {
+                        opcoesCat[i] = "ID: " + i + " | " + investimentosDisponiveis.get(i).getNomeProduto() + " (" + investimentosDisponiveis.get(i).getTaxaRendimento() + "% a.a.)";
                     }
 
                     String produtoEscolhido = SwingUtil.exibirMenuSelecao("Catálogo Comercial", "Selecione em qual título deseja aplicar o capital:", opcoesCat);
@@ -613,7 +607,7 @@ public class AplicacaoBancaria {
                         int indexSelecionado = Integer.parseInt(produtoEscolhido.split(" ")[1]);
                         double valorInvestir = Double.parseDouble(valorForm[0].replace(",", "."));
 
-                        Investimento produtoSelecionado = AplicacaoBancaria.produtosDisponiveis.get(indexSelecionado);
+                        Investimento produtoSelecionado = AplicacaoBancaria.investimentosDisponiveis.get(indexSelecionado);
                         String dataAtual = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
                         if (helper.realizarInvestimento(conta, produtoSelecionado, valorInvestir, dataAtual)) {
@@ -812,8 +806,12 @@ public class AplicacaoBancaria {
         }
     }
 
+
+    // --------------------------------------------------------------------------
+    // --------------------- Metodos Auxiliares dos Menus -----------------------
+    // --------------------------------------------------------------------------
     private static void Login() {
-        String loginTipo = SwingUtil.exibirMenuSelecao("Identificação de Login", "Quem é você no sistema?", "Sou Cliente", "Sou Administrador");
+        String loginTipo = SwingUtil.exibirMenuSelecao("Identificação de Login", "Quem é você?", "Sou Cliente", "Sou Administrador");
         if (loginTipo == null) return;
 
         if (loginTipo.equals("Sou Cliente")) {
@@ -835,13 +833,13 @@ public class AplicacaoBancaria {
                         AplicacaoBancaria.menuGestaoContas((Cliente) encontrado);
                         break;
                     } else {
-                        JOptionPane.showMessageDialog(null, "Credenciais inválidas para este tipo de Usuário", "Acesso Negado", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Acesso Negado para esse Tipo de Perfil", "Acesso Negado", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
         } else if (loginTipo.equals("Sou Administrador")) {
             while (true) {
-                String[] dados = SwingUtil.exibirFormulario("Painel Root - Autenticação", "Credenciais estritas do setor operacional:", "CPF ADM:", "Senha ADM:");
+                String[] dados = SwingUtil.exibirFormulario("Autenticação de Segurança", "Entre com as suas credenciais de acesso:", "CPF:", "Senha:");
                 if (dados == null) { System.out.println("Login cancelado."); break; }
 
                 String cpf = dados[0].trim();
@@ -854,11 +852,11 @@ public class AplicacaoBancaria {
                     if (encontrado == null) {
                         JOptionPane.showMessageDialog(null, "CPF ou Senha incorretos", "Erro", JOptionPane.ERROR_MESSAGE);
                     } else if (encontrado.tipoUsuario.equalsIgnoreCase("Administrador")) {
-                        JOptionPane.showMessageDialog(null, "Autenticação Administrativa Concedida.");
+                        JOptionPane.showMessageDialog(null, "Autenticação Concluída com Sucesso!");
                         AplicacaoBancaria.menuPrincipalAdministrador((Administrador) encontrado);
                         break;
                     } else {
-                        JOptionPane.showMessageDialog(null, "Credenciais inválidas para este perfil corporativo", "Acesso Negado", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Acesso Negado para esse Tipo de Perfil", "Acesso Negado", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
@@ -866,7 +864,7 @@ public class AplicacaoBancaria {
     }
 
     private static void Cadastro() {
-        String tipoCadastro = SwingUtil.exibirMenuSelecao("Tipo de Perfil", "Qual perfil deseja-se instanciar?", "Perfil para Cliente", "Perfil para Administrador");
+        String tipoCadastro = SwingUtil.exibirMenuSelecao("Criação de Perfil", "Qual perfil deseja-se criar?", "Perfil para Cliente", "Perfil para Administrador");
         if (tipoCadastro == null) return;
 
         if (tipoCadastro.equals("Perfil para Cliente")) {
@@ -882,18 +880,18 @@ public class AplicacaoBancaria {
                 String senha = dados[5].trim();
 
                 if (nome.isEmpty() || cpf.isEmpty() || telefone.isEmpty() || dataNascimento.isEmpty() || email.isEmpty() || senha.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos mandatórios", "Erro", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos obrigatórios", "Erro", JOptionPane.ERROR_MESSAGE);
                 } else {
                     String senhaCriptografada = BCrypt.hashpw(senha, BCrypt.gensalt(12));
                     Cliente cliente = new Cliente(nome, cpf, email, senhaCriptografada, dataNascimento, telefone, "Cliente");
                     AplicacaoBancaria.ListaUsuarios.add(cliente);
-                    JOptionPane.showMessageDialog(null, "Cliente registrado com sucesso no banco de dados!");
+                    JOptionPane.showMessageDialog(null, "Perfil Criado com Sucesso!");
                     break;
                 }
             }
         } else if (tipoCadastro.equals("Perfil para Administrador")) {
             while (true) {
-                String[] dados = SwingUtil.exibirFormulario("Cadastro de Administrador", "Insira os privilégios e dados administrativos:", "Nome:", "CPF:", "Telefone:", "Data de Nascimento (dd/mm/aaaa):", "E-mail:", "Senha:", "Matrícula:");
+                String[] dados = SwingUtil.exibirFormulario("Cadastro de Administrador", "Insira suas informações pessoais nos campos abaixo:", "Nome:", "CPF:", "Telefone:", "Data de Nascimento (dd/mm/aaaa):", "E-mail:", "Senha:", "Matrícula:");
                 if (dados == null) { System.out.println("Cadastro cancelado."); break; }
 
                 String nome = dados[0].trim();
@@ -910,7 +908,7 @@ public class AplicacaoBancaria {
                     String senhaCriptografada = BCrypt.hashpw(senha, BCrypt.gensalt(12));
                     Administrador administrador = new Administrador(nome, cpf, email, senhaCriptografada, dataNascimento, telefone, "Administrador", matricula);
                     ListaUsuarios.add(administrador);
-                    JOptionPane.showMessageDialog(null, "Administrador registrado e homologado com sucesso!");
+                    JOptionPane.showMessageDialog(null, "Perfil Criado com Sucesso!");
                     break;
                 }
             }
@@ -976,7 +974,6 @@ public class AplicacaoBancaria {
         }
     }
 
-    // Método ponte criado para manter a compatibilidade com a assinatura de chamada do menu principal
     public static void menuGestaoContas(Cliente encontrado) {
         menuGestaoCartoes(encontrado);
     }

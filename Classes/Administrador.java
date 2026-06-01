@@ -169,12 +169,12 @@ public class Administrador extends Usuario {
     }
     
     public boolean adicionarInvestimento(Investimento i) {
-        AplicacaoBancaria.produtosDisponiveis.add(i);
+        AplicacaoBancaria.investimentosDisponiveis.add(i);
         return true;
     }
 
     public boolean removerInvestimento(int id) {
-        AplicacaoBancaria.produtosDisponiveis.remove(id);
+        AplicacaoBancaria.investimentosDisponiveis.remove(id);
         return true;
     }
 

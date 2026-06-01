@@ -90,15 +90,12 @@ public abstract class Usuario {
     }
 
 
-
     public void setTelefone(String telefone) {
         this.telefone = telefone;
     }
-
     public void setNome(String nome) {
         this.nome = nome;
     }
-
     public void setSenha(String senha) {
         String senhaCriptografada = BCrypt.hashpw(senha, BCrypt.gensalt(12));
         this.senha = senhaCriptografada;
@@ -148,7 +145,5 @@ public abstract class Usuario {
 
     public Status getStatus() {return this.statusPerfil;}
     public void setStatus(Status statusCliente) {this.statusPerfil = statusCliente;}
-
-
 
 }

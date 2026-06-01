@@ -36,6 +36,7 @@ public class Transacao {
     public  Conta getOrigem () {return this.origem;}
     public  Conta getDestino () {return this.destino;}
     public double getValor () {return this.valor;}
+    public String getHora() {return this.hora;}
 
     public void setTipoFluxo(String tipoFluxo) {this.tipoFluxo = tipoFluxo;}
 

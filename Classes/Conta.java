@@ -102,5 +102,6 @@ public abstract class Conta {
     public String getAgencia() {return agencia;}
     public String getNumeroConta() {return numeroConta;}
     public void setSaldo(double saldo) {this.saldo = saldo;}
+    public ArrayList<Cartao> getCartoes() {return cartoes;}
 
 }

@@ -48,7 +48,7 @@ public class AplicacaoBancaria {
             }
         }
     }
-    public static void menuPrincipalCliente(Cliente encontrado) {
+    public static void menuGestaoCartoes(Cliente encontrado) {
         int mpC = 0;
 
         while (mpC == 0) {
@@ -138,7 +138,7 @@ public class AplicacaoBancaria {
                         int id = Integer.parseInt(idStr);
                         Conta contaSelecionada = contas.get(id);
 
-                        dashboardCliente(contaSelecionada, encontrado);
+                        menuPrincipalCliente(contaSelecionada, encontrado);
                     } catch (NumberFormatException e) {
                         JOptionPane.showMessageDialog(null, "ID inválido! Digite apenas números.");
                     } catch (IndexOutOfBoundsException e) {
@@ -153,6 +153,153 @@ public class AplicacaoBancaria {
                 default:
                     JOptionPane.showMessageDialog(null, "Opção inválida!");
                     mpC = 0;
+                    break;
+            }
+        }
+    }
+    public static void menuPrincipalCliente(Conta conta, Cliente encontrado) {
+        int opcaoDash = 0;
+
+        while (opcaoDash != 7) {
+            String stringDash = JOptionPane.showInputDialog(
+                    "==================================\n" +
+                            "       DASHBOARD DA CONTA         \n" +
+                            "==================================\n" +
+                            "Conta: " + conta.getNumeroConta() + " | Saldo: R$ " + String.format("%.2f", conta.getSaldo()) + "\n" +
+                            "==================================\n" +
+                            "1 - Configurações / Perfil\n" +
+                            "2 - Visualizar Dados da Conta\n" +
+                            "3 - Realizar Transação\n" +
+                            "4 - Visualizar Extrato\n" +
+                            "5 - Gestão de Cartões\n" +
+                            "6 - Investimentos e Poupança\n" +
+                            "7 - Voltar para Menu de Contas\n");
+
+            if (stringDash == null) return;
+
+            try {
+                opcaoDash = Integer.parseInt(stringDash);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Opção inválida! Digite apenas números.");
+                continue;
+            }
+
+            switch (opcaoDash) {
+                case 1:
+                    AplicacaoBancaria.configuracoes((Usuario )encontrado);
+                    break;
+
+                case 2:
+                    JOptionPane.showMessageDialog(null, conta.visualizarDadosConta(), "Dados da Conta", JOptionPane.INFORMATION_MESSAGE);
+                    break;
+
+                case 3:
+                    ArrayList<Cartao> cartoesDaConta = conta.getCartoes();
+
+                    Object[] dadosTx = SwingUtil.exibirFormularioTransacao(cartoesDaConta);
+                    if (dadosTx == null) break;
+
+                    try {
+                        String valorStr = (String) dadosTx[0];
+                        if (valorStr.trim().isEmpty()) {
+                            JOptionPane.showMessageDialog(null, "Por favor, insira um valor.", "Erro", JOptionPane.WARNING_MESSAGE);
+                            break;
+                        }
+
+                        double valor = Double.parseDouble(valorStr.replace(",", "."));
+                        String metodo = (String) dadosTx[1];
+                        int indiceCartao = (int) dadosTx[2];
+                        String categoria = (String) dadosTx[3];
+                        String cpfDest = (String) dadosTx[4];
+                        String numContaDest = (String) dadosTx[5];
+
+                        Cartao cartaoEscolhido = null;
+                        if (indiceCartao > 0 && cartoesDaConta != null && !cartoesDaConta.isEmpty()) {
+                            cartaoEscolhido = cartoesDaConta.get(indiceCartao - 1);
+                        }
+
+                        Conta contaDestino = null;
+                        if (!cpfDest.isEmpty() && !numContaDest.isEmpty()) {
+                            for (Usuario u : AplicacaoBancaria.ListaUsuarios) {
+                                if (u instanceof Cliente && u.getCpf().equals(cpfDest)) {
+                                    for (Conta c : ((Cliente) u).obterContas()) {
+                                        if (c.getNumeroConta().equals(numContaDest)) {
+                                            contaDestino = c;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            if (contaDestino == null) {
+                                JOptionPane.showMessageDialog(null, "Conta de destino não encontrada.", "Erro", JOptionPane.ERROR_MESSAGE);
+                                break;
+                            }
+                        }
+
+                        boolean sucesso = conta.realizarTransacao(valor, metodo, cartaoEscolhido, categoria, contaDestino);
+                        if (sucesso) {
+                            JOptionPane.showMessageDialog(null, "Transação concluída com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                        }
+
+                    } catch (NumberFormatException e) {
+                        JOptionPane.showMessageDialog(null, "Erro: Formato de valor inválido.", "Erro", JOptionPane.ERROR_MESSAGE);
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(null, e.getMessage(), "Erro na Transação", JOptionPane.ERROR_MESSAGE);
+                    }
+                    break;
+
+                case 4:
+                    String[] filtros = SwingUtil.exibirFiltrosExtrato();
+                    if (filtros == null) break;
+
+                    String fluxo = filtros[0];
+                    String metodoExtrato = filtros[1];
+                    String catExtrato = filtros[2];
+                    String diasStr = filtros[3];
+
+                    Integer dias = null;
+                    if (!diasStr.trim().isEmpty()) {
+                        try {
+                            dias = Integer.parseInt(diasStr.trim());
+                        } catch (NumberFormatException e) {
+                            JOptionPane.showMessageDialog(null, "Filtro de dias inválido e ignorado.");
+                        }
+                    }
+
+                    ArrayList<Transacao> extratoFiltrado = conta.visualizarExtrato(fluxo, metodoExtrato, catExtrato, dias, null);
+
+                    if (extratoFiltrado == null || extratoFiltrado.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "Nenhuma transação encontrada.", "Extrato Vazio", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        StringBuilder sb = new StringBuilder("=== EXTRATO DE TRANSAÇÕES ===\n\n");
+                        for (Transacao t : extratoFiltrado) {
+                            sb.append(String.format("[%s às %s] - %s\n", t.getData(), t.getHora(), t.getCategoria()));
+                            sb.append(String.format("Método: %s | Tipo: %s\n", t.getMetodoPagamento(), t.getFluxo()));
+                            sb.append(String.format("Valor: R$ %.2f\n", t.getValor()));
+                            sb.append("--------------------------------------------------\n");
+                        }
+
+                        JTextArea textArea = new JTextArea(15, 40);
+                        textArea.setText(sb.toString());
+                        textArea.setEditable(false);
+                        JOptionPane.showMessageDialog(null, new JScrollPane(textArea), "Extrato Consolidado", JOptionPane.PLAIN_MESSAGE);
+                    }
+                    break;
+
+                case 5:
+                    AplicacaoBancaria.gestaoCartoes(conta, encontrado);
+                    break;
+
+                case 6:
+                    AplicacaoBancaria.investimentosEPoupanca(conta, encontrado);
+                    break;
+
+                case 7:
+                    JOptionPane.showMessageDialog(null, "Voltando ao menu de contas...");
+                    break;
+
+                default:
+                    JOptionPane.showMessageDialog(null, "Opção inválida!");
                     break;
             }
         }
@@ -190,7 +337,7 @@ public class AplicacaoBancaria {
                         JOptionPane.showMessageDialog(null, "CPF ou Senha incorretos");
                     } else if (encontrado.tipoUsuario.equalsIgnoreCase("Cliente")) {
                         JOptionPane.showMessageDialog(null, "Sucesso");
-                        AplicacaoBancaria.menuPrincipalCliente((Cliente) encontrado);
+                        AplicacaoBancaria.menuGestaoCartoes((Cliente) encontrado);
                         break;
                     } else {
                         JOptionPane.showMessageDialog(null, "Credenciais inválidas para este tipo de Usuário");
@@ -340,10 +487,10 @@ public class AplicacaoBancaria {
 
 
 
-
-
+    private static void investimentosEPoupanca(Conta conta, Cliente encontrado) {}
+    private static void gestaoCartoes(Conta conta, Cliente encontrado) {}
+    private static void configuracoes(Usuario encontrado) {}
     public static void menuPrincipalAdministrador (Administrador encontrado) {}
-    public static void dashboardCliente(Conta contaSelecionada, Cliente encontrado) {}
 }
 
 

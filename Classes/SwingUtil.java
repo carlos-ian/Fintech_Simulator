@@ -2,6 +2,7 @@ package Classes;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class SwingUtil {
 
@@ -134,6 +135,66 @@ public class SwingUtil {
                     txtSaldo.getText(),
                     txtEspecifico1.getText(),
                     txtEspecifico2.getText()
+            };
+        }
+        return null;
+    }
+    public static Object[] exibirFormularioTransacao(ArrayList<Cartao> cartoes) {
+        JTextField txtValor = new JTextField();
+        JComboBox<String> comboMetodo = new JComboBox<>(new String[]{"PIX", "DEBITO", "CREDITO"});
+        JComboBox<String> comboCategoria = new JComboBox<>(new String[]{"Alimentação", "Lazer", "Saúde", "Educação", "Transporte", "Outros"});
+        JTextField txtCpfDestino = new JTextField();
+        JTextField txtNumContaDestino = new JTextField();
+
+        String[] opcoes = new String[cartoes.size() + 1];
+        opcoes[0] = "Não utilizar cartão (Saldo/PIX)";
+        for (int i = 0; i < cartoes.size(); i++) {
+            opcoes[i+1] = "Cartão Final: " + cartoes.get(i).getNumeroCartao().substring(Math.max(0, cartoes.get(i).getNumeroCartao().length() - 4));
+        }
+        JComboBox<String> comboCartoes = new JComboBox<>(opcoes);
+
+        Object[] componentes = {
+                "Valor:", txtValor,
+                "Método:", comboMetodo,
+                "Cartão:", comboCartoes,
+                "Categoria:", comboCategoria,
+                "\nDestinatário (Opcional):",
+                "CPF:", txtCpfDestino,
+                "Conta:", txtNumContaDestino
+        };
+
+        int res = JOptionPane.showConfirmDialog(null, componentes, "Transação", JOptionPane.OK_CANCEL_OPTION);
+        if (res == JOptionPane.OK_OPTION) {
+            return new Object[]{
+                    txtValor.getText(),
+                    comboMetodo.getSelectedItem(),
+                    comboCartoes.getSelectedIndex(),
+                    comboCategoria.getSelectedItem(),
+                    txtCpfDestino.getText(),
+                    txtNumContaDestino.getText()
+            };
+        }
+        return null;
+    }
+    public static String[] exibirFiltrosExtrato() {
+        JComboBox<String> comboFluxo = new JComboBox<>(new String[]{"", "ENTRADA", "SAÍDA"});
+        JComboBox<String> comboMetodo = new JComboBox<>(new String[]{"", "PIX", "DEBITO", "CREDITO"});
+        JTextField txtCat = new JTextField();
+        JTextField txtDias = new JTextField();
+
+        Object[] componentes = {
+                "Fluxo:", comboFluxo,
+                "Método:", comboMetodo,
+                "Categoria:", txtCat,
+                "Dias (ex: 30):", txtDias
+        };
+
+        if (JOptionPane.showConfirmDialog(null, componentes, "Filtros", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+            return new String[]{
+                    (String)comboFluxo.getSelectedItem(),
+                    (String)comboMetodo.getSelectedItem(),
+                    txtCat.getText(),
+                    txtDias.getText()
             };
         }
         return null;

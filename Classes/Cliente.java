@@ -4,11 +4,9 @@ import java.util.ArrayList;
 
 public class Cliente extends Usuario {
     ArrayList<Conta> listaContas = new ArrayList<>();
-    private Status statusCliente;
 
     public Cliente(String nome, String cpf, String email, String senha, String dataNascimento, String telefone, String tipoUsuario, Status statusCliente) {
         super(nome, cpf, email, senha, dataNascimento, telefone, tipoUsuario);
-        this.statusCliente = statusCliente;
     }
 
     @Override
@@ -33,7 +31,7 @@ public class Cliente extends Usuario {
             }
         }
         return dadosBasicos +
-                "\nSTATUS DO CLIENTE: " + this.statusCliente + dadosContas;
+                "\nSTATUS DO CLIENTE: " + this.statusPerfil + dadosContas;
     }
 
     public void abrirConta(String numeroConta, String agencia, double saldo, String tipoConta,
@@ -64,7 +62,7 @@ public class Cliente extends Usuario {
 
     public ArrayList<Conta> obterContas() {return this.listaContas;}
 
-    public Status getStatusCliente() {return this.statusCliente;}
-    public void setStatusCliente(Status statusCliente) {this.statusCliente = statusCliente;}
+    public Status getStatusCliente() {return this.statusPerfil;}
+    public void setStatusCliente(Status statusCliente) {this.statusPerfil = statusCliente;}
 
 }

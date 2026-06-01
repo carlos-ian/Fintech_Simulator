@@ -1,13 +1,6 @@
 package Classes;
 
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
-import Classes.Exceptions.*;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 
 
 public class Administrador extends Usuario {
@@ -36,7 +29,7 @@ public class Administrador extends Usuario {
     public void setMatricula(String matricula) {this.matricula = matricula;}
 
     public Cliente consultarCliente(String cpfBusca, ArrayList<Cliente> bancoDeClientes) {
-        for (Usuario c : AplicacaoBancaria1.ListaUsuarios) {
+        for (Usuario c : AplicacaoBancaria.ListaUsuarios) {
             if (c.cpf.equals(cpfBusca) && c.tipoUsuario.equals("Cliente")) {
                 return (Cliente) c;
             }
@@ -176,12 +169,12 @@ public class Administrador extends Usuario {
     }
     
     public boolean adicionarInvestimento(Investimento i) {
-        AplicacaoBancaria1.produtosDisponiveis.add(i);
+        AplicacaoBancaria.produtosDisponiveis.add(i);
         return true;
     }
 
     public boolean removerInvestimento(int id) {
-        AplicacaoBancaria1.produtosDisponiveis.remove(id);
+        AplicacaoBancaria.produtosDisponiveis.remove(id);
         return true;
     }
 

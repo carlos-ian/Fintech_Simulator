@@ -1,7 +1,5 @@
 package Classes;
 
-import javax.swing.*;
-import java.util.ArrayList;
 import org.mindrot.jbcrypt.BCrypt;
 
 public abstract class Usuario {
@@ -15,6 +13,7 @@ public abstract class Usuario {
     protected String dataNascimento;
     protected String telefone;
     protected String tipoUsuario;
+    protected Status statusPerfil;
 
     public Usuario (String nome, String cpf, String email, String senha, String dataNascimento, String telefone, String tipoUsuario) {
         this.nome = nome;
@@ -25,11 +24,12 @@ public abstract class Usuario {
         this.telefone = telefone;
         this.tipoUsuario = tipoUsuario;
         this.id = cod_sequencial++;
+        this.statusPerfil = Status.ATIVO;
     }
 
     public static Usuario autenticar(String cpf, String senha) {
 
-        for (Usuario u : AplicacaoBancaria1.ListaUsuarios) {
+        for (Usuario u : AplicacaoBancaria.ListaUsuarios) {
             if (u.getCpf().equals(cpf)) {
                 if(BCrypt.checkpw(senha, u.getSenha())) {
                     return u;
@@ -57,7 +57,7 @@ public abstract class Usuario {
                 throw new IllegalStateException("Não é possível encerrar: o cliente possui saldo em conta.");
             }
         }
-        AplicacaoBancaria1.ListaUsuarios.remove(u);
+        AplicacaoBancaria.ListaUsuarios.remove(u);
     }
 
     public void alterarDados(String tipoDado, String novoValor) {

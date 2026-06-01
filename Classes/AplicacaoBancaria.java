@@ -9,6 +9,12 @@ public class AplicacaoBancaria {
     public static ArrayList<Investimento> produtosDisponiveis = new ArrayList<>();
 
     public static void main(String[] args) {
+        AplicacaoBancaria.produtosDisponiveis.add(new Investimento("CDB Pós-Fixado", 11.5, 6, "Renda Fixa", "Garantido pelo FGC"));
+        AplicacaoBancaria.produtosDisponiveis.add(new Investimento("LCI Isento", 9.8, 12, "Renda Fixa", "Isento de Imposto de Renda"));
+        AplicacaoBancaria.produtosDisponiveis.add(new Investimento("Tesouro IPCA+", 6.2, 24, "Título Público", "Proteção contra a inflação"));
+        AplicacaoBancaria.produtosDisponiveis.add(new Investimento("Fundo de Ações", 18.5, 0, "Renda Variável", "Maior risco e maior potencial"));
+        AplicacaoBancaria.produtosDisponiveis.add(new Investimento("Poupança", 6.17, 0, "Renda Fixa", "Liquidez diária garantida"));
+
         int menu = 0;
         while (menu == 0) {
             String stringMenu = JOptionPane.showInputDialog(
@@ -525,6 +531,107 @@ public class AplicacaoBancaria {
             }
         }
     }
+    public static void investimentosEPoupanca(Conta conta, Cliente encontrado) {
+        int opcaoInv = 0;
+
+        while (opcaoInv != 4) {
+            String stringInv = JOptionPane.showInputDialog(
+                    "==================================\n" +
+                            "     INVESTIMENTOS E POUPANÇA     \n" +
+                            "==================================\n" +
+                            "Saldo Livre Atual: R$ " + String.format("%.2f", conta.getSaldo()) + "\n" +
+                            "==================================\n" +
+                            "1 - Visualizar Meus Investimentos\n" +
+                            "2 - Realizar Aplicação\n" +
+                            "3 - Resgatar Aplicação\n" +
+                            "4 - Voltar\n");
+
+            if (stringInv == null) return;
+
+            try {
+                opcaoInv = Integer.parseInt(stringInv);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Opção inválida! Digite apenas números.");
+                continue;
+            }
+
+            Investimento helper = new Investimento(null, 0, 0, null, null);
+
+            switch (opcaoInv) {
+                case 1:
+                    ArrayList<Investimento> feitos = conta.listaInvestimentos;
+
+                    if (feitos == null || feitos.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "Não há aplicações ativas nesta conta.", "Investimentos", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        StringBuilder sbFeitos = new StringBuilder("=== SEU PORTFÓLIO DE ATIVOS ===\n\n");
+                        for (int i = 0; i < feitos.size(); i++) {
+                            Investimento inv = feitos.get(i);
+                            sbFeitos.append("ID: ").append(i).append("\n");
+                            sbFeitos.append(inv.toString()).append("\n-----------------------\n");
+                        }
+
+                        JTextArea txtArea = new JTextArea(15, 40);
+                        txtArea.setText(sbFeitos.toString());
+                        txtArea.setEditable(false);
+                        JOptionPane.showMessageDialog(null, new JScrollPane(txtArea), "Aplicações Consolidadas", JOptionPane.PLAIN_MESSAGE);
+                    }
+                    break;
+
+                case 2:
+                    Object[] dadosNovoInv = SwingUtil.exibirFormularioNovoInvestimento(AplicacaoBancaria.produtosDisponiveis);
+                    if (dadosNovoInv == null) break;
+
+                    try {
+                        int indexSelecionado = (int) dadosNovoInv[0];
+                        String valorStr = (String) dadosNovoInv[1];
+                        double valorInvestir = Double.parseDouble(valorStr.replace(",", "."));
+
+                        Investimento produtoSelecionado = AplicacaoBancaria.produtosDisponiveis.get(indexSelecionado);
+                        String dataAtual = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+                        if (helper.realizarInvestimento(conta, produtoSelecionado, valorInvestir, dataAtual)) {
+                            JOptionPane.showMessageDialog(null, "Aplicação realizada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    } catch (NumberFormatException e) {
+                        JOptionPane.showMessageDialog(null, "Erro: Valor numérico digitado incorretamente.", "Erro", JOptionPane.ERROR_MESSAGE);
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(null, e.getMessage(), "Falha na Operação", JOptionPane.ERROR_MESSAGE);
+                    }
+                    break;
+
+                case 3:
+                    if (conta.listaInvestimentos == null || conta.listaInvestimentos.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "Você não possui nenhuma aplicação para resgatar.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                        break;
+                    }
+
+                    String idResgateStr = SwingUtil.exibirFormularioResgateInvestimento();
+                    if (idResgateStr == null) break;
+
+                    try {
+                        int idInvestimento = Integer.parseInt(idResgateStr);
+
+                        if (helper.resgatarInvestimento(conta, idInvestimento)) {
+                            JOptionPane.showMessageDialog(null, "Resgate concluído! O valor retornou ao seu saldo livre.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    } catch (NumberFormatException e) {
+                        JOptionPane.showMessageDialog(null, "Erro: O ID deve ser um número inteiro.", "Erro", JOptionPane.ERROR_MESSAGE);
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(null, e.getMessage(), "Falha no Resgate", JOptionPane.WARNING_MESSAGE);
+                    }
+                    break;
+
+                case 4:
+                    JOptionPane.showMessageDialog(null, "Voltando ao Dashboard...");
+                    break;
+
+                default:
+                    JOptionPane.showMessageDialog(null, "Opção inválida!");
+                    break;
+            }
+        }
+    }
 
     private static void Login() {
         String stringLogin = JOptionPane.showInputDialog("Quem é você?\n" +
@@ -706,8 +813,5 @@ public class AplicacaoBancaria {
         }
     }
 
-
-
-    private static void investimentosEPoupanca(Conta conta, Cliente encontrado) {}
     public static void menuPrincipalAdministrador (Administrador encontrado) {}
 }

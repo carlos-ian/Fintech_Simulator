@@ -106,4 +106,6 @@ public class Investimento {
     public void setNomeProduto(String nomeProduto) {this.nomeProduto = nomeProduto;}
     public void setTaxaRendimento(double taxaRendimento) {this.taxaRendimento = taxaRendimento;}
     public void setStatus(String status) {this.Status = status;}
+    public String getNomeProduto() {return nomeProduto;}
+    public double getTaxaRendimento() {return taxaRendimento;}
 }

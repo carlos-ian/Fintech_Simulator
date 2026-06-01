@@ -330,4 +330,50 @@ public class SwingUtil {
         }
         return null;
     }
+    public static Object[] exibirFormularioNovoInvestimento(ArrayList<Investimento> disponiveis) {
+        if (disponiveis == null || disponiveis.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Não há produtos de investimento disponíveis no banco no momento.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return null;
+        }
+
+        String[] nomesProdutos = new String[disponiveis.size()];
+        for (int i = 0; i < disponiveis.size(); i++) {
+            nomesProdutos[i] = disponiveis.get(i).getNomeProduto() + " (Rendimento: " + disponiveis.get(i).getTaxaRendimento() + "%)";
+        }
+
+        JComboBox<String> comboProdutos = new JComboBox<>(nomesProdutos);
+        JTextField txtValorInvestir = new JTextField();
+
+        Object[] formulario = {
+                "Selecione o Produto:", comboProdutos,
+                "Valor a ser aplicado: R$", txtValorInvestir
+        };
+
+        int resultado = JOptionPane.showConfirmDialog(null, formulario, "Aplicar em Investimento", JOptionPane.OK_CANCEL_OPTION);
+        if (resultado == JOptionPane.OK_OPTION) {
+            return new Object[]{ comboProdutos.getSelectedIndex(), txtValorInvestir.getText().trim() };
+        }
+        return null;
+    }
+    public static String exibirFormularioResgateInvestimento() {
+        JTextField txtIdResgate = new JTextField();
+        Object[] formulario = { "Digite o ID do investimento que deseja resgatar:", txtIdResgate };
+
+        int resultado = JOptionPane.showConfirmDialog(null, formulario, "Resgate de Aplicação", JOptionPane.OK_CANCEL_OPTION);
+        if (resultado == JOptionPane.OK_OPTION) {
+            return txtIdResgate.getText().trim();
+        }
+        return null;
+    }
+
+    public static String exibirFormularioMovimentacaoPoupanca(String titulo, String mensagem) {
+        JTextField txtValor = new JTextField();
+        Object[] formulario = { mensagem, txtValor };
+
+        int resultado = JOptionPane.showConfirmDialog(null, formulario, titulo, JOptionPane.OK_CANCEL_OPTION);
+        if (resultado == JOptionPane.OK_OPTION) {
+            return txtValor.getText().trim();
+        }
+        return null;
+    }
 }

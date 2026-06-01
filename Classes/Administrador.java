@@ -28,8 +28,6 @@ public class Administrador extends Usuario {
                 "\nMATRÍCULA: " + this.matricula;
     }
 
-    public void setMatricula(String matricula) {this.matricula = matricula;}
-
     public Cliente consultarCliente(String cpfBusca, ArrayList<Cliente> bancoDeClientes) {
         for (Usuario c : AplicacaoBancaria.ListaUsuarios) {
             if (c.cpf.equals(cpfBusca) && c.tipoUsuario.equals("Cliente")) {
@@ -76,26 +74,6 @@ public class Administrador extends Usuario {
             return null;
         }
         return conta.extrato;
-    }
-
-    public boolean estornarTransacao(Transacao transacao) {
-        if (transacao == null || transacao.getStatus().equalsIgnoreCase("ESTORNADO")) {
-            return false;
-        }
-
-        Conta contaOrigem = transacao.getOrigem();
-        Conta contaDestino = transacao.getDestino();
-        double valor = transacao.getValor();
-
-        if (contaDestino != null && contaOrigem != null) {
-            contaDestino.setSaldo(contaDestino.getSaldo() - valor);
-            contaOrigem.setSaldo(contaOrigem.getSaldo() + valor);
-        }
-
-        contaDestino.extrato.remove(transacao);
-        contaOrigem.extrato.remove(transacao);
-
-        return true;
     }
 
     public boolean analisarPedidoLimite(Cartao cartao, Conta conta, double novoLimite) {
@@ -168,29 +146,6 @@ public class Administrador extends Usuario {
                 maiorSaldo, contaVIP, totalTransacoes,
                 usuariosAtivos, usuariosBloqueados
         );
-    }
-    
-    public boolean adicionarInvestimento(Investimento i) {
-        AplicacaoBancaria.investimentosDisponiveis.add(i);
-        return true;
-    }
-
-    public boolean removerInvestimento(int id) {
-        AplicacaoBancaria.investimentosDisponiveis.remove(id);
-        return true;
-    }
-
-    public boolean editarInvestimento(Investimento i, String novoNome, double novaTaxa, String novoStatus) {
-        if (novoNome == null || novoNome.isBlank()) {return false;}
-
-        if (novaTaxa < 0) {return false;}
-
-        if (novoStatus == null || novoStatus.isBlank()) {return false;}
-
-        i.setNomeProduto(novoNome);
-        i.setTaxaRendimento(novaTaxa);
-        i.setStatus(novoStatus);
-        return true;
     }
 
     public String getMatricula() {return this.matricula;}

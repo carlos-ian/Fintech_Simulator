@@ -11,30 +11,13 @@ public class Investimento {
     private double taxaRendimento;
     private double valorAplicado;
     private String dataAplicacao;
-    private String Status;
 
-    Investimento(String nomeProduto, double taxaRendimento, double valorAplicado, String dataAplicacao,
-                 String Status){
+    Investimento(String nomeProduto, double taxaRendimento, double valorAplicado, String dataAplicacao){
         idInvestimento = contador++;
         this.nomeProduto = nomeProduto;
         this.taxaRendimento = taxaRendimento;
         this.valorAplicado = valorAplicado;
         this.dataAplicacao = dataAplicacao;
-        this.Status = Status;
-    }
-
-    public ArrayList<Investimento> visualizarInvestimentosFeitos(Conta conta) {
-        if (conta.listaInvestimentos == null || conta.listaInvestimentos.isEmpty()) {
-            return null;
-        }
-        return conta.listaInvestimentos;
-    }
-
-    public static ArrayList<Investimento> visualizarInvestimentosDisponiveis() {
-        if (AplicacaoBancaria.investimentosDisponiveis == null || AplicacaoBancaria.investimentosDisponiveis.isEmpty()) {
-            return null;
-        }
-        return AplicacaoBancaria.investimentosDisponiveis;
     }
 
     public boolean realizarInvestimento(Conta conta, Investimento produtoSelecionado, double valorParaInvestir, String dataAtual) throws SaldoInsuficienteException {
@@ -48,16 +31,10 @@ public class Investimento {
         }
 
         conta.saldo -= valorParaInvestir;
+        produtoSelecionado.dataAplicacao = dataAtual;
+        produtoSelecionado.valorAplicado = valorParaInvestir;
 
-        Investimento novoInvestimento = new Investimento(
-                produtoSelecionado.nomeProduto,
-                produtoSelecionado.taxaRendimento,
-                valorParaInvestir,
-                dataAtual,
-                "Ativo"
-        );
-
-        conta.listaInvestimentos.add(novoInvestimento);
+        conta.listaInvestimentos.add(produtoSelecionado);
 
         System.out.printf("Investimento de R$ %.2f em '%s' realizado com sucesso!\n",
                 valorParaInvestir, produtoSelecionado.nomeProduto);
@@ -78,14 +55,8 @@ public class Investimento {
             throw new IllegalArgumentException("Investimento com o ID " + idInvestimento + " não foi encontrado.");
         }
 
-        if (investimentoEncontrado.Status.equalsIgnoreCase("Resgatado")) {
-            throw new IllegalStateException("Este investimento já foi resgatado anteriormente.");
-        }
-
         double valorParaDevolver = investimentoEncontrado.valorAplicado;
         conta.saldo += valorParaDevolver;
-
-        investimentoEncontrado.Status = "Resgatado";
 
         System.out.printf("Resgate de R$ %.2f do produto '%s' realizado com sucesso!\n",
                 valorParaDevolver, investimentoEncontrado.nomeProduto);
@@ -99,13 +70,9 @@ public class Investimento {
                 "\nProduto: " + nomeProduto +
                 "\nTaxa de rendimento: " + taxaRendimento + "%" +
                 "\nValor aplicado: R$ " + valorAplicado +
-                "\nData aplicação: " + dataAplicacao +
-                "\nStatus: " + Status + "\n";
+                "\nData aplicação: " + dataAplicacao + "\n";
     }
 
-    public void setNomeProduto(String nomeProduto) {this.nomeProduto = nomeProduto;}
-    public void setTaxaRendimento(double taxaRendimento) {this.taxaRendimento = taxaRendimento;}
-    public void setStatus(String status) {this.Status = status;}
     public String getNomeProduto() {return nomeProduto;}
     public double getTaxaRendimento() {return taxaRendimento;}
 }

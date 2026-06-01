@@ -22,6 +22,7 @@ public class Cartao {
         if (this.numeroCartao != null && this.numeroCartao.length() >= 4) {
             numeroMascarado += this.numeroCartao.substring(this.numeroCartao.length() - 4);
         } else {
+
             numeroMascarado = this.numeroCartao;
         }
 

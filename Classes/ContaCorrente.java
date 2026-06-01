@@ -56,13 +56,12 @@ public class ContaCorrente extends Conta {
             }
 
             cartaoEscolhido.setLimiteDisponivel(cartaoEscolhido.getLimiteDisponivel() - valor);
-            destino.saldo += valor;
 
         } else {
             throw new IllegalArgumentException("Método de pagamento inválido: " + metodoPagamento);
         }
 
-        if (destino != null && (metodoPagamento.equalsIgnoreCase("PIX") || metodoPagamento.equalsIgnoreCase("DEBITO"))) {
+        if (destino != null && (metodoPagamento.equalsIgnoreCase("PIX") || metodoPagamento.equalsIgnoreCase("DEBITO") || metodoPagamento.equalsIgnoreCase("CREDITO"))) {
             destino.saldo += valor;
         }
 
@@ -70,10 +69,11 @@ public class ContaCorrente extends Conta {
         String horaAtual = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
 
         Transacao transacao = new Transacao(dataAtual, horaAtual, valor, categoria, "SAÍDA", metodoPagamento, "CONCLUIDO", this, destino);
+        Transacao transacaoD = transacao;
         this.extrato.add(transacao);
+        transacaoD.setTipoFluxo("ENTRADA");
         if (destino != null) {
-            transacao.setTipoFluxo("ENTRADA");
-            destino.extrato.add(transacao);
+            destino.extrato.add(transacaoD);
         }
 
         return true;

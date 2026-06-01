@@ -81,7 +81,7 @@ public class SwingUtil {
                 "Forma de Pagamento:", comboMetodo,
                 "Selecione o Cartão (Se aplicável):", comboCartoes,
                 "Categoria da Despesa:", comboCat,
-                "\nDados do Favorecido (Opcional para Transferências):",
+                "\nDados de Destino:",
                 "CPF do Destinatário:", txtCpf,
                 "Número da Conta Destino:", txtConta
         };

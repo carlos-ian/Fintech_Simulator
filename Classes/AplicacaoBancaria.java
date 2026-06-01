@@ -9,11 +9,11 @@ public class AplicacaoBancaria {
     public static ArrayList<Investimento> investimentosDisponiveis = new ArrayList<>();
 
     public static void main(String[] args) {
-        AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("CDB Pós-Fixado", 11.5, 6, "Renda Fixa", "Garantido pelo FGC"));
-        AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("LCI Isento", 9.8, 12, "Renda Fixa", "Isento de Imposto de Renda"));
-        AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("Tesouro IPCA+", 6.2, 24, "Título Público", "Proteção contra a inflação"));
-        AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("Fundo de Ações", 18.5, 0, "Renda Variável", "Maior risco e maior potencial"));
-        AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("Poupança", 6.17, 0, "Renda Fixa", "Liquidez diária garantida"));
+        AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("CDB Pós-Fixado", 11.5, 0, null));
+        AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("LCI Isento", 9.8, 0, null));
+        AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("Tesouro IPCA+", 6.2, 0, null));
+        AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("Fundo de Ações", 18.5, 0, null));
+        AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("Poupança", 6.17, 0, null));
 
         int menu = 0;
         while (menu == 0) {
@@ -51,7 +51,6 @@ public class AplicacaoBancaria {
 
     public static void menuGestaoContas(Cliente encontrado) {
         int mpC = 0;
-
         while (mpC == 0) {
             String stringMenu = JOptionPane.showInputDialog(
                     "1 - Listar Contas\n" +
@@ -160,7 +159,6 @@ public class AplicacaoBancaria {
 
     public static void menuPrincipalCliente(Conta conta, Cliente encontrado) {
         int opcaoDash = 0;
-
         while (opcaoDash != 7) {
             String stringDash = JOptionPane.showInputDialog(
                     "==================================\n" +
@@ -405,11 +403,10 @@ public class AplicacaoBancaria {
 
     private static void gestaoCartoes(Conta conta, Cliente encontrado) {
         int opcaoCartao = 0;
-
         while (opcaoCartao != 7) {
             String stringCartao = JOptionPane.showInputDialog(
                     "==================================\n" +
-                            "         GESTÃO DE CARTÕES        \n" +
+                            "               GESTÃO DE CARTÕES        \n" +
                             "==================================\n" +
                             "1 - Criar Novo Cartão\n" +
                             "2 - Visualizar Dados do Cartão\n" +
@@ -442,7 +439,7 @@ public class AplicacaoBancaria {
                     opcoesCartao[i] = "ID: " + i + " | Cartão Final: " + (num.length() >= 4 ? num.substring(num.length() - 4) : num);
                 }
 
-                String escolhaCartao = SwingUtil.exibirMenuSelecao("Seletor de Hardware", "Escolha o cartão para realizar a operação:", opcoesCartao);
+                String escolhaCartao = SwingUtil.exibirMenuSelecao("Seleção do Cartão", "Escolha o cartão para realizar a operação:", opcoesCartao);
                 if (escolhaCartao == null) continue;
 
                 int idCartao = Integer.parseInt(escolhaCartao.split(" ")[1]);
@@ -451,7 +448,7 @@ public class AplicacaoBancaria {
 
             switch (opcaoCartao) {
                 case 1:
-                    String[] dadosNovoCartao = SwingUtil.exibirFormulario("Emissão de Novo Cartão", "Insira os parâmetros físicos da bandeira:", "Número do Cartão (16 dígitos):", "Tipo (DEBITO/CREDITO):", "Limite de Crédito:");
+                    String[] dadosNovoCartao = SwingUtil.exibirFormulario("Criação de Novo Cartão", "Insira as seguintes informações:", "Número do Cartão (16 dígitos):", "Tipo (DEBITO/CREDITO):", "Limite de Crédito:");
                     if (dadosNovoCartao == null) break;
 
                     String numero = dadosNovoCartao[0].trim();
@@ -501,7 +498,7 @@ public class AplicacaoBancaria {
                     break;
 
                 case 6:
-                    String[] novoLimiteForm = SwingUtil.exibirFormulario("Análise Score", "Solicitação de alteração de linha de crédito:", "Informe o novo limite total desejado:");
+                    String[] novoLimiteForm = SwingUtil.exibirFormulario("Ajuste de Limite", "Solicitação de alteração de linha de crédito:", "Informe o novo limite total desejado:");
                     if (novoLimiteForm == null || novoLimiteForm[0].isEmpty()) break;
 
                     try {
@@ -513,11 +510,6 @@ public class AplicacaoBancaria {
                                 admSistema = (Administrador) u;
                                 break;
                             }
-                        }
-
-                        if (admSistema == null) {
-                            JOptionPane.showMessageDialog(null, "Operação indisponível: Nenhum Administrador ativo no sistema para homologar a análise.", "Erro do Sistema", JOptionPane.ERROR_MESSAGE);
-                            break;
                         }
 
                         if (cartaoSelecionado.solicitarAjusteLimite(novoLimite, admSistema, conta)) {
@@ -547,17 +539,18 @@ public class AplicacaoBancaria {
     public static void investimentosEPoupanca(Conta conta, Cliente encontrado) {
         int opcaoInv = 0;
 
-        while (opcaoInv != 4) {
+        while (opcaoInv != 5) {
             String stringInv = JOptionPane.showInputDialog(
                     "==================================\n" +
                             "     INVESTIMENTOS E POUPANÇA     \n" +
                             "==================================\n" +
                             "Saldo Livre Atual: R$ " + String.format("%.2f", conta.getSaldo()) + "\n" +
                             "==================================\n" +
-                            "1 - Visualizar Meus Investimentos\n" +
-                            "2 - Realizar Aplicação\n" +
-                            "3 - Resgatar Aplicação\n" +
-                            "4 - Voltar\n");
+                            "1 - Visualizar Investimentos Disponíveis\n" +
+                            "2 - Visualizar Meus Investimentos\n" +
+                            "3 - Realizar Aplicação\n" +
+                            "4 - Resgatar Aplicação\n" +
+                            "5 - Voltar\n");
 
             if (stringInv == null) return;
 
@@ -568,16 +561,38 @@ public class AplicacaoBancaria {
                 continue;
             }
 
-            Investimento helper = new Investimento(null, 0, 0, null, null);
+            Investimento helper = new Investimento(null, 0, 0, null);
+            ArrayList<Investimento> disponiveis = AplicacaoBancaria.investimentosDisponiveis;
 
             switch (opcaoInv) {
                 case 1:
+                    if (disponiveis == null || disponiveis.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "Não há produtos de investimento cadastrados no momento.", "Investimentos", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        StringBuilder sbDisponiveis = new StringBuilder("=== TÍTULOS DISPONÍVEIS PARA APLICAÇÃO ===\n\n");
+                        for (int i = 0; i < disponiveis.size(); i++) {
+                            Investimento inv = disponiveis.get(i);
+                            sbDisponiveis.append("ID: ").append(i).append("\n");
+                            sbDisponiveis.append("Produto: ").append(inv.getNomeProduto()).append("\n");
+                            sbDisponiveis.append("Taxa de Rendimento: ").append(inv.getTaxaRendimento()).append("% a.a.\n");
+                            sbDisponiveis.append("-------------------------------------------\n");
+                        }
+
+                        JTextArea txtAreaDisponiveis = new JTextArea(15, 40);
+                        txtAreaDisponiveis.setText(sbDisponiveis.toString());
+                        txtAreaDisponiveis.setEditable(false);
+
+                        JOptionPane.showMessageDialog(null, new JScrollPane(txtAreaDisponiveis), "Mercado de Ativos", JOptionPane.PLAIN_MESSAGE);
+                    }
+                    break;
+
+                case 2:
                     ArrayList<Investimento> feitos = conta.listaInvestimentos;
 
                     if (feitos == null || feitos.isEmpty()) {
                         JOptionPane.showMessageDialog(null, "Não há aplicações ativas nesta conta.", "Investimentos", JOptionPane.INFORMATION_MESSAGE);
                     } else {
-                        StringBuilder sbFeitos = new StringBuilder("=== SEU PORTFÓLIO DE ATIVOS ===\n\n");
+                        StringBuilder sbFeitos = new StringBuilder("=== INVESTIMENTOS FEITOS ===\n\n");
                         for (int i = 0; i < feitos.size(); i++) {
                             Investimento inv = feitos.get(i);
                             sbFeitos.append("ID: ").append(i).append("\n");
@@ -591,23 +606,28 @@ public class AplicacaoBancaria {
                     }
                     break;
 
-                case 2:
-                    String[] opcoesCat = new String[investimentosDisponiveis.size()];
-                    for (int i = 0; i < investimentosDisponiveis.size(); i++) {
-                        opcoesCat[i] = "ID: " + i + " | " + investimentosDisponiveis.get(i).getNomeProduto() + " (" + investimentosDisponiveis.get(i).getTaxaRendimento() + "% a.a.)";
+                case 3:
+                    if (disponiveis == null || disponiveis.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "Não há investimentos disponíveis para aplicação.", "Erro", JOptionPane.ERROR_MESSAGE);
+                        break;
                     }
 
-                    String produtoEscolhido = SwingUtil.exibirMenuSelecao("Catálogo Comercial", "Selecione em qual título deseja aplicar o capital:", opcoesCat);
+                    String[] opcoesCat = new String[disponiveis.size()];
+                    for (int i = 0; i < disponiveis.size(); i++) {
+                        opcoesCat[i] = "ID: " + i + " | " + disponiveis.get(i).getNomeProduto() + " (" + disponiveis.get(i).getTaxaRendimento() + "% a.a.)";
+                    }
+
+                    String produtoEscolhido = SwingUtil.exibirMenuSelecao("Investimentos Disponíveis", "Selecione em qual título deseja aplicar o capital:", opcoesCat);
                     if (produtoEscolhido == null) break;
 
-                    String[] valorForm = SwingUtil.exibirFormulario("Aporte Inicial", null, "Valor para Investir (R$):");
+                    String[] valorForm = SwingUtil.exibirFormulario("Realização de Investimento", null, "Valor para Investir (R$):");
                     if (valorForm == null || valorForm[0].isEmpty()) break;
 
                     try {
                         int indexSelecionado = Integer.parseInt(produtoEscolhido.split(" ")[1]);
                         double valorInvestir = Double.parseDouble(valorForm[0].replace(",", "."));
 
-                        Investimento produtoSelecionado = AplicacaoBancaria.investimentosDisponiveis.get(indexSelecionado);
+                        Investimento produtoSelecionado = disponiveis.get(indexSelecionado);
                         String dataAtual = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
                         if (helper.realizarInvestimento(conta, produtoSelecionado, valorInvestir, dataAtual)) {
@@ -620,7 +640,7 @@ public class AplicacaoBancaria {
                     }
                     break;
 
-                case 3:
+                case 4:
                     if (conta.listaInvestimentos == null || conta.listaInvestimentos.isEmpty()) {
                         JOptionPane.showMessageDialog(null, "Você não possui nenhuma aplicação para resgatar.", "Aviso", JOptionPane.WARNING_MESSAGE);
                         break;
@@ -631,7 +651,7 @@ public class AplicacaoBancaria {
                         ativosParaResgate[i] = "ID: " + i + " | Ativo: " + conta.listaInvestimentos.get(i).getNomeProduto();
                     }
 
-                    String resgateSel = SwingUtil.exibirMenuSelecao("Liquidação de Ativos", "Escolha qual aplicação deseja resgatar:", ativosParaResgate);
+                    String resgateSel = SwingUtil.exibirMenuSelecao("Resgate de Investimento", "Escolha qual investimento deseja resgatar:", ativosParaResgate);
                     if (resgateSel == null) break;
 
                     try {
@@ -645,7 +665,7 @@ public class AplicacaoBancaria {
                     }
                     break;
 
-                case 4:
+                case 5:
                     JOptionPane.showMessageDialog(null, "Voltando ao Dashboard...");
                     break;
 
@@ -697,7 +717,7 @@ public class AplicacaoBancaria {
                         break;
                     }
 
-                    int acaoCliente = SwingUtil.exibirMenuBotoes("Gerenciador Operacional de Clientes",
+                    int acaoCliente = SwingUtil.exibirMenuBotoes("Gerenciar Clientes",
                             "Cliente: " + clienteEncontrado.getNome() + "\nStatus Atual: " + clienteEncontrado.getStatus(),
                             "Ativar Perfil", "Desativar Perfil", "Cancelar");
 
@@ -725,7 +745,7 @@ public class AplicacaoBancaria {
                         contasStr[i] = "Nº Conta: " + titular.obterContas().get(i).getNumeroConta() + " [" + titular.obterContas().get(i).getTipoConta() + "]";
                     }
 
-                    String contaSel = SwingUtil.exibirMenuSelecao("Mapeador de Contas", "Selecione qual conta auditar:", contasStr);
+                    String contaSel = SwingUtil.exibirMenuSelecao("Seleção de Conta", "Selecione qual conta auditar:", contasStr);
                     if (contaSel == null) break;
 
                     Conta contaAlvo = null;
@@ -796,7 +816,7 @@ public class AplicacaoBancaria {
                     break;
 
                 case 5:
-                    JOptionPane.showMessageDialog(null, "Efetuando logoff administrativo...");
+                    JOptionPane.showMessageDialog(null, "Voltando para Menu Inicial...");
                     return;
 
                 default:
@@ -809,7 +829,7 @@ public class AplicacaoBancaria {
 
     // --------------------------------------------------------------------------
     // --------------------- Metodos Auxiliares dos Menus -----------------------
-    // --------------------------------------------------------------------------
+    // --------------------------------------------------------------------
     private static void Login() {
         String loginTipo = SwingUtil.exibirMenuSelecao("Identificação de Login", "Quem é você?", "Sou Cliente", "Sou Administrador");
         if (loginTipo == null) return;

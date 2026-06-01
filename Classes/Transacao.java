@@ -27,29 +27,13 @@ public class Transacao {
         this.destino = destino;
     }
 
-    public int getId () {return this.id;}
     public  String getData () {return this.data;}
     public  String getCategoria () {return this.categoria;}
     public  String getFluxo () {return this.tipoFluxo;}
     public  String getMetodoPagamento () {return this.metodoPagamento;}
     public  String getStatus () {return this.status;}
-    public  Conta getOrigem () {return this.origem;}
-    public  Conta getDestino () {return this.destino;}
     public double getValor () {return this.valor;}
     public String getHora() {return this.hora;}
 
     public void setTipoFluxo(String tipoFluxo) {this.tipoFluxo = tipoFluxo;}
-
-    public void visualizarTransacao() {
-        System.out.printf(this.origem + " --> " + this.destino + "\n" +
-                        "[%s %s] %s | %s | %s | Valor: R$ %.2f | Status: %s\n",
-                this.data,
-                this.hora,
-                this.tipoFluxo,
-                this.metodoPagamento,
-                this.categoria,
-                this.valor,
-                this.status
-        );
-    }
 }

@@ -88,10 +88,11 @@ public class ContaKids extends Conta {
                 destino
         );
 
+        Transacao transacaoD = transacao;
         this.extrato.add(transacao);
+        transacaoD.setTipoFluxo("ENTRADA");
         if (destino != null) {
-            transacao.setTipoFluxo("ENTRADA");
-            destino.extrato.add(transacao);
+            destino.extrato.add(transacaoD);
         }
 
         return true;

@@ -13,6 +13,7 @@ public class ContaPoupanca extends Conta {
         this.taxaRendimento = taxaRendimento;
     }
 
+    // Metodo que Talvez será Retirado
     public void aplicarRendimento() {
         if (this.statusConta != Status.ATIVO) {
             System.out.println("Não foi possível aplicar rendimento: Conta inativa.");
@@ -71,7 +72,7 @@ public class ContaPoupanca extends Conta {
             throw new IllegalArgumentException("Método de pagamento inválido para poupança: " + metodoPagamento);
         }
 
-        if (destino != null && (metodoPagamento.equalsIgnoreCase("PIX") || metodoPagamento.equalsIgnoreCase("DEBITO"))) {
+        if (destino != null && (metodoPagamento.equalsIgnoreCase("PIX") || metodoPagamento.equalsIgnoreCase("DEBITO") || metodoPagamento.equalsIgnoreCase("CREDITO"))) {
             destino.saldo += valor;
         }
 
@@ -95,9 +96,10 @@ public class ContaPoupanca extends Conta {
                 destino
         );
 
+        Transacao transacaoD = transacao;
         this.extrato.add(transacao);
+        transacaoD.setTipoFluxo("ENTRADA");
         if (destino != null) {
-            transacao.setTipoFluxo("ENTRADA");
             destino.extrato.add(transacao);
         }
 

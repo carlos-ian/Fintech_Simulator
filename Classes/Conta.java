@@ -8,10 +8,9 @@ import java.time.temporal.ChronoUnit;
 import Classes.Exceptions.*;
 
 public abstract class Conta {
-    protected ArrayList<Transacao> extrato;
-    protected ArrayList<Cartao> cartoes;
-    protected ArrayList<Investimento> listaInvestimentos;
-    protected Poupanca poupanca;
+    protected ArrayList<Transacao> extrato = new ArrayList<>();
+    protected ArrayList<Cartao> cartoes = new ArrayList<>();
+    protected ArrayList<Investimento> listaInvestimentos = new ArrayList<>();
 
     protected String numeroConta;
     protected String agencia;
@@ -25,9 +24,6 @@ public abstract class Conta {
         this.saldo = saldo;
         this.tipoConta = tipoConta;
         this.statusConta = Status.ATIVO;
-
-        this.cartoes = new ArrayList<Cartao>();
-        this.extrato = new ArrayList<>();
     }
 
     public abstract boolean realizarTransacao(double valor, String metodoPagamento, Cartao cartaoEscolhido, String category, Conta destino)

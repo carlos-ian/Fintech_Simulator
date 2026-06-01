@@ -61,5 +61,4 @@ public class Cliente extends Usuario {
     }
 
     public ArrayList<Conta> obterContas() {return this.listaContas;}
-
 }

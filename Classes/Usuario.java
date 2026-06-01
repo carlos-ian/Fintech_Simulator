@@ -23,8 +23,8 @@ public abstract class Usuario {
         this.dataNascimento = dataNascimento;
         this.telefone = telefone;
         this.tipoUsuario = tipoUsuario;
-        this.id = cod_sequencial++;
         this.statusPerfil = Status.ATIVO;
+        this.id = cod_sequencial++;
     }
 
     public static Usuario autenticar(String cpf, String senha) {

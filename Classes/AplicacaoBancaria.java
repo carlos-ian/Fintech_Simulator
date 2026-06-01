@@ -22,7 +22,7 @@ public class AplicacaoBancaria {
                             "                   SEJA BEM VINDO\n" +
                             "===============================\n" +
                             "1 - Fazer Login\n" +
-                            "2 - Criar uma conta\n" +
+                            "2 - Criar Perfil de Usuário\n" +
                             "3 - Sair\n");
 
             if (stringMenu == null) { System.out.println("...ENCERRANDO O SISTEMA..."); return; }
@@ -49,7 +49,7 @@ public class AplicacaoBancaria {
         }
     }
 
-    public static void menuGestaoCartoes(Cliente encontrado) {
+    public static void menuGestaoContas(Cliente encontrado) {
         int mpC = 0;
 
         while (mpC == 0) {
@@ -134,7 +134,7 @@ public class AplicacaoBancaria {
                         opcoesEntrar[i] = "ID: " + i + " | Conta: " + contas.get(i).getNumeroConta() + " [" + contas.get(i).getTipoConta() + "]";
                     }
 
-                    String contaEntrarSel = SwingUtil.exibirMenuSelecao("Acessar Conta", "Escolha em qual conta deseja logar no Dashboard:", opcoesEntrar);
+                    String contaEntrarSel = SwingUtil.exibirMenuSelecao("Acessar Conta", "Escolha em qual conta deseja entrar:", opcoesEntrar);
                     if (contaEntrarSel == null) { mpC = 0; break; }
 
                     try {
@@ -916,7 +916,7 @@ public class AplicacaoBancaria {
     }
 
     private static void AberturaConta(Cliente encontrado) {
-        String tipo = SwingUtil.exibirMenuSelecao("Abertura de Conta", "Selecione o tipo de conta ideal para seu perfil corporativo:", "Conta Corrente", "Conta Poupança", "Conta Kids", "Conta Investimento");
+        String tipo = SwingUtil.exibirMenuSelecao("Abertura de Conta", "Selecione o tipo de conta que deseja criar:", "Conta Corrente", "Conta Poupança", "Conta Kids", "Conta Investimento");
         if (tipo == null) return;
 
         String[] dados;
@@ -972,9 +972,5 @@ public class AplicacaoBancaria {
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "Erro: Verifique a formatação dos campos numéricos.");
         }
-    }
-
-    public static void menuGestaoContas(Cliente encontrado) {
-        menuGestaoCartoes(encontrado);
     }
 }

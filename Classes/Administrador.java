@@ -190,4 +190,6 @@ public class Administrador extends Usuario {
         i.setStatus(novoStatus);
         return true;
     }
+
+    public String getMatricula() {return this.matricula;}
 }

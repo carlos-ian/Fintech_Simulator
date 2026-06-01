@@ -632,6 +632,139 @@ public class AplicacaoBancaria {
             }
         }
     }
+    public static void menuPrincipalAdministrador(Administrador admin) {
+        int mpA = 0;
+
+        while (mpA != 5) {
+            String stringMenu = JOptionPane.showInputDialog(
+                    "==================================\n" +
+                            "       PAINEL ADMINISTRATIVO      \n" +
+                            "==================================\n" +
+                            "Olá, " + admin.getNome() + " | Matrícula: " + admin.getMatricula() + "\n" +
+                            "==================================\n" +
+                            "1 - Configurações / Meu Perfil\n" +
+                            "2 - Gerenciar Clientes (Buscar, Ativar, Desativar)\n" +
+                            "3 - Gerenciar Contas (Bloquear, Desbloquear, Histórico)\n" +
+                            "4 - Gerar Relatório Geral Fintech\n" +
+                            "5 - Voltar para a Tela de Login\n");
+
+            if (stringMenu == null) return;
+
+            try {
+                mpA = Integer.parseInt(stringMenu);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Opção inválida! Digite apenas números.");
+                continue;
+            }
+
+            switch (mpA) {
+                case 1:
+                    AplicacaoBancaria.configuracoes(admin);
+                    break;
+
+                case 2:
+                    String cpfBusca = JOptionPane.showInputDialog("Digite o CPF do Cliente que deseja gerenciar:");
+                    if (cpfBusca == null || cpfBusca.trim().isEmpty()) break;
+
+                    Cliente clienteEncontrado = admin.consultarCliente(cpfBusca.trim(), null);
+
+                    if (clienteEncontrado == null) {
+                        JOptionPane.showMessageDialog(null, "Cliente não localizado na base de dados.", "Erro", JOptionPane.ERROR_MESSAGE);
+                        break;
+                    }
+
+                    int acaoCliente = SwingUtil.exibirOpcoesGerenciamentoCliente(clienteEncontrado);
+
+                    if (acaoCliente == 0) {
+                        boolean mudou = admin.ativarPerfilCliente(clienteEncontrado);
+                        JOptionPane.showMessageDialog(null, mudou ? "Perfil ativado com sucesso!" : "O perfil já estava ativo.");
+                    } else if (acaoCliente == 1) {
+                        boolean mudou = admin.desativarPerfilCliente(clienteEncontrado);
+                        JOptionPane.showMessageDialog(null, mudou ? "Perfil desativado com sucesso!" : "O perfil já estava inativo.");
+                    }
+                    break;
+
+                case 3:
+                    String cpfContaBusca = JOptionPane.showInputDialog("Digite o CPF do titular da conta:");
+                    if (cpfContaBusca == null || cpfContaBusca.trim().isEmpty()) break;
+
+                    Cliente titular = admin.consultarCliente(cpfContaBusca.trim(), null);
+                    if (titular == null) {
+                        JOptionPane.showMessageDialog(null, "Titular não encontrado na base de dados.");
+                        break;
+                    }
+
+                    Conta contaAlvo = SwingUtil.exibirSeletorContasAdministrador(titular.obterContas());
+                    if (contaAlvo == null) break;
+
+                    int acaoConta = SwingUtil.exibirOpcoesGerenciamentoConta(contaAlvo);
+
+                    if (acaoConta == 0) {
+                        String justificativa = JOptionPane.showInputDialog("Digite a justificativa para o bloqueio:");
+                        if (justificativa != null && !justificativa.isBlank()) {
+                            boolean ok = admin.bloquearConta(contaAlvo, justificativa);
+                            JOptionPane.showMessageDialog(null, ok ? "Conta bloqueada com sucesso." : "A conta já está bloqueada.");
+                        }
+                    } else if (acaoConta == 1) {
+                        boolean ok = admin.desbloquearConta(contaAlvo);
+                        JOptionPane.showMessageDialog(null, ok ? "Conta desbloqueada com sucesso." : "A conta não estava bloqueada.");
+                    } else if (acaoConta == 2) {
+                        ArrayList<Transacao> historico = admin.visualizarHistoricoConta(contaAlvo);
+                        if (historico == null || historico.isEmpty()) {
+                            JOptionPane.showMessageDialog(null, "Nenhuma transação registrada nesta conta.");
+                        } else {
+                            StringBuilder sb = new StringBuilder("=== AUDITORIA DE HISTÓRICO ===\n\n");
+                            for (Transacao t : historico) {
+                                sb.append(String.format("[%s às %s] R$ %.2f (%s) - Tipo: %s | Status: %s\n",
+                                        t.getData(), t.getHora(), t.getValor(), t.getMetodoPagamento(), t.getFluxo(), t.getStatus()));
+                                sb.append("--------------------------------------------------\n");
+                            }
+                            JTextArea ta = new JTextArea(15, 45);
+                            ta.setText(sb.toString());
+                            ta.setEditable(false);
+                            JOptionPane.showMessageDialog(null, new JScrollPane(ta), "Auditoria de Conta", JOptionPane.PLAIN_MESSAGE);
+                        }
+                    }
+                    break;
+
+                case 4:
+                    ArrayList<Cliente> todosClientes = new ArrayList<>();
+                    ArrayList<Conta> todasContas = new ArrayList<>();
+                    ArrayList<Transacao> todasTransacoes = new ArrayList<>();
+
+                    for (Usuario u : AplicacaoBancaria.ListaUsuarios) {
+                        if (u instanceof Cliente) {
+                            Cliente c = (Cliente) u;
+                            todosClientes.add(c);
+                            for (Conta conta : c.obterContas()) {
+                                todasContas.add(conta);
+                                if (conta.extrato != null) {
+                                    todasTransacoes.addAll(conta.extrato);
+                                }
+                            }
+                        }
+                    }
+
+                    String relatorio = admin.gerarRelatorioFintech(todosClientes, todasContas, todasTransacoes);
+
+                    JTextArea txtRelatorio = new JTextArea(18, 50);
+                    txtRelatorio.setText(relatorio);
+                    txtRelatorio.setEditable(false);
+                    txtRelatorio.setFont(new java.awt.Font("Monospaced", java.awt.Font.PLAIN, 12));
+
+                    JOptionPane.showMessageDialog(null, new JScrollPane(txtRelatorio), "Fintech Analytics System", JOptionPane.PLAIN_MESSAGE);
+                    break;
+
+                case 5:
+                    JOptionPane.showMessageDialog(null, "Efetuando logoff administrativo...");
+                    return;
+
+                default:
+                    JOptionPane.showMessageDialog(null, "Opção inválida!");
+                    break;
+            }
+        }
+    }
 
     private static void Login() {
         String stringLogin = JOptionPane.showInputDialog("Quem é você?\n" +
@@ -812,6 +945,4 @@ public class AplicacaoBancaria {
             JOptionPane.showMessageDialog(null, "Erro: Verifique os campos numéricos.");
         }
     }
-
-    public static void menuPrincipalAdministrador (Administrador encontrado) {}
 }

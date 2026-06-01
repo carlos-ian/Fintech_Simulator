@@ -106,5 +106,7 @@ public abstract class Conta {
     public String getNumeroConta() {return numeroConta;}
     public void setSaldo(double saldo) {this.saldo = saldo;}
     public ArrayList<Cartao> getCartoes() {return cartoes;}
+    public String getTipoConta() {return tipoConta;}
+    public Status getStatus() {return statusConta;}
 
 }

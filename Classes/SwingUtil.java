@@ -19,10 +19,11 @@ public class SwingUtil {
         int opcao = JOptionPane.showConfirmDialog(null, componentes, "Login", JOptionPane.OK_CANCEL_OPTION);
 
         if (opcao == JOptionPane.OK_OPTION) {
-            return new String[]{ cpfField.getText(), new String(senhaField.getPassword()) };
+            return new String[]{cpfField.getText(), new String(senhaField.getPassword())};
         }
         return null;
     }
+
     public static String[] exibirFormularioCadastroCliente() {
         JTextField nomeField = new JTextField();
         JTextField cpfField = new JTextField();
@@ -55,6 +56,7 @@ public class SwingUtil {
         }
         return null;
     }
+
     public static String[] exibirFormularioCadastroADM() {
         JTextField nomeField = new JTextField();
         JTextField cpfField = new JTextField();
@@ -90,11 +92,13 @@ public class SwingUtil {
         }
         return null;
     }
+
     public static String exibirSeletorTipoConta() {
         String[] opcoes = {"Conta Corrente", "Conta Poupança", "Conta Kids", "Conta Investimento"};
         return (String) JOptionPane.showInputDialog(null, "Selecione o tipo de conta:",
                 "Abertura de Conta", JOptionPane.QUESTION_MESSAGE, null, opcoes, opcoes[0]);
     }
+
     public static String[] exibirFormularioConta(String tipoConta) {
         JPanel painel = new JPanel(new GridLayout(0, 2, 10, 10));
 
@@ -102,9 +106,12 @@ public class SwingUtil {
         JTextField txtAgencia = new JTextField();
         JTextField txtSaldo = new JTextField();
 
-        painel.add(new JLabel("Número da Conta:")); painel.add(txtNumero);
-        painel.add(new JLabel("Agência:")); painel.add(txtAgencia);
-        painel.add(new JLabel("Saldo Inicial:")); painel.add(txtSaldo);
+        painel.add(new JLabel("Número da Conta:"));
+        painel.add(txtNumero);
+        painel.add(new JLabel("Agência:"));
+        painel.add(txtAgencia);
+        painel.add(new JLabel("Saldo Inicial:"));
+        painel.add(txtSaldo);
 
         // Campos específicos de cada tipo
         JTextField txtEspecifico1 = new JTextField();
@@ -129,7 +136,7 @@ public class SwingUtil {
         int confirmacao = JOptionPane.showConfirmDialog(null, painel, "Dados - " + tipoConta, JOptionPane.OK_CANCEL_OPTION);
 
         if (confirmacao == JOptionPane.OK_OPTION) {
-            return new String[] {
+            return new String[]{
                     txtNumero.getText(),
                     txtAgencia.getText(),
                     txtSaldo.getText(),
@@ -139,6 +146,7 @@ public class SwingUtil {
         }
         return null;
     }
+
     public static Object[] exibirFormularioTransacao(ArrayList<Cartao> cartoes) {
         JTextField txtValor = new JTextField();
         JComboBox<String> comboMetodo = new JComboBox<>(new String[]{"PIX", "DEBITO", "CREDITO"});
@@ -149,7 +157,7 @@ public class SwingUtil {
         String[] opcoes = new String[cartoes.size() + 1];
         opcoes[0] = "Não utilizar cartão (Saldo/PIX)";
         for (int i = 0; i < cartoes.size(); i++) {
-            opcoes[i+1] = "Cartão Final: " + cartoes.get(i).getNumeroCartao().substring(Math.max(0, cartoes.get(i).getNumeroCartao().length() - 4));
+            opcoes[i + 1] = "Cartão Final: " + cartoes.get(i).getNumeroCartao().substring(Math.max(0, cartoes.get(i).getNumeroCartao().length() - 4));
         }
         JComboBox<String> comboCartoes = new JComboBox<>(opcoes);
 
@@ -176,6 +184,7 @@ public class SwingUtil {
         }
         return null;
     }
+
     public static String[] exibirFiltrosExtrato() {
         JComboBox<String> comboFluxo = new JComboBox<>(new String[]{"", "ENTRADA", "SAÍDA"});
         JComboBox<String> comboMetodo = new JComboBox<>(new String[]{"", "PIX", "DEBITO", "CREDITO"});
@@ -191,14 +200,15 @@ public class SwingUtil {
 
         if (JOptionPane.showConfirmDialog(null, componentes, "Filtros", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
             return new String[]{
-                    (String)comboFluxo.getSelectedItem(),
-                    (String)comboMetodo.getSelectedItem(),
+                    (String) comboFluxo.getSelectedItem(),
+                    (String) comboMetodo.getSelectedItem(),
                     txtCat.getText(),
                     txtDias.getText()
             };
         }
         return null;
     }
+
     public static String exibirConfirmacaoExclusao() {
         JPasswordField senhaExcluirField = new JPasswordField();
         Object[] formulario = {
@@ -215,6 +225,7 @@ public class SwingUtil {
         }
         return null;
     }
+
     public static String[] exibirFormularioAlterarDados() {
         String[] camposDisponiveis = {"Nome", "CPF", "Email", "Senha", "Telefone", "DataNascimento"};
 
@@ -255,11 +266,12 @@ public class SwingUtil {
                 novoValor = ((JTextField) inputField).getText().trim();
             }
 
-            return new String[]{ tipoDadoEscolhido, novoValor };
+            return new String[]{tipoDadoEscolhido, novoValor};
         }
 
         return null;
     }
+
     public static String exibirSeletorStatus(String statusAtual) {
         String[] statusOpcoes = {"ATIVO", "INATIVO"};
 
@@ -271,6 +283,7 @@ public class SwingUtil {
                 statusOpcoes,
                 statusOpcoes[0].equals(statusAtual) ? statusOpcoes[0] : statusOpcoes[1]);
     }
+
     public static Cartao exibirSeletorCartoes(ArrayList<Cartao> cartoesDaConta) {
         if (cartoesDaConta == null || cartoesDaConta.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Esta conta não possui nenhum cartão vinculado.", "Aviso", JOptionPane.WARNING_MESSAGE);
@@ -295,6 +308,7 @@ public class SwingUtil {
         }
         return null;
     }
+
     public static String[] exibirFormularioCriarCartao() {
         JTextField txtNumero = new JTextField();
         JComboBox<String> comboTipo = new JComboBox<>(new String[]{"DEBITO", "CREDITO", "AMBOS"});
@@ -317,6 +331,7 @@ public class SwingUtil {
         }
         return null;
     }
+
     public static String exibirFormularioAjusteLimite() {
         JTextField txtNovoLimite = new JTextField();
         Object[] formularioLimite = {
@@ -330,6 +345,7 @@ public class SwingUtil {
         }
         return null;
     }
+
     public static Object[] exibirFormularioNovoInvestimento(ArrayList<Investimento> disponiveis) {
         if (disponiveis == null || disponiveis.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Não há produtos de investimento disponíveis no banco no momento.", "Aviso", JOptionPane.WARNING_MESSAGE);
@@ -351,13 +367,14 @@ public class SwingUtil {
 
         int resultado = JOptionPane.showConfirmDialog(null, formulario, "Aplicar em Investimento", JOptionPane.OK_CANCEL_OPTION);
         if (resultado == JOptionPane.OK_OPTION) {
-            return new Object[]{ comboProdutos.getSelectedIndex(), txtValorInvestir.getText().trim() };
+            return new Object[]{comboProdutos.getSelectedIndex(), txtValorInvestir.getText().trim()};
         }
         return null;
     }
+
     public static String exibirFormularioResgateInvestimento() {
         JTextField txtIdResgate = new JTextField();
-        Object[] formulario = { "Digite o ID do investimento que deseja resgatar:", txtIdResgate };
+        Object[] formulario = {"Digite o ID do investimento que deseja resgatar:", txtIdResgate};
 
         int resultado = JOptionPane.showConfirmDialog(null, formulario, "Resgate de Aplicação", JOptionPane.OK_CANCEL_OPTION);
         if (resultado == JOptionPane.OK_OPTION) {
@@ -368,7 +385,7 @@ public class SwingUtil {
 
     public static String exibirFormularioMovimentacaoPoupanca(String titulo, String mensagem) {
         JTextField txtValor = new JTextField();
-        Object[] formulario = { mensagem, txtValor };
+        Object[] formulario = {mensagem, txtValor};
 
         int resultado = JOptionPane.showConfirmDialog(null, formulario, titulo, JOptionPane.OK_CANCEL_OPTION);
         if (resultado == JOptionPane.OK_OPTION) {
@@ -376,4 +393,55 @@ public class SwingUtil {
         }
         return null;
     }
+    public static int exibirOpcoesGerenciamentoCliente(Cliente cliente) {
+        String[] opcoesCliente = {"Ativar Perfil", "Desativar Perfil", "Voltar"};
+        return JOptionPane.showOptionDialog(null,
+                "Cliente: " + cliente.getNome() + "\nStatus Atual: " + cliente.getStatus(),
+                "Gerenciamento de Cliente",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                opcoesCliente,
+                opcoesCliente[0]);
+    }
+    public static Conta exibirSeletorContasAdministrador(ArrayList<Conta> contasDoCliente) {
+        if (contasDoCliente == null || contasDoCliente.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "O titular não possui contas vinculadas.");
+            return null;
+        }
+
+        String[] listaContasStr = new String[contasDoCliente.size()];
+        for (int i = 0; i < contasDoCliente.size(); i++) {
+            listaContasStr[i] = "Nº: " + contasDoCliente.get(i).getNumeroConta() + " [" + contasDoCliente.get(i).getTipoConta() + "]";
+        }
+
+        String contaEscolhidaStr = (String) JOptionPane.showInputDialog(null,
+                "Selecione a conta para gerenciar:",
+                "Contas do Cliente",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                listaContasStr,
+                listaContasStr[0]);
+
+        if (contaEscolhidaStr == null) return null;
+
+        for (Conta c : contasDoCliente) {
+            if (contaEscolhidaStr.contains(c.getNumeroConta())) {
+                return c;
+            }
+        }
+        return null;
+    }
+    public static int exibirOpcoesGerenciamentoConta(Conta conta) {
+        String[] opcoesConta = {"Bloquear Conta", "Desbloquear Conta", "Ver Histórico/Extrato", "Voltar"};
+        return JOptionPane.showOptionDialog(null,
+                "Conta selecionada: " + conta.getNumeroConta() + "\nStatus: " + conta.getStatus(),
+                "Gerenciamento de Conta",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                opcoesConta,
+                opcoesConta[0]);
+    }
+
 }

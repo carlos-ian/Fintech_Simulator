@@ -25,7 +25,7 @@ public class AplicacaoBancaria {
                             "2 - Criar uma conta\n" +
                             "3 - Sair\n");
 
-            if (stringMenu == null) {System.out.println("Sistema encerrado pelo usuário."); return;}
+            if (stringMenu == null) { System.out.println("Sistema encerrado pelo usuário."); return; }
 
             try {
                 menu = Integer.parseInt(stringMenu);
@@ -54,6 +54,7 @@ public class AplicacaoBancaria {
             }
         }
     }
+
     public static void menuGestaoCartoes(Cliente encontrado) {
         int mpC = 0;
 
@@ -83,9 +84,11 @@ public class AplicacaoBancaria {
                     if (contas.isEmpty()) {
                         JOptionPane.showMessageDialog(null, "Você não possui contas cadastradas.");
                     } else {
+                        StringBuilder sb = new StringBuilder("=== SUAS CONTAS BANCÁRIAS ===\n\n");
                         for (Conta c : contas) {
-                            JOptionPane.showMessageDialog(null, c.visualizarDadosConta());
+                            sb.append(c.visualizarDadosConta()).append("\n-----------------------\n");
                         }
+                        JOptionPane.showMessageDialog(null, sb.toString(), "Lista de Contas", JOptionPane.INFORMATION_MESSAGE);
                     }
                     mpC = 0;
                     break;
@@ -102,26 +105,25 @@ public class AplicacaoBancaria {
                         break;
                     }
 
+                    String[] opcoesFechar = new String[contas.size()];
                     for (int i = 0; i < contas.size(); i++) {
-                        JOptionPane.showMessageDialog(null, "ID: " + i + "\n" + contas.get(i).visualizarDadosConta());
+                        opcoesFechar[i] = "ID: " + i + " | Conta: " + contas.get(i).getNumeroConta() + " [" + contas.get(i).getTipoConta() + "]";
                     }
 
-                    try {
-                        String idStr = JOptionPane.showInputDialog("Qual o id da conta que deseja-se excluir?");
-                        if (idStr == null) { mpC = 0; break; }
+                    String contaFecharSel = SwingUtil.exibirMenuSelecao("Encerrar Conta", "Selecione a conta que deseja fechar permanentemente:", opcoesFechar);
+                    if (contaFecharSel == null) { mpC = 0; break; }
 
-                        int id = Integer.parseInt(idStr);
+                    try {
+                        int id = Integer.parseInt(contaFecharSel.split(" ")[1]);
                         boolean resultado = encontrado.fecharConta(contas.get(id));
 
                         if (resultado) {
-                            JOptionPane.showMessageDialog(null, "Sucesso");
+                            JOptionPane.showMessageDialog(null, "Conta encerrada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                         } else {
-                            JOptionPane.showMessageDialog(null, "Falha ao remover");
+                            JOptionPane.showMessageDialog(null, "Falha ao fechar conta (Verifique se há saldo residual pendente).", "Erro", JOptionPane.ERROR_MESSAGE);
                         }
-                    } catch (NumberFormatException e) {
-                        JOptionPane.showMessageDialog(null, "ID inválido! Digite apenas números.");
-                    } catch (IndexOutOfBoundsException e) {
-                        JOptionPane.showMessageDialog(null, "ID não encontrado na lista.");
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(null, "Erro ao processar o encerramento.");
                     }
                     mpC = 0;
                     break;
@@ -133,22 +135,20 @@ public class AplicacaoBancaria {
                         break;
                     }
 
+                    String[] opcoesEntrar = new String[contas.size()];
                     for (int i = 0; i < contas.size(); i++) {
-                        JOptionPane.showMessageDialog(null, "ID: " + i + "\n" + contas.get(i).visualizarDadosConta());
+                        opcoesEntrar[i] = "ID: " + i + " | Conta: " + contas.get(i).getNumeroConta() + " [" + contas.get(i).getTipoConta() + "]";
                     }
 
+                    String contaEntrarSel = SwingUtil.exibirMenuSelecao("Acessar Conta", "Escolha em qual conta deseja logar no Dashboard:", opcoesEntrar);
+                    if (contaEntrarSel == null) { mpC = 0; break; }
+
                     try {
-                        String idStr = JOptionPane.showInputDialog("Qual o id da conta que deseja-se entrar?");
-                        if (idStr == null) { mpC = 0; break; }
-
-                        int id = Integer.parseInt(idStr);
+                        int id = Integer.parseInt(contaEntrarSel.split(" ")[1]);
                         Conta contaSelecionada = contas.get(id);
-
                         menuPrincipalCliente(contaSelecionada, encontrado);
-                    } catch (NumberFormatException e) {
-                        JOptionPane.showMessageDialog(null, "ID inválido! Digite apenas números.");
-                    } catch (IndexOutOfBoundsException e) {
-                        JOptionPane.showMessageDialog(null, "ID não encontrado.");
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(null, "Erro ao tentar acessar a conta selecionada.");
                     }
                     mpC = 0;
                     break;
@@ -163,6 +163,7 @@ public class AplicacaoBancaria {
             }
         }
     }
+
     public static void menuPrincipalCliente(Conta conta, Cliente encontrado) {
         int opcaoDash = 0;
 
@@ -255,24 +256,24 @@ public class AplicacaoBancaria {
                     break;
 
                 case 4:
-                    String[] filtros = SwingUtil.exibirFiltrosExtrato();
+                    String[] filtros = SwingUtil.exibirFormulario("Filtros do Extrato", "Deixe em branco para ignorar o filtro:", "Fluxo (ENTRADA/SAÍDA):", "Método de Pagamento:", "Categoria:", "Dias de Histórico:");
                     if (filtros == null) break;
 
-                    String fluxo = filtros[0];
-                    String metodoExtrato = filtros[1];
-                    String catExtrato = filtros[2];
-                    String diasStr = filtros[3];
+                    String fluxo = filtros[0].trim().toUpperCase();
+                    String metodoExtrato = filtros[1].trim().toUpperCase();
+                    String catExtrato = filtros[2].trim();
+                    String diasStr = filtros[3].trim();
 
                     Integer dias = null;
-                    if (!diasStr.trim().isEmpty()) {
+                    if (!diasStr.isEmpty()) {
                         try {
-                            dias = Integer.parseInt(diasStr.trim());
+                            dias = Integer.parseInt(diasStr);
                         } catch (NumberFormatException e) {
                             JOptionPane.showMessageDialog(null, "Filtro de dias inválido e ignorado.");
                         }
                     }
 
-                    ArrayList<Transacao> extratoFiltrado = conta.visualizarExtrato(fluxo, metodoExtrato, catExtrato, dias, null);
+                    ArrayList<Transacao> extratoFiltrado = conta.visualizarExtrato(fluxo.isEmpty() ? null : fluxo, metodoExtrato.isEmpty() ? null : metodoExtrato, catExtrato.isEmpty() ? null : catExtrato, dias, null);
 
                     if (extratoFiltrado == null || extratoFiltrado.isEmpty()) {
                         JOptionPane.showMessageDialog(null, "Nenhuma transação encontrada.", "Extrato Vazio", JOptionPane.INFORMATION_MESSAGE);
@@ -310,6 +311,7 @@ public class AplicacaoBancaria {
             }
         }
     }
+
     public static void configuracoes(Usuario encontrado) {
         int config = 0;
 
@@ -335,11 +337,11 @@ public class AplicacaoBancaria {
 
             switch (config) {
                 case 1:
-                    String senhaDigitada = SwingUtil.exibirConfirmacaoExclusao();
-                    if (senhaDigitada == null) break;
+                    String[] confirmacaoExclusao = SwingUtil.exibirFormulario("Confirmação de Segurança", "ESTA AÇÃO É IRREVERSÍVEL!", "Confirme sua Senha:");
+                    if (confirmacaoExclusao == null || confirmacaoExclusao[0].isEmpty()) break;
 
                     try {
-                        encontrado.encerrarPerfil(encontrado, senhaDigitada);
+                        encontrado.encerrarPerfil(encontrado, confirmacaoExclusao[0]);
                         JOptionPane.showMessageDialog(null, "Perfil excluído com sucesso. Desconectando do sistema...", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                         System.exit(0);
                     } catch (Exception e) {
@@ -348,12 +350,13 @@ public class AplicacaoBancaria {
                     break;
 
                 case 2:
-                    String[] dadosAlteracao = SwingUtil.exibirFormularioAlterarDados();
-                    if (dadosAlteracao == null) break;
+                    String tipoDado = SwingUtil.exibirMenuSelecao("Mapeador Cadastral", "Selecione o dado que deseja modificar:", "Email", "Senha", "Telefone");
+                    if (tipoDado == null) break;
 
-                    String tipoDado = dadosAlteracao[0];
-                    String novoValor = dadosAlteracao[1];
+                    String[] novoValForm = SwingUtil.exibirFormulario("Atualização cadastral", null, "Digite o novo valor para " + tipoDado + ":");
+                    if (novoValForm == null) break;
 
+                    String novoValor = novoValForm[0].trim();
                     if (novoValor.isEmpty()) {
                         JOptionPane.showMessageDialog(null, "O campo não pode ser vazio.", "Erro", JOptionPane.WARNING_MESSAGE);
                         break;
@@ -367,13 +370,12 @@ public class AplicacaoBancaria {
                     }
                     break;
 
-                case 3: // VISUALIZAR DADOS
+                case 3:
                     JOptionPane.showMessageDialog(null, encontrado.visualizarDados(), "Dados do Perfil", JOptionPane.INFORMATION_MESSAGE);
                     break;
 
                 case 4:
-                    String statusAtual = (encontrado.getStatus() != null) ? encontrado.getStatus().toString() : "DESCONHECIDO";
-                    String statusEscolhido = SwingUtil.exibirSeletorStatus(statusAtual);
+                    String statusEscolhido = SwingUtil.exibirMenuSelecao("Chaveamento de Acesso", "Escolha o novo estado operacional do perfil:", "ATIVO", "INATIVO");
                     if (statusEscolhido == null) break;
 
                     try {
@@ -388,7 +390,7 @@ public class AplicacaoBancaria {
                         JOptionPane.showMessageDialog(null, "Status alterado para " + statusEscolhido + " com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
 
                         if (novoStatus == Status.INATIVO) {
-                            JOptionPane.showMessageDialog(null, "Como seu perfil foi inativado, você será desconectado.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                            JOptionPane.showMessageDialog(null, "Como seu perfil foi inativado, você será desconectado do ecossistema.", "Aviso", JOptionPane.WARNING_MESSAGE);
                             System.exit(0);
                         }
                     } catch (IllegalArgumentException e) {
@@ -406,6 +408,7 @@ public class AplicacaoBancaria {
             }
         }
     }
+
     private static void gestaoCartoes(Conta conta, Cliente encontrado) {
         int opcaoCartao = 0;
 
@@ -433,18 +436,33 @@ public class AplicacaoBancaria {
 
             Cartao cartaoSelecionado = null;
             if (opcaoCartao >= 2 && opcaoCartao <= 6) {
-                cartaoSelecionado = SwingUtil.exibirSeletorCartoes(conta.getCartoes());
-                if (cartaoSelecionado == null) continue;
+                ArrayList<Cartao> listaCartoes = conta.getCartoes();
+                if (listaCartoes.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Esta conta não possui cartões emitidos.");
+                    continue;
+                }
+
+                String[] opcoesCartao = new String[listaCartoes.size()];
+                for (int i = 0; i < listaCartoes.size(); i++) {
+                    String num = listaCartoes.get(i).getNumeroCartao();
+                    opcoesCartao[i] = "ID: " + i + " | Cartão Final: " + (num.length() >= 4 ? num.substring(num.length() - 4) : num);
+                }
+
+                String escolhaCartao = SwingUtil.exibirMenuSelecao("Seletor de Hardware", "Escolha o cartão para realizar a operação:", opcoesCartao);
+                if (escolhaCartao == null) continue;
+
+                int idCartao = Integer.parseInt(escolhaCartao.split(" ")[1]);
+                cartaoSelecionado = listaCartoes.get(idCartao);
             }
 
             switch (opcaoCartao) {
                 case 1:
-                    String[] dadosNovoCartao = SwingUtil.exibirFormularioCriarCartao();
+                    String[] dadosNovoCartao = SwingUtil.exibirFormulario("Emissão de Novo Cartão", "Insira os parâmetros físicos da bandeira:", "Número do Cartão (16 dígitos):", "Tipo (DEBITO/CREDITO):", "Limite de Crédito:");
                     if (dadosNovoCartao == null) break;
 
-                    String numero = dadosNovoCartao[0];
-                    String tipo = dadosNovoCartao[1];
-                    String limiteStr = dadosNovoCartao[2];
+                    String numero = dadosNovoCartao[0].trim();
+                    String tipo = dadosNovoCartao[1].trim().toUpperCase();
+                    String limiteStr = dadosNovoCartao[2].trim();
 
                     if (numero.isEmpty()) {
                         JOptionPane.showMessageDialog(null, "O número do cartão é obrigatório.", "Erro", JOptionPane.WARNING_MESSAGE);
@@ -489,11 +507,11 @@ public class AplicacaoBancaria {
                     break;
 
                 case 6:
-                    String novoLimiteStr = SwingUtil.exibirFormularioAjusteLimite();
-                    if (novoLimiteStr == null) break;
+                    String[] novoLimiteForm = SwingUtil.exibirFormulario("Análise Score", "Solicitação de alteração de linha de crédito:", "Informe o novo limite total desejado:");
+                    if (novoLimiteForm == null || novoLimiteForm[0].isEmpty()) break;
 
                     try {
-                        double novoLimite = Double.parseDouble(novoLimiteStr.replace(",", "."));
+                        double novoLimite = Double.parseDouble(novoLimiteForm[0].replace(",", "."));
 
                         Administrador admSistema = null;
                         for (Usuario u : AplicacaoBancaria.ListaUsuarios) {
@@ -531,6 +549,7 @@ public class AplicacaoBancaria {
             }
         }
     }
+
     public static void investimentosEPoupanca(Conta conta, Cliente encontrado) {
         int opcaoInv = 0;
 
@@ -579,13 +598,20 @@ public class AplicacaoBancaria {
                     break;
 
                 case 2:
-                    Object[] dadosNovoInv = SwingUtil.exibirFormularioNovoInvestimento(AplicacaoBancaria.produtosDisponiveis);
-                    if (dadosNovoInv == null) break;
+                    String[] opcoesCat = new String[produtosDisponiveis.size()];
+                    for (int i = 0; i < produtosDisponiveis.size(); i++) {
+                        opcoesCat[i] = "ID: " + i + " | " + produtosDisponiveis.get(i).getNomeProduto() + " (" + produtosDisponiveis.get(i).getTaxaRendimento() + "% a.a.)";
+                    }
+
+                    String produtoEscolhido = SwingUtil.exibirMenuSelecao("Catálogo Comercial", "Selecione em qual título deseja aplicar o capital:", opcoesCat);
+                    if (produtoEscolhido == null) break;
+
+                    String[] valorForm = SwingUtil.exibirFormulario("Aporte Inicial", null, "Valor para Investir (R$):");
+                    if (valorForm == null || valorForm[0].isEmpty()) break;
 
                     try {
-                        int indexSelecionado = (int) dadosNovoInv[0];
-                        String valorStr = (String) dadosNovoInv[1];
-                        double valorInvestir = Double.parseDouble(valorStr.replace(",", "."));
+                        int indexSelecionado = Integer.parseInt(produtoEscolhido.split(" ")[1]);
+                        double valorInvestir = Double.parseDouble(valorForm[0].replace(",", "."));
 
                         Investimento produtoSelecionado = AplicacaoBancaria.produtosDisponiveis.get(indexSelecionado);
                         String dataAtual = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
@@ -606,17 +632,20 @@ public class AplicacaoBancaria {
                         break;
                     }
 
-                    String idResgateStr = SwingUtil.exibirFormularioResgateInvestimento();
-                    if (idResgateStr == null) break;
+                    String[] ativosParaResgate = new String[conta.listaInvestimentos.size()];
+                    for (int i = 0; i < conta.listaInvestimentos.size(); i++) {
+                        ativosParaResgate[i] = "ID: " + i + " | Ativo: " + conta.listaInvestimentos.get(i).getNomeProduto();
+                    }
+
+                    String resgateSel = SwingUtil.exibirMenuSelecao("Liquidação de Ativos", "Escolha qual aplicação deseja resgatar:", ativosParaResgate);
+                    if (resgateSel == null) break;
 
                     try {
-                        int idInvestimento = Integer.parseInt(idResgateStr);
+                        int idInvestimento = Integer.parseInt(resgateSel.split(" ")[1]);
 
                         if (helper.resgatarInvestimento(conta, idInvestimento)) {
                             JOptionPane.showMessageDialog(null, "Resgate concluído! O valor retornou ao seu saldo livre.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                         }
-                    } catch (NumberFormatException e) {
-                        JOptionPane.showMessageDialog(null, "Erro: O ID deve ser um número inteiro.", "Erro", JOptionPane.ERROR_MESSAGE);
                     } catch (Exception e) {
                         JOptionPane.showMessageDialog(null, e.getMessage(), "Falha no Resgate", JOptionPane.WARNING_MESSAGE);
                     }
@@ -632,6 +661,7 @@ public class AplicacaoBancaria {
             }
         }
     }
+
     public static void menuPrincipalAdministrador(Administrador admin) {
         int mpA = 0;
 
@@ -659,7 +689,7 @@ public class AplicacaoBancaria {
 
             switch (mpA) {
                 case 1:
-                    AplicacaoBancaria.configuracoes(admin);
+                    AplicacaoBancaria.configuracoes((Usuario) admin);
                     break;
 
                 case 2:
@@ -673,7 +703,9 @@ public class AplicacaoBancaria {
                         break;
                     }
 
-                    int acaoCliente = SwingUtil.exibirOpcoesGerenciamentoCliente(clienteEncontrado);
+                    int acaoCliente = SwingUtil.exibirMenuBotoes("Gerenciador Operacional de Clientes",
+                            "Cliente: " + clienteEncontrado.getNome() + "\nStatus Atual: " + clienteEncontrado.getStatus(),
+                            "Ativar Perfil", "Desativar Perfil", "Cancelar");
 
                     if (acaoCliente == 0) {
                         boolean mudou = admin.ativarPerfilCliente(clienteEncontrado);
@@ -689,15 +721,29 @@ public class AplicacaoBancaria {
                     if (cpfContaBusca == null || cpfContaBusca.trim().isEmpty()) break;
 
                     Cliente titular = admin.consultarCliente(cpfContaBusca.trim(), null);
-                    if (titular == null) {
-                        JOptionPane.showMessageDialog(null, "Titular não encontrado na base de dados.");
+                    if (titular == null || titular.obterContas().isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "Titular não possui contas registradas na base.");
                         break;
                     }
 
-                    Conta contaAlvo = SwingUtil.exibirSeletorContasAdministrador(titular.obterContas());
-                    if (contaAlvo == null) break;
+                    String[] contasStr = new String[titular.obterContas().size()];
+                    for (int i = 0; i < titular.obterContas().size(); i++) {
+                        contasStr[i] = "Nº Conta: " + titular.obterContas().get(i).getNumeroConta() + " [" + titular.obterContas().get(i).getTipoConta() + "]";
+                    }
 
-                    int acaoConta = SwingUtil.exibirOpcoesGerenciamentoConta(contaAlvo);
+                    String contaSel = SwingUtil.exibirMenuSelecao("Mapeador de Contas", "Selecione qual conta auditar:", contasStr);
+                    if (contaSel == null) break;
+
+                    Conta contaAlvo = null;
+                    for (Conta c : titular.obterContas()) {
+                        if (contaSel.contains(c.getNumeroConta())) {
+                            contaAlvo = c;
+                            break;
+                        }
+                    }
+
+                    int acaoConta = SwingUtil.exibirMenuBotoes("Painel de Auditoria - Conta: " + contaAlvo.getNumeroConta(),
+                            "Selecione o procedimento de controle de risco corporativo:", "Bloquear", "Desbloquear", "Ver Histórico/Logs", "Cancelar");
 
                     if (acaoConta == 0) {
                         String justificativa = JOptionPane.showInputDialog("Digite a justificativa para o bloqueio:");
@@ -736,10 +782,10 @@ public class AplicacaoBancaria {
                         if (u instanceof Cliente) {
                             Cliente c = (Cliente) u;
                             todosClientes.add(c);
-                            for (Conta conta : c.obterContas()) {
-                                todasContas.add(conta);
-                                if (conta.extrato != null) {
-                                    todasTransacoes.addAll(conta.extrato);
+                            for (Conta con : c.obterContas()) {
+                                todasContas.add(con);
+                                if (con.extrato != null) {
+                                    todasTransacoes.addAll(con.extrato);
                                 }
                             }
                         }
@@ -767,152 +813,136 @@ public class AplicacaoBancaria {
     }
 
     private static void Login() {
-        String stringLogin = JOptionPane.showInputDialog("Quem é você?\n" +
-                "1 - Sou Cliente\n" +
-                "2 - Sou Administrador\n" +
-                "3 - Voltar");
+        String loginTipo = SwingUtil.exibirMenuSelecao("Identificação de Login", "Quem é você no sistema?", "Sou Cliente", "Sou Administrador");
+        if (loginTipo == null) return;
 
-        if (stringLogin == null) return;
-
-        int login;
-        try {
-            login = Integer.parseInt(stringLogin);
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Opção inválida! Digite apenas números.");
-            return;
-        }
-
-        if (login == 1) {
+        if (loginTipo.equals("Sou Cliente")) {
             while (true) {
-                String[] dados = SwingUtil.exibirFormularioLogin();
+                String[] dados = SwingUtil.exibirFormulario("Autenticação de Segurança", "Entre com as suas credenciais de acesso:", "CPF:", "Senha:");
                 if (dados == null) { System.out.println("Login cancelado."); break; }
 
-                String cpf = dados[0];
-                String senha = dados[1];
+                String cpf = dados[0].trim();
+                String senha = dados[1].trim();
 
                 if (cpf.isEmpty() || senha.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos", "Erro", JOptionPane.ERROR_MESSAGE);
                 } else {
                     Usuario encontrado = Usuario.autenticar(cpf, senha);
                     if (encontrado == null) {
-                        JOptionPane.showMessageDialog(null, "CPF ou Senha incorretos");
+                        JOptionPane.showMessageDialog(null, "CPF ou Senha incorretos", "Erro", JOptionPane.ERROR_MESSAGE);
                     } else if (encontrado.tipoUsuario.equalsIgnoreCase("Cliente")) {
-                        JOptionPane.showMessageDialog(null, "Sucesso");
-                        AplicacaoBancaria.menuGestaoCartoes((Cliente) encontrado);
+                        JOptionPane.showMessageDialog(null, "Autenticação Concluída com Sucesso!");
+                        AplicacaoBancaria.menuGestaoContas((Cliente) encontrado);
                         break;
                     } else {
-                        JOptionPane.showMessageDialog(null, "Credenciais inválidas para este tipo de Usuário");
+                        JOptionPane.showMessageDialog(null, "Credenciais inválidas para este tipo de Usuário", "Acesso Negado", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
-        } else if (login == 2) {
+        } else if (loginTipo.equals("Sou Administrador")) {
             while (true) {
-                String[] dados = SwingUtil.exibirFormularioLogin();
+                String[] dados = SwingUtil.exibirFormulario("Painel Root - Autenticação", "Credenciais estritas do setor operacional:", "CPF ADM:", "Senha ADM:");
                 if (dados == null) { System.out.println("Login cancelado."); break; }
 
-                String cpf = dados[0];
-                String senha = dados[1];
+                String cpf = dados[0].trim();
+                String senha = dados[1].trim();
 
                 if (cpf.isEmpty() || senha.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos", "Erro", JOptionPane.ERROR_MESSAGE);
                 } else {
                     Usuario encontrado = Usuario.autenticar(cpf, senha);
                     if (encontrado == null) {
-                        JOptionPane.showMessageDialog(null, "CPF ou Senha incorretos");
+                        JOptionPane.showMessageDialog(null, "CPF ou Senha incorretos", "Erro", JOptionPane.ERROR_MESSAGE);
                     } else if (encontrado.tipoUsuario.equalsIgnoreCase("Administrador")) {
-                        JOptionPane.showMessageDialog(null, "Sucesso");
+                        JOptionPane.showMessageDialog(null, "Autenticação Administrativa Concedida.");
                         AplicacaoBancaria.menuPrincipalAdministrador((Administrador) encontrado);
                         break;
                     } else {
-                        JOptionPane.showMessageDialog(null, "Credenciais inválidas para este tipo de Usuário");
+                        JOptionPane.showMessageDialog(null, "Credenciais inválidas para este perfil corporativo", "Acesso Negado", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
-        } else if (login == 3) {
-            JOptionPane.showMessageDialog(null, "Voltando...");
-        } else {
-            JOptionPane.showMessageDialog(null, "Opção inválida!");
         }
     }
+
     private static void Cadastro() {
-        String stringCadastro = JOptionPane.showInputDialog("Qual perfil deseja-se criar??\n" +
-                "1 - Perfil para cliente\n" +
-                "2 - Perfil para Administrador\n" +
-                "3 - Voltar");
+        String tipoCadastro = SwingUtil.exibirMenuSelecao("Tipo de Perfil", "Qual perfil deseja-se instanciar?", "Perfil para Cliente", "Perfil para Administrador");
+        if (tipoCadastro == null) return;
 
-        if (stringCadastro == null) return;
-
-        int cadastro;
-        try {
-            cadastro = Integer.parseInt(stringCadastro);
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Opção inválida! Digite apenas números.");
-            return;
-        }
-
-        if (cadastro == 1) {
+        if (tipoCadastro.equals("Perfil para Cliente")) {
             while (true) {
-                String[] dados = SwingUtil.exibirFormularioCadastroCliente();
+                String[] dados = SwingUtil.exibirFormulario("Cadastro de Cliente", "Insira suas informações pessoais nos campos abaixo:", "Nome:", "CPF:", "Telefone:", "Data de Nascimento (dd/mm/aaaa):", "E-mail:", "Senha:");
                 if (dados == null) { System.out.println("Cadastro cancelado."); break; }
 
-                String nome = dados[0];
-                String cpf = dados[1];
-                String telefone = dados[2];
-                String dataNascimento = dados[3];
-                String email = dados[4];
-                String senha = dados[5];
+                String nome = dados[0].trim();
+                String cpf = dados[1].trim();
+                String telefone = dados[2].trim();
+                String dataNascimento = dados[3].trim();
+                String email = dados[4].trim();
+                String senha = dados[5].trim();
 
                 if (nome.isEmpty() || cpf.isEmpty() || telefone.isEmpty() || dataNascimento.isEmpty() || email.isEmpty() || senha.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos", "Erro", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos mandatórios", "Erro", JOptionPane.ERROR_MESSAGE);
                 } else {
                     String senhaCriptografada = BCrypt.hashpw(senha, BCrypt.gensalt(12));
-                    Cliente cliente = new Cliente(nome, cpf, email, senhaCriptografada, dataNascimento, telefone, "Cliente", Status.ATIVO);
+                    Cliente cliente = new Cliente(nome, cpf, email, senhaCriptografada, dataNascimento, telefone, "Cliente");
                     AplicacaoBancaria.ListaUsuarios.add(cliente);
-                    JOptionPane.showMessageDialog(null, "Cliente criado com sucesso!");
+                    JOptionPane.showMessageDialog(null, "Cliente registrado com sucesso no banco de dados!");
                     break;
                 }
             }
-        } else if (cadastro == 2) {
+        } else if (tipoCadastro.equals("Perfil para Administrador")) {
             while (true) {
-                String[] dados = SwingUtil.exibirFormularioCadastroADM();
+                String[] dados = SwingUtil.exibirFormulario("Cadastro de Administrador", "Insira os privilégios e dados administrativos:", "Nome:", "CPF:", "Telefone:", "Data de Nascimento (dd/mm/aaaa):", "E-mail:", "Senha:", "Matrícula:");
                 if (dados == null) { System.out.println("Cadastro cancelado."); break; }
 
-                String nome = dados[0];
-                String cpf = dados[1];
-                String telefone = dados[2];
-                String dataNascimento = dados[3];
-                String email = dados[4];
-                String senha = dados[5];
-                String matricula = dados[6];
+                String nome = dados[0].trim();
+                String cpf = dados[1].trim();
+                String telefone = dados[2].trim();
+                String dataNascimento = dados[3].trim();
+                String email = dados[4].trim();
+                String senha = dados[5].trim();
+                String matricula = dados[6].trim();
 
                 if (nome.isEmpty() || cpf.isEmpty() || telefone.isEmpty() || dataNascimento.isEmpty() || email.isEmpty() || senha.isEmpty() || matricula.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos", "Erro", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos mandatórios", "Erro", JOptionPane.ERROR_MESSAGE);
                 } else {
                     String senhaCriptografada = BCrypt.hashpw(senha, BCrypt.gensalt(12));
                     Administrador administrador = new Administrador(nome, cpf, email, senhaCriptografada, dataNascimento, telefone, "Administrador", matricula);
                     ListaUsuarios.add(administrador);
-                    JOptionPane.showMessageDialog(null, "Administrador criado com sucesso!");
+                    JOptionPane.showMessageDialog(null, "Administrador registrado e homologado com sucesso!");
                     break;
                 }
             }
-        } else if (cadastro == 3) {
-            JOptionPane.showMessageDialog(null, "Voltando...");
-        } else {
-            JOptionPane.showMessageDialog(null, "Opção inválida!");
         }
     }
 
     private static void AberturaConta(Cliente encontrado) {
-        String tipo = SwingUtil.exibirSeletorTipoConta();
+        String tipo = SwingUtil.exibirMenuSelecao("Abertura de Conta", "Selecione o tipo de conta ideal para seu perfil corporativo:", "Conta Corrente", "Conta Poupança", "Conta Kids", "Conta Investimento");
         if (tipo == null) return;
 
-        String[] dados = SwingUtil.exibirFormularioConta(tipo);
+        String[] dados;
+        switch (tipo) {
+            case "Conta Corrente":
+                dados = SwingUtil.exibirFormulario("Nova Conta Corrente", null, "Número da Conta:", "Agência:", "Saldo Inicial:", "Limite Cheque Especial:");
+                break;
+            case "Conta Poupança":
+                dados = SwingUtil.exibirFormulario("Nova Conta Poupança", null, "Número da Conta:", "Agência:", "Saldo Inicial:", "Taxa de Rendimento Mensal:");
+                break;
+            case "Conta Kids":
+                dados = SwingUtil.exibirFormulario("Nova Conta Kids", null, "Número da Conta:", "Agência:", "Saldo Inicial:", "CPF do Responsável Legal:", "Limite de Movimentação Mensal:");
+                break;
+            default:
+                dados = SwingUtil.exibirFormulario("Nova Conta Investimento", null, "Número da Conta:", "Agência:", "Saldo Inicial:", "Perfil de Risco (Baixo/Medio/Alto):");
+                break;
+        }
+
         if (dados == null) return;
 
         try {
-            String num = dados[0];
-            String ag = dados[1];
-            String saldoStr = dados[2];
+            String num = dados[0].trim();
+            String ag = dados[1].trim();
+            String saldoStr = dados[2].trim();
 
             if (num.isEmpty() || ag.isEmpty() || saldoStr.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Erro: Todos os campos básicos devem ser preenchidos.");
@@ -930,19 +960,24 @@ public class AplicacaoBancaria {
                 encontrado.abrirConta(num, ag, sal, tipo, 0, taxa, null, 0, null);
 
             } else if (tipo.equalsIgnoreCase("Conta Kids")) {
-                String cpfResp = dados[3];
+                String cpfResp = dados[3].trim();
                 double limMes = Double.parseDouble(dados[4].replace(",", "."));
                 encontrado.abrirConta(num, ag, sal, tipo, 0, 0, cpfResp, limMes, null);
 
             } else if (tipo.equalsIgnoreCase("Conta Investimento")) {
-                String risco = dados[3];
+                String risco = dados[3].trim();
                 encontrado.abrirConta(num, ag, sal, tipo, 0, 0, null, 0, risco);
             }
 
-            JOptionPane.showMessageDialog(null, "Conta criada com sucesso!");
+            JOptionPane.showMessageDialog(null, "Conta bancária criada e vinculada com sucesso!");
 
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Erro: Verifique os campos numéricos.");
+            JOptionPane.showMessageDialog(null, "Erro: Verifique a formatação dos campos numéricos.");
         }
+    }
+
+    // Método ponte criado para manter a compatibilidade com a assinatura de chamada do menu principal
+    public static void menuGestaoContas(Cliente encontrado) {
+        menuGestaoCartoes(encontrado);
     }
 }

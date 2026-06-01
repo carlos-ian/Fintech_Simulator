@@ -20,10 +20,8 @@ public class SwingUtil {
         if (opcao == JOptionPane.OK_OPTION) {
             return new String[]{ cpfField.getText(), new String(senhaField.getPassword()) };
         }
-        return null; // Cancelou ou fechou a janela
+        return null;
     }
-
-    // Método para exibir o formulário do Cliente
     public static String[] exibirFormularioCadastroCliente() {
         JTextField nomeField = new JTextField();
         JTextField cpfField = new JTextField();
@@ -56,8 +54,6 @@ public class SwingUtil {
         }
         return null;
     }
-
-    // Método para exibir o formulário do Administrador
     public static String[] exibirFormularioCadastroADM() {
         JTextField nomeField = new JTextField();
         JTextField cpfField = new JTextField();

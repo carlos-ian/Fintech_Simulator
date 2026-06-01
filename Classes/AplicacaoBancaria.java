@@ -31,11 +31,11 @@ public class AplicacaoBancaria {
 
             switch (menu) {
                 case 1:
-                    menuLogin();
+                    Login();
                     menu = 0;
                     break;
                 case 2:
-                    menuCadastro();
+                    Cadastro();
                     menu = 0;
                     break;
                 case 3:
@@ -49,7 +49,7 @@ public class AplicacaoBancaria {
         }
     }
 
-    private static void menuLogin() {
+    private static void Login() {
         String stringLogin = JOptionPane.showInputDialog("Quem é você?\n" +
                 "1 - Sou Cliente\n" +
                 "2 - Sou Administrador\n" +
@@ -117,7 +117,7 @@ public class AplicacaoBancaria {
             JOptionPane.showMessageDialog(null, "Opção inválida!");
         }
     }
-    private static void menuCadastro() {
+    private static void Cadastro() {
         String stringCadastro = JOptionPane.showInputDialog("Qual perfil deseja-se criar??\n" +
                 "1 - Perfil para cliente\n" +
                 "2 - Perfil para Administrador\n" +
@@ -184,7 +184,6 @@ public class AplicacaoBancaria {
             JOptionPane.showMessageDialog(null, "Opção inválida!");
         }
     }
-
 
 
 

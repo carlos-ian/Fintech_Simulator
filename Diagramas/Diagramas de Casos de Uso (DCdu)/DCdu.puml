@@ -6,71 +6,80 @@ actor "Usuário" as U
 actor "Cliente" as C
 actor "Administrador" as A
 
-C -up-|> U
-A -up-|> U
+' Herança de Atores
+C --|> U
+A --|> U
 
-usecase "Criar Perfil de Usuário" as RF01
-usecase "Encerrar Perfil de Usuário" as RF02
-usecase "Alterar Dados do Perfil" as RF03
-usecase "Visualizar Dados do Perfil" as RF04
+package "Módulo: Usuário" {
+    usecase "RF01 - Criar Perfil de Usuário" as RF01
+    usecase "RF02 - Realizar Autenticação" as RF02
+    usecase "RF07 - Visualizar Perfil" as RF07
+    usecase "RF08 - Alterar Perfil" as RF08
+    usecase "RF09 - Desativar/Ativar Perfil" as RF09
+    usecase "RF10 - Exclusão de Perfil" as RF10
 
-usecase "Realizar Autenticação" as RF05
-usecase "Abrir/Encerrar Conta" as RF06
+    usecase "Realizar Autenticação \n (Como Cliente)" as RF02C
+    usecase "Realizar Autenticação \n (Como Administrador)" as RF02A
+}
 
-usecase "Realizar Autenticação \n (Como Cliente)" as RF05C
-usecase "Realizar Autenticação \n (Como Administrador)" as RF05A
+package "Módulo: Conta (Cliente) & Cartões" as cc {
+    usecase "RF03 - Abrir e Encerrar Contas" as RF03
+    usecase "RF04 - Visualizar Lista de Contas" as RF04
+    usecase "RF05 - Escolher e Alternar Contas" as RF05
+    usecase "RF06 - Visualizar Dados da Conta" as RF06
+    
+    usecase "RF11 - Criar e Excluir Cartões" as RF11
+    usecase "RF12 - Visualizar Dados do Cartão" as RF12
+    usecase "RF13 - Bloquear e Desbloquear Cartão" as RF13
+    usecase "RF14 - Visualizar e Ajustar Limite" as RF14
+    
+    usecase "RF15 - Realizar Transações" as RF15
+    usecase "RF16 - Visualização de Extratos" as RF16
+}
 
-usecase "Realizar Transações" as RF07a
-usecase "Receber Transações" as RF07b
-usecase "Visualizar Extrato" as RF08
-usecase "Gerenciar Cartões" as RF09
-usecase "Visualizar e Ajustar Limite" as RF10
-usecase "Visualizar Investimentos" as RF11
+package "Módulo: Investimento" as inv{
+    usecase "RF17 - Realizar Investimentos" as RF17
+    usecase "RF18 - Resgate de Investimentos" as RF18
+    usecase "RF19 - Visualização de Investimentos" as RF19
+}
 
-usecase "Realizar Investimentos" as RF12
-usecase "Resgatar Investimentos" as RF13
+package "Módulo: Administrador" as aa {
+    usecase "RF20 - Gerenciamento de Clientes" as RF20
+    usecase "RF21 - Gerenciamento de Contas" as RF21
+    usecase "RF22 - Gerar Relatório Geral" as RF22
+}
 
-usecase "Visualizar Poupança" as RF14
-usecase "Guardar na Poupança" as RF15a
-usecase "Resgatar da Poupança" as RF15b
+package "Módulo: Regras de Tipos de Conta" {
+    usecase "RF23 - Regras Conta Poupança" as RF23
+    usecase "RF24 - Regras Conta Investimento" as RF24
+    usecase "RF25 - Regras Conta Kids" as RF25
+}
 
-usecase "Gerenciar Contas de Usuário" as RF16
-usecase "Analisar Solicitações de Aumento de Limite" as RF17
-usecase "Visualizar Transações" as RF18
-usecase "Estornar Transações" as RF19
-usecase "Gerar Relatório Geral" as RF20
-usecase "Editar Lista de Investimentos" as RF21
-
+' Associações do Usuário (Geral)
 U -- RF01
-U -left- RF02
-U -left- RF03
-U -left- RF04
+RF01 <.. RF02 : <<extend>>
+U -- RF07
+U -- RF08
+U -- RF09
+U -- RF10
 
-RF05 <|-up- RF05C
-RF05 <|-up- RF05A
-RF01 <.. RF05 : <<include>>
+' Associações do Cliente
+' Associações do Administrador
+A -- RF14 : "Avaliar Solicitação"
 
-C -- RF05C
-A -- RF05A
+' Relacionamentos de Extensão para Regras de Negócio de Tipos de Conta
+RF15 ..> RF23 : <<extend>>
+RF15 ..> RF24 : <<extend>>
+RF15 ..> RF25 : <<extend>>
 
-RF05C <.right. RF06 : <<include>>
-RF05C <.left. RF07a : <<include>>
-RF05C <.left. RF07b : <<include>>
-RF05C <.. RF08 : <<include>>
-RF05C <.. RF09 : <<include>>
-RF09 ..> RF10 : <<extend>>
-RF05C <.. RF11 : <<include>>
-RF11 ..> RF12 : <<extend>>
-RF11 ..> RF13 : <<extend>>
-RF05C <.. RF14 : <<include>>
-RF14 ..> RF15a : <<extend>>
-RF14 ..> RF15b : <<extend>>
+RF02 <|-right- RF02C 
+RF02 <|-left- RF02A 
 
-RF05A <.. RF16 : <<include>> 
-RF05A <.. RF17 : <<include>>
-RF16 .left.> RF18 : <<extend>>
-RF18 .right.> RF19 : <<extend>>
-RF05A <.. RF20 : <<include>>
-RF05A <.. RF21 : <<include>>
+A -left- RF02A 
+C -- RF02C
+
+RF02C -up-> cc
+RF02C -up-> inv
+RF02A -right-> aa
 
 @enduml

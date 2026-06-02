@@ -3,8 +3,9 @@ skinparam classAttributeIconSize 0
 hide methods
 hide circles
 
-class SistemaBancario {
-    nomeFintech
+class AplicacaoBancaria {
+    listaUsuarios
+    listaInvestimentos
 }
 
 class Usuario {
@@ -15,7 +16,7 @@ class Usuario {
 }
 
 class Cliente {
-    status
+    listaContas
 }
 
 class Administrador {
@@ -46,12 +47,9 @@ class Investimento {
     valorAplicado
 }
 
-class Poupanca {
-    saldoReservado
-}
 
 ' Relacionamentos Conceituais
-SistemaBancario "1" -- "*" Usuario : gerencia
+AplicacaoBancaria "1" -- "*" Usuario : gerencia
 Usuario <|-- Cliente
 Usuario <|-- Administrador
 
@@ -59,7 +57,6 @@ Cliente "1" -- "1..*" Conta : possui
 Conta "1" -- "0..*" Cartao : tem
 Conta "1" -- "*" Transacao : registra
 Conta "1" -- "*" Investimento : aplica
-Conta "1" -- "1" Poupanca : reserva
 
 Administrador "1" -- "*" Conta : audita
 @enduml

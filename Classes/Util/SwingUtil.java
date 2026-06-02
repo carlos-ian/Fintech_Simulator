@@ -1,4 +1,6 @@
-package Classes;
+package Classes.Util;
+
+import Classes.Model.Operacoes.Cartao;
 
 import javax.swing.*;
 import java.awt.*;

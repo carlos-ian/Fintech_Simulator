@@ -1,4 +1,7 @@
-package Classes;
+package Classes.Model.Operacoes;
+
+import Classes.Model.Conta.Conta;
+import Classes.Model.Usuario.Administrador;
 
 public class Cartao {
     private String numeroCartao;
@@ -8,7 +11,7 @@ public class Cartao {
     private double limiteDisponivel;
     private boolean estaBloqueado;
 
-    Cartao(String numeroCartao, String titular, String tipoCartao, double limiteTotal, double limiteDisponivel) {
+    public Cartao(String numeroCartao, String titular, String tipoCartao, double limiteTotal, double limiteDisponivel) {
         this.numeroCartao = numeroCartao;
         this.titular = titular;
         this.tipoCartao = tipoCartao;

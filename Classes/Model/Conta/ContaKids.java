@@ -1,6 +1,10 @@
-package Classes;
+package Classes.Model.Conta;
 
+import Classes.Model.Operacoes.Cartao;
 import Classes.Exceptions.*;
+import Classes.Model.Operacoes.Status;
+import Classes.Model.Operacoes.Transacao;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -10,7 +14,7 @@ public class ContaKids extends Conta {
     private double limiteMensal;
     private double totalGastoNoMes;
 
-    ContaKids(String numeroConta, String agencia, double saldo, String tipoConta, String cpfResponsavel, double limiteMensal) {
+    public ContaKids(String numeroConta, String agencia, double saldo, String tipoConta, String cpfResponsavel, double limiteMensal) {
         super(numeroConta, agencia, saldo, tipoConta);
         this.cpfResponsavel = cpfResponsavel;
         this.limiteMensal = limiteMensal;

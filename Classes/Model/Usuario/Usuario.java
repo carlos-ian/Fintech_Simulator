@@ -1,5 +1,8 @@
-package Classes;
+package Classes.Model.Usuario;
 
+import Classes.AplicacaoBancaria;
+import Classes.Model.Conta.Conta;
+import Classes.Model.Operacoes.Status;
 import org.mindrot.jbcrypt.BCrypt;
 
 public abstract class Usuario {
@@ -88,6 +91,7 @@ public abstract class Usuario {
                 "\nTELEFONE: " + this.telefone;
     }
 
+    public String getTipoUsuario() {return tipoUsuario;}
     public String getNome() {
         return nome;
     }

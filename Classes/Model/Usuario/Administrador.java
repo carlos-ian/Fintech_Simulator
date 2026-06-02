@@ -1,4 +1,11 @@
-package Classes;
+package Classes.Model.Usuario;
+
+import Classes.*;
+import Classes.Model.Conta.Conta;
+import Classes.Model.Operacoes.Cartao;
+import Classes.Model.Operacoes.Justificativa;
+import Classes.Model.Operacoes.Status;
+import Classes.Model.Operacoes.Transacao;
 
 import java.util.ArrayList;
 import java.io.IOException;
@@ -53,8 +60,8 @@ public class Administrador extends Usuario {
     }
 
     public boolean ativarConta(Conta conta) {
-        if (conta.statusConta == Status.INATIVO) {
-            conta.statusConta = Status.ATIVO;
+        if (conta.getStatus() == Status.INATIVO) {
+            conta.setStatus(Status.ATIVO);
             return true;
         }
         return false;
@@ -84,12 +91,12 @@ public class Administrador extends Usuario {
         if (conta == null) {
             return null;
         }
-        return conta.extrato;
+        return conta.getExtrato();
     }
 
     public boolean analisarPedidoLimite(Cartao cartao, Conta conta, double novoLimite) {
         double limiteAtual = cartao.getLimiteTotal();
-        double saldoAtual = conta.saldo; 
+        double saldoAtual = conta.getSaldo();
 
         double crescimentoMaximo = limiteAtual * 1.5;
         double tetoBaseadoNoSaldo = saldoAtual * 3.0;
@@ -128,8 +135,8 @@ public class Administrador extends Usuario {
             for (Conta conta : todasContas) {
                 montanteTotal += conta.getSaldo();
 
-                if (conta.listaInvestimentos != null) {
-                    numeroInvestimentosFeitos += conta.listaInvestimentos.size();
+                if (conta.getListaInvestimentos() != null) {
+                    numeroInvestimentosFeitos += conta.getListaInvestimentos().size();
                 }
             }
         }

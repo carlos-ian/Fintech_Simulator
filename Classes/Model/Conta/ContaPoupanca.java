@@ -1,6 +1,10 @@
-package Classes;
+package Classes.Model.Conta;
 
+import Classes.Model.Operacoes.Cartao;
 import Classes.Exceptions.*;
+import Classes.Model.Operacoes.Status;
+import Classes.Model.Operacoes.Transacao;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -8,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 public class ContaPoupanca extends Conta {
     private double taxaRendimento;
 
-    ContaPoupanca(String numeroConta, String agencia, double saldo, String tipoConta, double taxaRendimento) {
+    public ContaPoupanca(String numeroConta, String agencia, double saldo, String tipoConta, double taxaRendimento) {
         super(numeroConta, agencia, saldo, tipoConta);
         this.taxaRendimento = taxaRendimento;
     }

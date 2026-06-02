@@ -1,4 +1,6 @@
-package Classes;
+package Classes.Model.Operacoes;
+
+import Classes.Model.Conta.Conta;
 
 public class Transacao {
     private static int codigoSequencial = 0;
@@ -14,7 +16,7 @@ public class Transacao {
     private Conta origem;
     private Conta destino;
 
-    Transacao(String data, String hora, double valor, String categoria, String tipoFluxo, String metodoPagamento, String status, Conta origem, Conta destino) {
+    public Transacao(String data, String hora, double valor, String categoria, String tipoFluxo, String metodoPagamento, String status, Conta origem, Conta destino) {
         this.id = ++codigoSequencial;
         this.data = data;
         this.hora = hora;

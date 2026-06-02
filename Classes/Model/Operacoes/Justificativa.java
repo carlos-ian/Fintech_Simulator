@@ -1,4 +1,4 @@
-package Classes;
+package Classes.Model.Operacoes;
 
 public enum Justificativa {
     SUSPEITA_FRAUDE("Suspeita de atividade fraudulenta"),

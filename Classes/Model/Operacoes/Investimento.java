@@ -1,7 +1,7 @@
-package Classes;
+package Classes.Model.Operacoes;
 
 import Classes.Exceptions.*;
-import java.util.ArrayList;
+import Classes.Model.Conta.Conta;
 
 public class Investimento {
     private static int contador = 0;
@@ -12,7 +12,7 @@ public class Investimento {
     private double valorAplicado;
     private String dataAplicacao;
 
-    Investimento(String nomeProduto, double taxaRendimento, double valorAplicado, String dataAplicacao){
+    public Investimento(String nomeProduto, double taxaRendimento, double valorAplicado, String dataAplicacao){
         idInvestimento = contador++;
         this.nomeProduto = nomeProduto;
         this.taxaRendimento = taxaRendimento;
@@ -26,15 +26,15 @@ public class Investimento {
             throw new IllegalArgumentException("O valor do investimento deve ser maior que zero.");
         }
 
-        if (valorParaInvestir > conta.saldo) {
+        if (valorParaInvestir > conta.getSaldo()) {
             throw new SaldoInsuficienteException("Saldo insuficiente para realizar este investimento.");
         }
 
-        conta.saldo -= valorParaInvestir;
+        conta.setSaldo(conta.getSaldo() - valorParaInvestir);
         produtoSelecionado.dataAplicacao = dataAtual;
         produtoSelecionado.valorAplicado = valorParaInvestir;
 
-        conta.listaInvestimentos.add(produtoSelecionado);
+        conta.getListaInvestimentos().add(produtoSelecionado);
 
         System.out.printf("Investimento de R$ %.2f em '%s' realizado com sucesso!\n",
                 valorParaInvestir, produtoSelecionado.nomeProduto);
@@ -44,7 +44,7 @@ public class Investimento {
     public boolean resgatarInvestimento(Conta conta, int idInvestimento) throws Exception {
         Investimento investimentoEncontrado = null;
 
-        for (Investimento inv : conta.listaInvestimentos) {
+        for (Investimento inv : conta.getListaInvestimentos()) {
             if (inv.idInvestimento == idInvestimento) {
                 investimentoEncontrado = inv;
                 break;
@@ -56,7 +56,7 @@ public class Investimento {
         }
 
         double valorParaDevolver = investimentoEncontrado.valorAplicado;
-        conta.saldo += valorParaDevolver;
+        conta.setSaldo(conta.getSaldo() + valorParaDevolver);
 
         System.out.printf("Resgate de R$ %.2f do produto '%s' realizado com sucesso!\n",
                 valorParaDevolver, investimentoEncontrado.nomeProduto);

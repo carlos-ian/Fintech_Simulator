@@ -1,4 +1,6 @@
-package Classes;
+package Classes.Model.Usuario;
+
+import Classes.Model.Conta.*;
 
 import java.util.ArrayList;
 

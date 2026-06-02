@@ -1,11 +1,17 @@
-package Classes;
+package Classes.Model.Conta;
 
-import java.util.ArrayList;
+import Classes.Exceptions.ContaInativaException;
+import Classes.Exceptions.LimiteInsuficienteException;
+import Classes.Exceptions.SaldoInsuficienteException;
+import Classes.Model.Operacoes.Cartao;
+import Classes.Model.Operacoes.Investimento;
+import Classes.Model.Operacoes.Status;
+import Classes.Model.Operacoes.Transacao;
+
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import Classes.Exceptions.*;
+import java.util.ArrayList;
 
 public abstract class Conta {
     protected ArrayList<Transacao> extrato = new ArrayList<>();
@@ -105,4 +111,6 @@ public abstract class Conta {
     public String getTipoConta() {return tipoConta;}
     public Status getStatus() {return statusConta;}
     public void setStatus(Status status) {this.statusConta = status;}
+    public ArrayList<Investimento> getListaInvestimentos() {return listaInvestimentos;}
+    public ArrayList<Transacao> getExtrato() {return extrato;}
 }

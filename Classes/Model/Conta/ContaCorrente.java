@@ -1,6 +1,10 @@
-package Classes;
+package Classes.Model.Conta;
 
+import Classes.Model.Operacoes.Cartao;
 import Classes.Exceptions.*;
+import Classes.Model.Operacoes.Status;
+import Classes.Model.Operacoes.Transacao;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;

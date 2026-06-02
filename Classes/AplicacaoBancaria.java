@@ -1,8 +1,15 @@
 package Classes;
 
+import Classes.Model.Conta.Conta;
+import Classes.Model.Operacoes.*;
+import Classes.Model.Usuario.Administrador;
+import Classes.Model.Usuario.Cliente;
+import Classes.Model.Usuario.Usuario;
+import Classes.Util.SwingUtil;
+import org.mindrot.jbcrypt.BCrypt;
+
 import javax.swing.*;
 import java.util.ArrayList;
-import org.mindrot.jbcrypt.BCrypt;
 
 public class AplicacaoBancaria {
     public static ArrayList<Usuario> ListaUsuarios = new ArrayList<>();
@@ -15,6 +22,11 @@ public class AplicacaoBancaria {
         AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("Fundo de Ações", 18.5, 0, null));
         AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("Poupança", 6.17, 0, null));
 
+        AplicacaoBancaria.menuInicial();
+
+    }
+
+    public static void menuInicial() {
         int menu = 0;
         while (menu == 0) {
             String stringMenu = JOptionPane.showInputDialog(
@@ -25,7 +37,7 @@ public class AplicacaoBancaria {
                             "2 - Criar Perfil de Usuário\n" +
                             "3 - Sair\n");
 
-            if (stringMenu == null) { System.out.println("...ENCERRANDO O SISTEMA..."); return; }
+            if (stringMenu == null) {System.out.println("--- ENCERRANDO SISTEMA ---"); return;}
 
             try {
                 menu = Integer.parseInt(stringMenu);
@@ -36,11 +48,22 @@ public class AplicacaoBancaria {
             }
 
             switch (menu) {
-                case 1: Login(); menu = 0; break;
-                case 2: Cadastro(); menu = 0; break;
+                case 1:
+                    String loginTipo = SwingUtil.exibirMenuSelecao("Identificação de Login", "Quem é você?", "Sou Cliente", "Sou Administrador");
+                    if (loginTipo != null) {Login(loginTipo);}
+                    menu = 0;
+                    break;
+
+                case 2:
+                    String tipoCadastro = SwingUtil.exibirMenuSelecao("Criação de Perfil", "Qual perfil deseja-se criar?", "Perfil para Cliente", "Perfil para Administrador");
+                    if (tipoCadastro != null) {Cadastro(tipoCadastro);}
+                    menu = 0;
+                    break;
+
                 case 3:
-                    JOptionPane.showMessageDialog(null, "...ENCERRANDO O SISTEMA...");
+                    JOptionPane.showMessageDialog(null, "--- ENCERRANDO SISTEMA ---");
                     return;
+
                 default:
                     JOptionPane.showMessageDialog(null, "Opção inválida!");
                     menu = 0;
@@ -48,6 +71,104 @@ public class AplicacaoBancaria {
             }
         }
     }
+
+    private static void Login(String perfilSelecionado) {
+        while (true) {
+            String tipoPerfil = perfilSelecionado.equals("Sou Cliente") ? "Cliente" : "Administrador";
+
+            String[] dados = SwingUtil.exibirFormulario("Autenticação de Segurança - " + tipoPerfil, "Entre com as suas credenciais de acesso:", "CPF:", "Senha:");
+            if (dados == null) { System.out.println("Login cancelado."); break; }
+
+            String cpf = dados[0].trim();
+            String senha = dados[1].trim();
+
+            if (cpf.isEmpty() || senha.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos", "Erro", JOptionPane.ERROR_MESSAGE);
+                continue;
+            }
+
+            Usuario encontrado = Usuario.autenticar(cpf, senha);
+            if (encontrado == null || !encontrado.getTipoUsuario().equalsIgnoreCase(tipoPerfil)) {
+                JOptionPane.showMessageDialog(null, "CPF ou Senha incorretos para o perfil " + tipoPerfil, "Erro", JOptionPane.ERROR_MESSAGE);
+                continue;
+            }
+
+            if (encontrado.getStatus() == Status.INATIVO) {
+                int resposta = JOptionPane.showConfirmDialog(null,
+                        "Seu perfil está atualmente INATIVO.\nDeseja reativar seu perfil para acessar a aplicação?",
+                        "Perfil Inativo", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+                if (resposta == JOptionPane.YES_OPTION) {
+                    encontrado.setStatus(Status.ATIVO);
+                    JOptionPane.showMessageDialog(null, "Perfil reativado com sucesso! Prossiga com o acesso.");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Acesso negado. É necessário ativar o perfil para entrar.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                    break;
+                }
+            }
+
+            JOptionPane.showMessageDialog(null, "Autenticação " + tipoPerfil + " Concluída com Sucesso!");
+            if (tipoPerfil.equals("Cliente")) {
+                AplicacaoBancaria.menuGestaoContas((Cliente) encontrado);
+            } else {
+                AplicacaoBancaria.menuPrincipalAdministrador((Administrador) encontrado);
+            }
+            break;
+        }
+    }
+
+    private static void Cadastro(String perfilSelecionado) {
+        while (true) {
+            boolean ehCliente = perfilSelecionado.equals("Perfil para Cliente");
+            String[] dados;
+
+            if (ehCliente) {
+                dados = SwingUtil.exibirFormulario("Cadastro de Usuário", "Insira suas informações pessoais nos campos abaixo:",
+                        "Nome:", "CPF:", "Telefone:", "Data de Nascimento (dd/mm/aaaa):", "E-mail:", "Senha:");
+            } else {
+                dados = SwingUtil.exibirFormulario("Cadastro de Usuário", "Insira suas informações pessoais nos campos abaixo:",
+                        "Nome:", "CPF:", "Telefone:", "Data de Nascimento (dd/mm/aaaa):", "E-mail:", "Senha:", "Matrícula:");
+            }
+
+            if (dados == null) { System.out.println("Cadastro cancelado."); break; }
+
+            boolean temCampoVazio = false;
+            for (String campo : dados) {
+                if (campo.trim().isEmpty()) {
+                    temCampoVazio = true;
+                    break;
+                }
+            }
+
+            if (temCampoVazio) {
+                JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos obrigatórios", "Erro", JOptionPane.ERROR_MESSAGE);
+                continue;
+            }
+
+            String nome = dados[0].trim();
+            String cpf = dados[1].trim();
+            String telefone = dados[2].trim();
+            String dataNascimento = dados[3].trim();
+            String email = dados[4].trim();
+            String senha = dados[5].trim();
+            String senhaCriptografada = BCrypt.hashpw(senha, BCrypt.gensalt(12));
+
+            if (ehCliente) {
+                Cliente cliente = new Cliente(nome, cpf, email, senhaCriptografada, dataNascimento, telefone, "Cliente");
+                AplicacaoBancaria.ListaUsuarios.add(cliente);
+            } else {
+                String matricula = dados[6].trim();
+                Administrador administrador = new Administrador(nome, cpf, email, senhaCriptografada, dataNascimento, telefone, "Administrador", matricula);
+                AplicacaoBancaria.ListaUsuarios.add(administrador);
+            }
+
+            JOptionPane.showMessageDialog(null, "Perfil Criado com Sucesso!");
+            break;
+        }
+    }
+
+
+// --- //
 
     public static void menuGestaoContas(Cliente encontrado) {
         int mpC = 0;
@@ -587,7 +708,7 @@ public class AplicacaoBancaria {
                     break;
 
                 case 2:
-                    ArrayList<Investimento> feitos = conta.listaInvestimentos;
+                    ArrayList<Investimento> feitos = conta.getListaInvestimentos();
 
                     if (feitos == null || feitos.isEmpty()) {
                         JOptionPane.showMessageDialog(null, "Não há aplicações ativas nesta conta.", "Investimentos", JOptionPane.INFORMATION_MESSAGE);
@@ -641,14 +762,14 @@ public class AplicacaoBancaria {
                     break;
 
                 case 4:
-                    if (conta.listaInvestimentos == null || conta.listaInvestimentos.isEmpty()) {
+                    if (conta.getListaInvestimentos() == null || conta.getListaInvestimentos().isEmpty()) {
                         JOptionPane.showMessageDialog(null, "Você não possui nenhuma aplicação para resgatar.", "Aviso", JOptionPane.WARNING_MESSAGE);
                         break;
                     }
 
-                    String[] ativosParaResgate = new String[conta.listaInvestimentos.size()];
-                    for (int i = 0; i < conta.listaInvestimentos.size(); i++) {
-                        ativosParaResgate[i] = "ID: " + i + " | Ativo: " + conta.listaInvestimentos.get(i).getNomeProduto();
+                    String[] ativosParaResgate = new String[conta.getListaInvestimentos().size()];
+                    for (int i = 0; i < conta.getListaInvestimentos().size(); i++) {
+                        ativosParaResgate[i] = "ID: " + i + " | Ativo: " + conta.getListaInvestimentos().get(i).getNomeProduto();
                     }
 
                     String resgateSel = SwingUtil.exibirMenuSelecao("Resgate de Investimento", "Escolha qual investimento deseja resgatar:", ativosParaResgate);
@@ -819,8 +940,8 @@ public class AplicacaoBancaria {
                             todosClientes.add(c);
                             for (Conta con : c.obterContas()) {
                                 todasContas.add(con);
-                                if (con.extrato != null) {
-                                    todasTransacoes.addAll(con.extrato);
+                                if (con.getExtrato() != null) {
+                                    todasTransacoes.addAll(con.getExtrato());
                                 }
                             }
                         }
@@ -853,110 +974,6 @@ public class AplicacaoBancaria {
     // --------------------------------------------------------------------------
     // --------------------- Metodos Auxiliares dos Menus -----------------------
     // --------------------------------------------------------------------
-    private static void Login() {
-        String loginTipo = SwingUtil.exibirMenuSelecao("Identificação de Login", "Quem é você?", "Sou Cliente", "Sou Administrador");
-        if (loginTipo == null) return;
-
-        if (loginTipo.equals("Sou Cliente")) {
-            while (true) {
-                String[] dados = SwingUtil.exibirFormulario("Autenticação de Segurança", "Entre com as suas credenciais de acesso:", "CPF:", "Senha:");
-                if (dados == null) { System.out.println("Login cancelado."); break; }
-
-                String cpf = dados[0].trim();
-                String senha = dados[1].trim();
-
-                if (cpf.isEmpty() || senha.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos", "Erro", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    Usuario encontrado = Usuario.autenticar(cpf, senha);
-                    if (encontrado == null) {
-                        JOptionPane.showMessageDialog(null, "CPF ou Senha incorretos", "Erro", JOptionPane.ERROR_MESSAGE);
-                    } else if (encontrado.tipoUsuario.equalsIgnoreCase("Cliente")) {
-                        JOptionPane.showMessageDialog(null, "Autenticação Concluída com Sucesso!");
-                        AplicacaoBancaria.menuGestaoContas((Cliente) encontrado);
-                        break;
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Acesso Negado para esse Tipo de Perfil", "Acesso Negado", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-            }
-        } else if (loginTipo.equals("Sou Administrador")) {
-            while (true) {
-                String[] dados = SwingUtil.exibirFormulario("Autenticação de Segurança", "Entre com as suas credenciais de acesso:", "CPF:", "Senha:");
-                if (dados == null) { System.out.println("Login cancelado."); break; }
-
-                String cpf = dados[0].trim();
-                String senha = dados[1].trim();
-
-                if (cpf.isEmpty() || senha.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos", "Erro", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    Usuario encontrado = Usuario.autenticar(cpf, senha);
-                    if (encontrado == null) {
-                        JOptionPane.showMessageDialog(null, "CPF ou Senha incorretos", "Erro", JOptionPane.ERROR_MESSAGE);
-                    } else if (encontrado.tipoUsuario.equalsIgnoreCase("Administrador")) {
-                        JOptionPane.showMessageDialog(null, "Autenticação Concluída com Sucesso!");
-                        AplicacaoBancaria.menuPrincipalAdministrador((Administrador) encontrado);
-                        break;
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Acesso Negado para esse Tipo de Perfil", "Acesso Negado", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-            }
-        }
-    }
-
-    private static void Cadastro() {
-        String tipoCadastro = SwingUtil.exibirMenuSelecao("Criação de Perfil", "Qual perfil deseja-se criar?", "Perfil para Cliente", "Perfil para Administrador");
-        if (tipoCadastro == null) return;
-
-        if (tipoCadastro.equals("Perfil para Cliente")) {
-            while (true) {
-                String[] dados = SwingUtil.exibirFormulario("Cadastro de Cliente", "Insira suas informações pessoais nos campos abaixo:", "Nome:", "CPF:", "Telefone:", "Data de Nascimento (dd/mm/aaaa):", "E-mail:", "Senha:");
-                if (dados == null) { System.out.println("Cadastro cancelado."); break; }
-
-                String nome = dados[0].trim();
-                String cpf = dados[1].trim();
-                String telefone = dados[2].trim();
-                String dataNascimento = dados[3].trim();
-                String email = dados[4].trim();
-                String senha = dados[5].trim();
-
-                if (nome.isEmpty() || cpf.isEmpty() || telefone.isEmpty() || dataNascimento.isEmpty() || email.isEmpty() || senha.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos obrigatórios", "Erro", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    String senhaCriptografada = BCrypt.hashpw(senha, BCrypt.gensalt(12));
-                    Cliente cliente = new Cliente(nome, cpf, email, senhaCriptografada, dataNascimento, telefone, "Cliente");
-                    AplicacaoBancaria.ListaUsuarios.add(cliente);
-                    JOptionPane.showMessageDialog(null, "Perfil Criado com Sucesso!");
-                    break;
-                }
-            }
-        } else if (tipoCadastro.equals("Perfil para Administrador")) {
-            while (true) {
-                String[] dados = SwingUtil.exibirFormulario("Cadastro de Administrador", "Insira suas informações pessoais nos campos abaixo:", "Nome:", "CPF:", "Telefone:", "Data de Nascimento (dd/mm/aaaa):", "E-mail:", "Senha:", "Matrícula:");
-                if (dados == null) { System.out.println("Cadastro cancelado."); break; }
-
-                String nome = dados[0].trim();
-                String cpf = dados[1].trim();
-                String telefone = dados[2].trim();
-                String dataNascimento = dados[3].trim();
-                String email = dados[4].trim();
-                String senha = dados[5].trim();
-                String matricula = dados[6].trim();
-
-                if (nome.isEmpty() || cpf.isEmpty() || telefone.isEmpty() || dataNascimento.isEmpty() || email.isEmpty() || senha.isEmpty() || matricula.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Não foram preenchidos todos os campos mandatórios", "Erro", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    String senhaCriptografada = BCrypt.hashpw(senha, BCrypt.gensalt(12));
-                    Administrador administrador = new Administrador(nome, cpf, email, senhaCriptografada, dataNascimento, telefone, "Administrador", matricula);
-                    ListaUsuarios.add(administrador);
-                    JOptionPane.showMessageDialog(null, "Perfil Criado com Sucesso!");
-                    break;
-                }
-            }
-        }
-    }
 
     private static void AberturaConta(Cliente encontrado) {
         String tipo = SwingUtil.exibirMenuSelecao("Abertura de Conta", "Selecione o tipo de conta que deseja criar:", "Conta Corrente", "Conta Poupança", "Conta Kids", "Conta Investimento");

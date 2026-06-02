@@ -21,6 +21,7 @@ public class Administrador extends Usuario {
         this.matricula = matricula;
     }
 
+    @Override
     public void alterarDados(String tipoDado, String novoValor) {
         if ("Status".equalsIgnoreCase(tipoDado)) {
             throw new IllegalArgumentException("Não é permitido alterar o status do admnistrador por este método.");

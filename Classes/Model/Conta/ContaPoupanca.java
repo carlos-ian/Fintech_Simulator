@@ -14,8 +14,6 @@ import java.time.format.DateTimeFormatter;
 
 public class ContaPoupanca extends Conta {
     private static final double taxaRendimento = 0.005;
-    private YearMonth ultimaAplicacaoRendimento = YearMonth.now().minusMonths(1);
-    private static final int DIA_FIXO_RENDIMENTO = 5;
 
     public ContaPoupanca(String numeroConta, String agencia, double saldo, String tipoConta) {
         super(numeroConta, agencia, saldo, tipoConta);
@@ -28,7 +26,6 @@ public class ContaPoupanca extends Conta {
 
         double valorRendimento = this.saldo * taxaRendimento;
         this.saldo += valorRendimento;
-        this.ultimaAplicacaoRendimento = mesAtual;
 
         String dataAtual = dataHoje.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         String horaAtual = horaAgora.format(DateTimeFormatter.ofPattern("HH:mm:ss"));

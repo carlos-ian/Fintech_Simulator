@@ -1,0 +1,78 @@
+@startuml Módulo Usuários (Visão Expandida)
+skinparam classAttributeIconSize 0
+left to right direction
+
+package "Módulo Usuários" #EBF5FB {
+    abstract class Usuario {
+        - {static} cod_sequencial : int = 0
+        # id : int
+        # nome : String
+        # cpf : String
+        # email : String
+        # senha : String
+        # dataNascimento : String
+        # telefone : String
+        # tipoUsuario : String
+        # statusPerfil : Status
+        --
+        + Usuario(nome : String, cpf : String, email : String, senha : String, dataNascimento : String, telefone : String, tipoUsuario : String)
+        + {static} autenticar(cpf : String, senha : String) : Usuario
+        + encerrarPerfil(u : Usuario, senha : String) : void
+        + alterarDados(tipoDado : String, novoValor : String) : void
+        + visualizarDados() : String
+        + getTipoUsuario() : String
+        + getNome() : String
+        + getSenha() : String
+        + getCpf() : String
+        + getStatus() : Status
+        + setStatus(statusCliente : Status) : void
+    }
+
+    class Cliente {
+        ~ listaContas : ArrayList<Conta>
+        --
+        + Cliente(nome : String, cpf : String, email : String, senha : String, dataNascimento : String, telefone : String, tipoUsuario : String)
+        + alterarDados(tipoDado : String, novoValor : String) : void 
+        + visualizarDados() : String 
+        + abrirConta(numeroConta : String, agencia : String, saldo : double, tipoConta : String, limiteChequeEspecial : double, cpfResponsavel : String, limiteMensal : double, perfilRisco : String) : void
+        + fecharConta(conta : Conta) : boolean
+        + obterContas() : ArrayList<Conta>
+    }
+
+    class Administrador {
+        - matricula : String
+        --
+        + Administrador(nome : String, cpf : String, email : String, senha : String, dataNascimento : String, telefone : String, tipoUsuario : String, matricula : String)
+        + alterarDados(tipoDado : String, novoValor : String) : void 
+        + visualizarDados() : String 
+        + consultarCliente(cpfBusca : String, bancoDeClientes : ArrayList<Cliente>) : Cliente
+        + desativarConta(conta : Conta, motivo : justificativa) : boolean
+        + ativarConta(conta : Conta) : boolean
+        + desativarPerfilCliente(cliente : Cliente, motivo: justificativa) : boolean
+        + ativarPerfilCliente(cliente : Cliente) : boolean
+        + visualizarHistoricoConta(conta : Conta) : ArrayList<Transacao>
+        + analisarPedidoLimite(cartao : Cartao, conta : Conta, novoLimite : double) : boolean
+        + gerarRelatorioFintech(todosUsuarios : ArrayList<Cliente>, todasContas : ArrayList<Conta>, todasTransacoes : ArrayList<Transacao>) : String
+        + getMatricula() : String
+    }
+    
+    Cliente -down-|> Usuario
+    Administrador -down-|> Usuario
+}
+
+package "Módulo Contas" #FEF9E7 {
+    abstract class Conta <<abstract>>
+}
+
+package "Módulo Operações" #E8F8F5 {
+    class Transacao
+    class Cartao
+    enum Status <<enum>>
+    enum Justificativa <<enum>>
+}
+
+Usuario "1" o-- "0..*" Conta 
+Usuario --> Status : possui
+Administrador ..> Cartao : analisa limite
+Administrador ..> Transacao : visualiza histórico
+@enduml

@@ -92,7 +92,7 @@ public abstract class Conta {
 
     public String visualizarDadosConta() {
         return String.format(
-                "=== DADOS DA CONTA ===\n" +
+                "===================================\n" +
                         "Agência: %s\n" +
                         "Número: %s\n" +
                         "Tipo: %s\n" +

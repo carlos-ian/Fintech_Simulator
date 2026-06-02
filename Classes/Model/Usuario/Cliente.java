@@ -37,7 +37,7 @@ public class Cliente extends Usuario {
     }
 
     public void abrirConta(String numeroConta, String agencia, double saldo, String tipoConta,
-                           double limiteChequeEspecial, double taxaRendimento, String cpfResponsavel,
+                           double limiteChequeEspecial, String cpfResponsavel,
                            double limiteMensal, String perfilRisco) {
 
         if (tipoConta.equalsIgnoreCase("Conta Corrente")) {
@@ -45,7 +45,7 @@ public class Cliente extends Usuario {
             listaContas.add(contaCorrente);
 
         } else if (tipoConta.equalsIgnoreCase("Conta Poupança")) {
-            ContaPoupanca contaPoupanca = new ContaPoupanca(numeroConta, agencia, saldo, tipoConta, taxaRendimento);
+            ContaPoupanca contaPoupanca = new ContaPoupanca(numeroConta, agencia, saldo, tipoConta);
             listaContas.add(contaPoupanca);
 
         } else if (tipoConta.equalsIgnoreCase("Conta Kids")) {

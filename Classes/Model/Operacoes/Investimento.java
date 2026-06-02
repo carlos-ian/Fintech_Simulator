@@ -1,6 +1,6 @@
 package Classes.Model.Operacoes;
 
-import Classes.Exceptions.*;
+import Classes.Exceptions.SaldoInsuficienteException;
 import Classes.Model.Conta.Conta;
 
 public class Investimento {
@@ -18,6 +18,10 @@ public class Investimento {
         this.taxaRendimento = taxaRendimento;
         this.valorAplicado = valorAplicado;
         this.dataAplicacao = dataAplicacao;
+    }
+
+    public void aplicarRendimento() {
+        this.valorAplicado += this.valorAplicado * this.taxaRendimento;
     }
 
     public boolean realizarInvestimento(Conta conta, Investimento produtoSelecionado, double valorParaInvestir, String dataAtual) throws SaldoInsuficienteException {

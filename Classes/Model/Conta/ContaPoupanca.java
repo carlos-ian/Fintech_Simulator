@@ -1,38 +1,50 @@
 package Classes.Model.Conta;
 
+import Classes.Exceptions.ContaInativaException;
+import Classes.Exceptions.LimiteInsuficienteException;
+import Classes.Exceptions.SaldoInsuficienteException;
 import Classes.Model.Operacoes.Cartao;
-import Classes.Exceptions.*;
 import Classes.Model.Operacoes.Status;
 import Classes.Model.Operacoes.Transacao;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 
 public class ContaPoupanca extends Conta {
-    private double taxaRendimento;
+    private static final double taxaRendimento = 0.005;
+    private YearMonth ultimaAplicacaoRendimento = YearMonth.now().minusMonths(1);
+    private static final int DIA_FIXO_RENDIMENTO = 5;
 
-    public ContaPoupanca(String numeroConta, String agencia, double saldo, String tipoConta, double taxaRendimento) {
+    public ContaPoupanca(String numeroConta, String agencia, double saldo, String tipoConta) {
         super(numeroConta, agencia, saldo, tipoConta);
-        this.taxaRendimento = taxaRendimento;
     }
 
-    // Metodo que Talvez será Retirado
     public void aplicarRendimento() {
-        if (this.statusConta != Status.ATIVO) {
-            System.out.println("Não foi possível aplicar rendimento: Conta inativa.");
-            return;
-        }
-
-        double valorRendimento = this.saldo * this.taxaRendimento;
-        this.saldo += valorRendimento;
-
         LocalDate dataHoje = LocalDate.now();
         LocalTime horaAgora = LocalTime.now();
+        YearMonth mesAtual = YearMonth.now();
+
+        double valorRendimento = this.saldo * taxaRendimento;
+        this.saldo += valorRendimento;
+        this.ultimaAplicacaoRendimento = mesAtual;
+
         String dataAtual = dataHoje.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         String horaAtual = horaAgora.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
 
-        Transacao transacaoRendimento = new Transacao(dataAtual, horaAtual, valorRendimento, "Rendimento", "ENTRADA", "RENDIMENTO", "CONCLUIDO", null, this);
+        Transacao transacaoRendimento = new Transacao(
+                dataAtual,
+                horaAtual,
+                valorRendimento,
+                "Rendimento Poupança",
+                "ENTRADA",
+                "RENDIMENTO",
+                "CONCLUIDO",
+                null,
+                this
+        );
+
         this.extrato.add(transacaoRendimento);
     }
 
@@ -40,26 +52,20 @@ public class ContaPoupanca extends Conta {
     public boolean realizarTransacao(double valor, String metodoPagamento, Cartao cartaoEscolhido, String categoria, Conta destino)
             throws ContaInativaException, SaldoInsuficienteException, LimiteInsuficienteException {
 
-        if (this.statusConta != Status.ATIVO) {
-            throw new ContaInativaException("Transação recusada: Sua conta poupança não está ativa.");
-        }
-        if (destino != null && destino.statusConta != Status.ATIVO) {
-            throw new ContaInativaException("Transação recusada: A conta de destino não está ativa.");
-        }
+        if (this.statusConta != Status.ATIVO) {throw new ContaInativaException("Transação recusada: Sua conta poupança não está ativa.");}
+        if (destino != null || destino.statusConta != Status.ATIVO) {throw new ContaInativaException("Transação recusada: A conta de destino não está ativa.");}
 
         if (metodoPagamento.equalsIgnoreCase("PIX")) {
             if (this.saldo < valor) {
                 throw new SaldoInsuficienteException("Saldo insuficiente na Conta Poupança para realizar o PIX.");
             }
             this.saldo -= valor;
+            destino.saldo += valor;
+
 
         } else if (metodoPagamento.equalsIgnoreCase("DEBITO")) {
-            if (cartaoEscolhido == null) {
-                throw new IllegalArgumentException("Transação recusada: É necessário informar o cartão para a função Débito.");
-            }
-            if (cartaoEscolhido.getEstaBloqueado()) {
-                throw new LimiteInsuficienteException("Transação recusada: O cartão informado está bloqueado.");
-            }
+            if (cartaoEscolhido == null) {throw new IllegalArgumentException("Transação recusada: É necessário informar o cartão para a função Débito.");}
+            if (cartaoEscolhido.getEstaBloqueado()) {throw new LimiteInsuficienteException("Transação recusada: O cartão informado está bloqueado.");}
             if (!cartaoEscolhido.getTipoCartao().equalsIgnoreCase("DEBITO") && !cartaoEscolhido.getTipoCartao().equalsIgnoreCase("AMBOS")) {
                 throw new IllegalArgumentException("Transação recusada: Este cartão não possui a função Débito.");
             }
@@ -68,16 +74,14 @@ public class ContaPoupanca extends Conta {
                 throw new SaldoInsuficienteException("Saldo insuficiente na Conta Poupança para realizar o Débito.");
             }
             this.saldo -= valor;
+            destino.saldo += valor;
+
 
         } else if (metodoPagamento.equalsIgnoreCase("CREDITO")) {
             throw new IllegalArgumentException("Transação recusada: Conta Poupança não possui função Crédito disponível.");
 
         } else {
             throw new IllegalArgumentException("Método de pagamento inválido para poupança: " + metodoPagamento);
-        }
-
-        if (destino != null && (metodoPagamento.equalsIgnoreCase("PIX") || metodoPagamento.equalsIgnoreCase("DEBITO") || metodoPagamento.equalsIgnoreCase("CREDITO"))) {
-            destino.saldo += valor;
         }
 
         LocalDate dataHoje = LocalDate.now();
@@ -103,9 +107,7 @@ public class ContaPoupanca extends Conta {
         Transacao transacaoD = transacao;
         this.extrato.add(transacao);
         transacaoD.setTipoFluxo("ENTRADA");
-        if (destino != null) {
-            destino.extrato.add(transacao);
-        }
+        destino.extrato.add(transacao);
 
         return true;
     }

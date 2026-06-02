@@ -21,23 +21,20 @@ public class ContaCorrente extends Conta {
     public boolean realizarTransacao(double valor, String metodoPagamento, Cartao cartaoEscolhido, String categoria, Conta destino)
             throws ContaInativaException, SaldoInsuficienteException, LimiteInsuficienteException {
 
-        if (this.statusConta != Status.ATIVO) {
-            throw new ContaInativaException("Transação recusada: Sua conta não está ativa.");
-        }
-        if (destino != null && destino.statusConta != Status.ATIVO) {
-            throw new ContaInativaException("Transação recusada: A conta de destino não está ativa.");
-        }
+        if (this.statusConta != Status.ATIVO) {throw new ContaInativaException("Transação recusada: Sua conta não está ativa.");}
+        if (destino != null || destino.statusConta != Status.ATIVO) {throw new ContaInativaException("Transação recusada: A conta de destino não está ativa.");}
 
         if (metodoPagamento.equalsIgnoreCase("PIX")) {
             if (this.saldo + this.limiteChequeEspecial < valor) {
                 throw new SaldoInsuficienteException("Saldo e limite de cheque especial insuficientes.");
             }
             this.saldo -= valor;
+            destino.saldo += valor;
+
 
         } else if (metodoPagamento.equalsIgnoreCase("DEBITO")) {
             if (cartaoEscolhido == null) throw new IllegalArgumentException("Informe o cartão.");
             if (cartaoEscolhido.getEstaBloqueado()) throw new IllegalArgumentException("Cartão bloqueado.");
-
             if (!cartaoEscolhido.getTipoCartao().equalsIgnoreCase("DEBITO") && !cartaoEscolhido.getTipoCartao().equalsIgnoreCase("AMBOS")) {
                 throw new IllegalArgumentException("Este cartão não possui a função Débito.");
             }
@@ -46,11 +43,11 @@ public class ContaCorrente extends Conta {
                 throw new SaldoInsuficienteException("Saldo e limite de cheque especial insuficientes.");
             }
             this.saldo -= valor;
+            destino.saldo += valor;
 
         } else if (metodoPagamento.equalsIgnoreCase("CREDITO")) {
             if (cartaoEscolhido == null) throw new IllegalArgumentException("Informe o cartão.");
             if (cartaoEscolhido.getEstaBloqueado()) throw new LimiteInsuficienteException("Cartão bloqueado.");
-
             if (!cartaoEscolhido.getTipoCartao().equalsIgnoreCase("CREDITO") && !cartaoEscolhido.getTipoCartao().equalsIgnoreCase("AMBOS")) {
                 throw new IllegalArgumentException("Este cartão não possui a função Crédito.");
             }
@@ -58,15 +55,11 @@ public class ContaCorrente extends Conta {
             if (cartaoEscolhido.getLimiteDisponivel() < valor) {
                 throw new LimiteInsuficienteException("Limite insuficiente no cartão.");
             }
-
             cartaoEscolhido.setLimiteDisponivel(cartaoEscolhido.getLimiteDisponivel() - valor);
+            destino.saldo += valor;
 
         } else {
             throw new IllegalArgumentException("Método de pagamento inválido: " + metodoPagamento);
-        }
-
-        if (destino != null && (metodoPagamento.equalsIgnoreCase("PIX") || metodoPagamento.equalsIgnoreCase("DEBITO") || metodoPagamento.equalsIgnoreCase("CREDITO"))) {
-            destino.saldo += valor;
         }
 
         String dataAtual = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
@@ -76,9 +69,7 @@ public class ContaCorrente extends Conta {
         Transacao transacaoD = transacao;
         this.extrato.add(transacao);
         transacaoD.setTipoFluxo("ENTRADA");
-        if (destino != null) {
-            destino.extrato.add(transacaoD);
-        }
+        destino.extrato.add(transacaoD);
 
         return true;
     }

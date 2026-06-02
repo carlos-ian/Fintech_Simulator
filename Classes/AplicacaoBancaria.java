@@ -1,6 +1,8 @@
 package Classes;
 
 import Classes.Model.Conta.Conta;
+import Classes.Model.Conta.ContaKids;
+import Classes.Model.Conta.ContaPoupanca;
 import Classes.Model.Operacoes.*;
 import Classes.Model.Usuario.Administrador;
 import Classes.Model.Usuario.Cliente;
@@ -9,11 +11,14 @@ import Classes.Util.SwingUtil;
 import org.mindrot.jbcrypt.BCrypt;
 
 import javax.swing.*;
+import java.time.YearMonth;
 import java.util.ArrayList;
 
 public class AplicacaoBancaria {
     public static ArrayList<Usuario> ListaUsuarios = new ArrayList<>();
     public static ArrayList<Investimento> investimentosDisponiveis = new ArrayList<>();
+    private static YearMonth ultimaAplicacaoRendimento = YearMonth.now().minusMonths(1);
+    private static final int DIA_ROTINA = 5;
 
     public static void main(String[] args) {
         AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("CDB Pós-Fixado", 11.5, 0, null));
@@ -21,6 +26,34 @@ public class AplicacaoBancaria {
         AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("Tesouro IPCA+", 6.2, 0, null));
         AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("Fundo de Ações", 18.5, 0, null));
         AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("Poupança", 6.17, 0, null));
+
+        java.time.LocalDate hoje = java.time.LocalDate.now();
+        YearMonth mesAtual = YearMonth.now();
+
+        if (hoje.getDayOfMonth() == DIA_ROTINA && !mesAtual.equals(ultimaAplicacaoRendimento)) {
+            for (Usuario usuario : AplicacaoBancaria.ListaUsuarios) {
+                if (usuario instanceof Cliente) {
+                    Cliente cliente = (Cliente) usuario;
+
+                    for (Conta conta : cliente.obterContas()) {
+                        if (conta instanceof ContaPoupanca) {
+                            ((ContaPoupanca) conta).aplicarRendimento();
+                        }
+
+                        if (conta instanceof ContaKids) {
+                            ((ContaKids) conta).resetarMes();
+                        }
+
+                        if (conta.getListaInvestimentos() != null && conta.getListaInvestimentos().isEmpty()) {
+                            for (Investimento inv : conta.getListaInvestimentos()) {
+                                inv.aplicarRendimento();
+                            }
+                        }
+                    }
+                }
+                ultimaAplicacaoRendimento = mesAtual;
+            }
+        }
 
         AplicacaoBancaria.menuInicial();
 
@@ -167,18 +200,13 @@ public class AplicacaoBancaria {
         }
     }
 
-
-// --- //
-
     public static void menuGestaoContas(Cliente encontrado) {
         int mpC = 0;
         while (mpC == 0) {
+            if (encontrado.getStatus().equals(Status.INATIVO)) {return;}
             String stringMenu = JOptionPane.showInputDialog(
-                    "1 - Listar Contas\n" +
-                            "2 - Abrir Nova Conta\n" +
-                            "3 - Fechar Conta\n" +
-                            "4 - Entrar com Conta\n" +
-                            "5 - Sair"
+                    "=====  Menu de Contas  =====\n" + "1 - Listar Contas\n" + "2 - Abrir Nova Conta\n" +
+                            "3 - Fechar Conta\n" + "4 - Entrar com Conta\n" + "5 - Sair"
             );
 
             if (stringMenu == null) return;
@@ -198,9 +226,9 @@ public class AplicacaoBancaria {
                     if (contas.isEmpty()) {
                         JOptionPane.showMessageDialog(null, "Você não possui contas cadastradas.");
                     } else {
-                        StringBuilder sb = new StringBuilder("=== SUAS CONTAS BANCÁRIAS ===\n\n");
+                        StringBuilder sb = new StringBuilder("=====  SUAS CONTAS BANCÁRIAS  =====\n\n");
                         for (Conta c : contas) {
-                            sb.append(c.visualizarDadosConta()).append("\n-----------------------\n");
+                            sb.append(c.visualizarDadosConta()).append("==================================\n\n");
                         }
                         JOptionPane.showMessageDialog(null, sb.toString(), "Lista de Contas", JOptionPane.INFORMATION_MESSAGE);
                     }
@@ -278,9 +306,69 @@ public class AplicacaoBancaria {
         }
     }
 
+    private static void AberturaConta(Cliente encontrado) {
+        String tipo = SwingUtil.exibirMenuSelecao("Abertura de Conta", "Selecione o tipo de conta que deseja criar:", "Conta Corrente", "Conta Poupança", "Conta Kids", "Conta Investimento");
+        if (tipo == null) return;
+
+        String[] dados;
+        switch (tipo) {
+            case "Conta Corrente":
+                dados = SwingUtil.exibirFormulario("Nova Conta Corrente", null, "Número da Conta:", "Agência:", "Saldo Inicial:", "Limite Cheque Especial:");
+                break;
+            case "Conta Poupança":
+                dados = SwingUtil.exibirFormulario("Nova Conta Poupança", null, "Número da Conta:", "Agência:", "Saldo Inicial:", "Taxa de Rendimento Mensal:");
+                break;
+            case "Conta Kids":
+                dados = SwingUtil.exibirFormulario("Nova Conta Kids", null, "Número da Conta:", "Agência:", "Saldo Inicial:", "CPF do Responsável Legal:", "Limite de Movimentação Mensal:");
+                break;
+            default:
+                dados = SwingUtil.exibirFormulario("Nova Conta Investimento", null, "Número da Conta:", "Agência:", "CPF do Titular:");
+                break;
+        }
+
+        if (dados == null) return;
+
+        try {
+            String num = dados[0].trim();
+            String ag = dados[1].trim();
+            String saldoStr = dados[2].trim();
+
+            if (num.isEmpty() || ag.isEmpty() || saldoStr.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Erro: Todos os campos básicos devem ser preenchidos.");
+                return;
+            }
+
+            double sal = Double.parseDouble(saldoStr.replace(",", "."));
+
+            if (tipo.equalsIgnoreCase("Conta Corrente")) {
+                double limite = Double.parseDouble(dados[3].replace(",", "."));
+                encontrado.abrirConta(num, ag, sal, tipo, limite, null, 0, null);
+
+            } else if (tipo.equalsIgnoreCase("Conta Poupança")) {
+                double taxa = Double.parseDouble(dados[3].replace(",", "."));
+                encontrado.abrirConta(num, ag, sal, tipo, 0, null, 0, null);
+
+            } else if (tipo.equalsIgnoreCase("Conta Kids")) {
+                String cpfResp = dados[3].trim();
+                double limMes = Double.parseDouble(dados[4].replace(",", "."));
+                encontrado.abrirConta(num, ag, sal, tipo, 0, cpfResp, limMes, null);
+
+            } else if (tipo.equalsIgnoreCase("Conta Investimento")) {
+                String titular = dados[3].trim();
+                encontrado.abrirConta(num, ag, sal, tipo, 0, null, 0, titular);
+            }
+
+            JOptionPane.showMessageDialog(null, "Conta bancária criada e vinculada com sucesso!");
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Erro: Verifique a formatação dos campos numéricos.");
+        }
+    }
+
     public static void menuPrincipalCliente(Conta conta, Cliente encontrado) {
         int opcaoDash = 0;
         while (opcaoDash != 7) {
+            if (encontrado.getStatus().equals(Status.INATIVO)) {return;}
             String stringDash = JOptionPane.showInputDialog(
                     "==================================\n" +
                             "               DASHBOARD DA CONTA         \n" +
@@ -292,7 +380,7 @@ public class AplicacaoBancaria {
                             "3 - Realizar Transação\n" +
                             "4 - Visualizar Extrato\n" +
                             "5 - Gestão de Cartões\n" +
-                            "6 - Investimentos e Poupança\n" +
+                            "6 - Investimentos\n" +
                             "7 - Voltar para Menu de Contas\n");
 
             if (stringDash == null) return;
@@ -306,7 +394,8 @@ public class AplicacaoBancaria {
 
             switch (opcaoDash) {
                 case 1:
-                    AplicacaoBancaria.configuracoes((Usuario) encontrado);
+                    AplicacaoBancaria.configuracoes(encontrado);
+                    opcaoDash = 0;
                     break;
 
                 case 2:
@@ -350,10 +439,10 @@ public class AplicacaoBancaria {
                                     }
                                 }
                             }
-                            if (contaDestino == null) {
-                                JOptionPane.showMessageDialog(null, "Conta de destino não encontrada.", "Erro", JOptionPane.ERROR_MESSAGE);
-                                break;
-                            }
+                        }
+
+                        if(!cpfDest.equals(encontrado.getCpf()) && conta.getTipoConta().equals("Conta Investimento")) {
+                            JOptionPane.showMessageDialog(null, "Transação Inválida para Conta Investimento", "Erro", JOptionPane.ERROR_MESSAGE);
                         }
 
                         boolean sucesso = conta.realizarTransacao(valor, metodo, cartaoEscolhido, categoria, contaDestino);
@@ -503,8 +592,8 @@ public class AplicacaoBancaria {
                         JOptionPane.showMessageDialog(null, "Status alterado para " + statusEscolhido + " com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
 
                         if (novoStatus == Status.INATIVO) {
-                            JOptionPane.showMessageDialog(null, "Como seu perfil foi inativado, você será desconectado do ecossistema.", "Aviso", JOptionPane.WARNING_MESSAGE);
-                            System.exit(0);
+                            JOptionPane.showMessageDialog(null, "Como seu perfil foi inativado, você será desconectado.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                            return;
                         }
                     } catch (IllegalArgumentException e) {
                         JOptionPane.showMessageDialog(null, "Erro ao processar alteração de status.", "Erro", JOptionPane.ERROR_MESSAGE);
@@ -967,70 +1056,6 @@ public class AplicacaoBancaria {
                     JOptionPane.showMessageDialog(null, "Opção inválida!");
                     break;
             }
-        }
-    }
-
-
-    // --------------------------------------------------------------------------
-    // --------------------- Metodos Auxiliares dos Menus -----------------------
-    // --------------------------------------------------------------------
-
-    private static void AberturaConta(Cliente encontrado) {
-        String tipo = SwingUtil.exibirMenuSelecao("Abertura de Conta", "Selecione o tipo de conta que deseja criar:", "Conta Corrente", "Conta Poupança", "Conta Kids", "Conta Investimento");
-        if (tipo == null) return;
-
-        String[] dados;
-        switch (tipo) {
-            case "Conta Corrente":
-                dados = SwingUtil.exibirFormulario("Nova Conta Corrente", null, "Número da Conta:", "Agência:", "Saldo Inicial:", "Limite Cheque Especial:");
-                break;
-            case "Conta Poupança":
-                dados = SwingUtil.exibirFormulario("Nova Conta Poupança", null, "Número da Conta:", "Agência:", "Saldo Inicial:", "Taxa de Rendimento Mensal:");
-                break;
-            case "Conta Kids":
-                dados = SwingUtil.exibirFormulario("Nova Conta Kids", null, "Número da Conta:", "Agência:", "Saldo Inicial:", "CPF do Responsável Legal:", "Limite de Movimentação Mensal:");
-                break;
-            default:
-                dados = SwingUtil.exibirFormulario("Nova Conta Investimento", null, "Número da Conta:", "Agência:", "Saldo Inicial:", "Perfil de Risco (Baixo/Medio/Alto):");
-                break;
-        }
-
-        if (dados == null) return;
-
-        try {
-            String num = dados[0].trim();
-            String ag = dados[1].trim();
-            String saldoStr = dados[2].trim();
-
-            if (num.isEmpty() || ag.isEmpty() || saldoStr.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Erro: Todos os campos básicos devem ser preenchidos.");
-                return;
-            }
-
-            double sal = Double.parseDouble(saldoStr.replace(",", "."));
-
-            if (tipo.equalsIgnoreCase("Conta Corrente")) {
-                double limite = Double.parseDouble(dados[3].replace(",", "."));
-                encontrado.abrirConta(num, ag, sal, tipo, limite, 0, null, 0, null);
-
-            } else if (tipo.equalsIgnoreCase("Conta Poupança")) {
-                double taxa = Double.parseDouble(dados[3].replace(",", "."));
-                encontrado.abrirConta(num, ag, sal, tipo, 0, taxa, null, 0, null);
-
-            } else if (tipo.equalsIgnoreCase("Conta Kids")) {
-                String cpfResp = dados[3].trim();
-                double limMes = Double.parseDouble(dados[4].replace(",", "."));
-                encontrado.abrirConta(num, ag, sal, tipo, 0, 0, cpfResp, limMes, null);
-
-            } else if (tipo.equalsIgnoreCase("Conta Investimento")) {
-                String risco = dados[3].trim();
-                encontrado.abrirConta(num, ag, sal, tipo, 0, 0, null, 0, risco);
-            }
-
-            JOptionPane.showMessageDialog(null, "Conta bancária criada e vinculada com sucesso!");
-
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Erro: Verifique a formatação dos campos numéricos.");
         }
     }
 }

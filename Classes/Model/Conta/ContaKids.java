@@ -27,50 +27,29 @@ public class ContaKids extends Conta {
     public boolean realizarTransacao(double valor, String metodoPagamento, Cartao cartaoEscolhido, String categoria, Conta destino)
             throws ContaInativaException, SaldoInsuficienteException, LimiteInsuficienteException {
 
-        if (this.statusConta != Status.ATIVO) {
-            throw new ContaInativaException("Transação recusada: Esta conta Kids não está ativa.");
-        }
-        if (destino != null && destino.statusConta != Status.ATIVO) {
-            throw new ContaInativaException("Transação recusada: A conta de destino não está ativa.");
-        }
+        if (this.statusConta != Status.ATIVO) {throw new ContaInativaException("Transação recusada: Esta conta Kids não está ativa.");}
+        if (destino != null || destino.statusConta != Status.ATIVO) {throw new ContaInativaException("Transação recusada: A conta de destino não está ativa.");}
+        if (metodoPagamento.equalsIgnoreCase("CREDITO")) {throw new IllegalArgumentException("Transação recusada: Contas para menores de idade não possuem a função Crédito disponível.");}
 
-        if (metodoPagamento.equalsIgnoreCase("CREDITO")) {
-            throw new IllegalArgumentException("Transação recusada: Contas para menores de idade não possuem a função Crédito disponível.");
-        }
-
-        if (this.totalGastoNoMes + valor > this.limiteMensal) {
-            throw new LimiteInsuficienteException("Transação recusada: O limite mensal de gastos definido pelos seus responsáveis foi atingido.");
-        }
+        if (this.totalGastoNoMes + valor > this.limiteMensal) {throw new LimiteInsuficienteException("Transação recusada: O limite mensal de gastos definido pelos seus responsáveis foi atingido.");}
 
         if (metodoPagamento.equalsIgnoreCase("PIX")) {
-            if (this.saldo < valor) {
-                throw new SaldoInsuficienteException("Saldo insuficiente na sua Conta Kids.");
-            }
+            if (this.saldo < valor) {throw new SaldoInsuficienteException("Saldo insuficiente na sua Conta Kids.");}
             this.saldo -= valor;
+            destino.saldo += valor;
 
         } else if (metodoPagamento.equalsIgnoreCase("DEBITO")) {
-            if (cartaoEscolhido == null) {
-                throw new IllegalArgumentException("Transação recusada: É necessário informar o cartão para a função Débito.");
-            }
-            if (cartaoEscolhido.getEstaBloqueado()) {
-                throw new LimiteInsuficienteException("Transação recusada: Seu cartão está bloqueado.");
-            }
-            if (!cartaoEscolhido.getTipoCartao().equalsIgnoreCase("DEBITO") && !cartaoEscolhido.getTipoCartao().equalsIgnoreCase("AMBOS")) {
-                throw new IllegalArgumentException("Transação recusada: Este cartão não possui a função Débito.");
-            }
+            if (cartaoEscolhido == null) {throw new IllegalArgumentException("Transação recusada: É necessário informar o cartão para a função Débito.");}
+            if (cartaoEscolhido.getEstaBloqueado()) {throw new LimiteInsuficienteException("Transação recusada: Seu cartão está bloqueado.");}
+            if (!cartaoEscolhido.getTipoCartao().equalsIgnoreCase("DEBITO") && !cartaoEscolhido.getTipoCartao().equalsIgnoreCase("AMBOS")) {throw new IllegalArgumentException("Transação recusada: Este cartão não possui a função Débito.");}
+            if (this.saldo < valor) {throw new SaldoInsuficienteException("Saldo insuficiente na sua Conta Kids.");}
 
-            if (this.saldo < valor) {
-                throw new SaldoInsuficienteException("Saldo insuficiente na sua Conta Kids.");
-            }
             this.saldo -= valor;
+            destino.saldo += valor;
 
-        } else {
-            throw new IllegalArgumentException("Método de pagamento inválido para Conta Kids: " + metodoPagamento);
-        }
+        } else {throw new IllegalArgumentException("Método de pagamento inválido para Conta Kids: " + metodoPagamento);}
 
         this.totalGastoNoMes += valor;
-
-        if (destino != null) {destino.saldo += valor;}
 
         LocalDate dataHoje = LocalDate.now();
         DateTimeFormatter formatadorData = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -95,9 +74,7 @@ public class ContaKids extends Conta {
         Transacao transacaoD = transacao;
         this.extrato.add(transacao);
         transacaoD.setTipoFluxo("ENTRADA");
-        if (destino != null) {
-            destino.extrato.add(transacaoD);
-        }
+        destino.extrato.add(transacaoD);
 
         return true;
     }

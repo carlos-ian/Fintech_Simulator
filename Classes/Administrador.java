@@ -1,7 +1,10 @@
 package Classes;
 
 import java.util.ArrayList;
-
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Administrador extends Usuario {
     private String matricula;
@@ -37,9 +40,13 @@ public class Administrador extends Usuario {
         return null;
     }
 
-    public boolean desativarConta(Conta conta, String justificativa) {
-        if (conta.statusConta != Status.INATIVO && justificativa != null) {
-            conta.statusConta = Status.INATIVO;
+    public boolean desativarConta(Conta conta, Justificativa motivo) {
+        if (motivo == null) {
+            throw new IllegalArgumentException("O motivo da desativação é obrigatório.");
+        }
+
+        if (conta.getStatus() != Status.INATIVO) {
+            conta.setStatus(Status.INATIVO);
             return true;
         }
         return false;
@@ -53,12 +60,16 @@ public class Administrador extends Usuario {
         return false;
     }
 
-    public boolean desativarPerfilCliente(Cliente cliente) {
-        if (cliente.getStatus() == Status.INATIVO) {
-            return false;
+    public boolean desativarPerfilCliente(Cliente cliente, Justificativa motivo) {
+        if (motivo == null) {
+            throw new IllegalArgumentException("O motivo da desativação é obrigatório.");
         }
-        cliente.setStatus(Status.INATIVO);
-        return true;
+
+        if (cliente.getStatus() != Status.INATIVO) {
+            cliente.setStatus(Status.INATIVO);
+            return true;
+        }
+        return false;
     }
 
     public boolean ativarPerfilCliente(Cliente cliente) {
@@ -95,19 +106,20 @@ public class Administrador extends Usuario {
     }
 
     public String gerarRelatorioFintech(ArrayList<Cliente> todosUsuarios, ArrayList<Conta> todasContas, ArrayList<Transacao> todasTransacoes) {
-        double montanteTotal = 0;
-        int usuariosAtivos = 0;
-        int usuariosBloqueados = 0;
+        int totalClientes = todosUsuarios != null ? todosUsuarios.size() : 0;
+        int clientesAtivos = 0;
+        int clientesDesativados = 0;
 
-        double maiorSaldo = 0;
-        String contaVIP = "Nenhuma";
+        int numeroContas = todasContas != null ? todasContas.size() : 0;
+        double montanteTotal = 0;
+        int numeroInvestimentosFeitos = 0;
 
         if (todosUsuarios != null) {
             for (Cliente cliente : todosUsuarios) {
                 if (cliente.getStatus() == Status.INATIVO) {
-                    usuariosBloqueados++;
+                    clientesDesativados++;
                 } else {
-                    usuariosAtivos++;
+                    clientesAtivos++;
                 }
             }
         }
@@ -116,36 +128,48 @@ public class Administrador extends Usuario {
             for (Conta conta : todasContas) {
                 montanteTotal += conta.getSaldo();
 
-                if (conta.getSaldo() > maiorSaldo) {
-                    maiorSaldo = conta.getSaldo();
-                    contaVIP = conta.getNumeroConta();
+                if (conta.listaInvestimentos != null) {
+                    numeroInvestimentosFeitos += conta.listaInvestimentos.size();
                 }
             }
         }
 
         int totalTransacoes = todasTransacoes != null ? todasTransacoes.size() : 0;
-        double saldoMedioPorAtivo = usuariosAtivos > 0 ? (montanteTotal / usuariosAtivos) : 0;
 
-        return String.format(
+        double mediaTransacoesPorConta = numeroContas > 0 ? ((double) totalTransacoes / numeroContas) : 0;
+
+        String conteudoRelatorio = String.format(
                 "\n===================================================\n" +
                         "             RELATÓRIO GERAL DA FINTECH            \n" +
                         "===================================================\n" +
-                        " FINANCEIRO:\n" +
-                        "  -> MONTANTE TOTAL (SOMA DE SALDOS): R$ %.2f\n" +
-                        "  -> Média de Saldo por Usuário Ativo: R$ %.2f\n" +
+                        " GESTÃO DE CLIENTES & CONTAS:\n" +
+                        "  -> Total de Clientes Cadastrados: %d\n" +
+                        "  -> Clientes Ativos:              %d\n" +
+                        "  -> Clientes Desativados:         %d\n" +
+                        "  -> Número Total de Contas:       %d\n" +
                         "---------------------------------------------------\n" +
-                        " AUDITORIA E DESTAQUES:\n" +
-                        "  -> Maior Saldo Individual (VIP):    R$ %.2f (Conta: %s)\n" +
-                        "  -> Volume de Operações do Sistema:  %d transações registradas\n" +
+                        " VOLUME DE OPERAÇÕES DO SISTEMA:\n" +
+                        "  -> Número de Investimentos Feitos: %d aplicados\n" +
+                        "  -> Número de Transações Totais:    %d realizadas\n" +
+                        "  -> Média de Transações por Conta:  %.1f operações\n" +
                         "---------------------------------------------------\n" +
-                        " GESTÃO DE USUÁRIOS:\n" +
-                        "  -> NÚMERO TOTAL DE USUÁRIOS ATIVOS: %d\n" +
-                        "  -> Número de Usuários Bloqueados:   %d\n" +
+                        " FINANCEIRO ANÁLISE:\n" +
+                        "  -> Montante Total em Custódia:    R$ %.2f\n" +
                         "===================================================",
-                montanteTotal, saldoMedioPorAtivo,
-                maiorSaldo, contaVIP, totalTransacoes,
-                usuariosAtivos, usuariosBloqueados
+                totalClientes, clientesAtivos, clientesDesativados, numeroContas,
+                numeroInvestimentosFeitos, totalTransacoes, mediaTransacoesPorConta,
+                montanteTotal
         );
+
+        try {
+            Path caminho = Paths.get("relatorio_fintech.txt");
+            Files.writeString(caminho, conteudoRelatorio);
+            System.out.println("Arquivo gravado com sucesso em: " + caminho.toAbsolutePath());
+        } catch (IOException e) {
+            System.err.println("Erro ao gerar o arquivo de relatório: " + e.getMessage());
+        }
+
+        return conteudoRelatorio;
     }
 
     public String getMatricula() {return this.matricula;}

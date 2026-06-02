@@ -104,5 +104,5 @@ public abstract class Conta {
     public ArrayList<Cartao> getCartoes() {return cartoes;}
     public String getTipoConta() {return tipoConta;}
     public Status getStatus() {return statusConta;}
-
+    public void setStatus(Status status) {this.statusConta = status;}
 }

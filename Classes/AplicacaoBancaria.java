@@ -725,9 +725,21 @@ public class AplicacaoBancaria {
                         boolean mudou = admin.ativarPerfilCliente(clienteEncontrado);
                         JOptionPane.showMessageDialog(null, mudou ? "Perfil ativado com sucesso!" : "O perfil já estava ativo.");
                     } else if (acaoCliente == 1) {
-                        boolean mudou = admin.desativarPerfilCliente(clienteEncontrado);
-                        JOptionPane.showMessageDialog(null, mudou ? "Perfil desativado com sucesso!" : "O perfil já estava inativo.");
-                    }
+                            Justificativa motivoSel = (Justificativa) JOptionPane.showInputDialog(
+                                    null,
+                                    "Selecione o motivo da desativação do perfil:",
+                                    "Desativação",
+                                    JOptionPane.QUESTION_MESSAGE,
+                                    null,
+                                    Justificativa.values(),
+                                    Justificativa.values()[0]
+                            );
+
+                            if (motivoSel != null) {
+                                boolean mudou = admin.desativarPerfilCliente(clienteEncontrado, motivoSel);
+                                JOptionPane.showMessageDialog(null, mudou ? "Perfil desativado com sucesso!" : "O perfil já estava inativo.");
+                            }
+                        }
                     break;
 
                 case 3:
@@ -760,9 +772,18 @@ public class AplicacaoBancaria {
                             "Selecione o procedimento de controle de risco corporativo:", "Bloquear", "Desbloquear", "Ver Histórico/Logs", "Cancelar");
 
                     if (acaoConta == 0) {
-                        String justificativa = JOptionPane.showInputDialog("Digite a justificativa para o bloqueio:");
-                        if (justificativa != null && !justificativa.isBlank()) {
-                            boolean ok = admin.desativarConta(contaAlvo, justificativa);
+                        Justificativa motivoSel = (Justificativa) JOptionPane.showInputDialog(
+                                null,
+                                "Selecione o motivo do bloqueio da conta:",
+                                "Controle de Risco Corporativo",
+                                JOptionPane.QUESTION_MESSAGE,
+                                null,
+                                Justificativa.values(),
+                                Justificativa.values()[0]
+                        );
+
+                        if (motivoSel != null) {
+                            boolean ok = admin.desativarConta(contaAlvo, motivoSel);
                             JOptionPane.showMessageDialog(null, ok ? "Conta bloqueada com sucesso." : "A conta já está bloqueada.");
                         }
                     } else if (acaoConta == 1) {
@@ -812,7 +833,9 @@ public class AplicacaoBancaria {
                     txtRelatorio.setEditable(false);
                     txtRelatorio.setFont(new java.awt.Font("Monospaced", java.awt.Font.PLAIN, 12));
 
-                    JOptionPane.showMessageDialog(null, new JScrollPane(txtRelatorio), "Fintech Analytics System", JOptionPane.PLAIN_MESSAGE);
+                    JOptionPane.showMessageDialog(null, new JScrollPane(txtRelatorio), "Sistema Analítica da Fintech", JOptionPane.PLAIN_MESSAGE);
+
+                    JOptionPane.showMessageDialog(null, "Cópia do relatório exportada para 'relatorio_fintech.txt' com sucesso!", "Exportação", JOptionPane.INFORMATION_MESSAGE);
                     break;
 
                 case 5:

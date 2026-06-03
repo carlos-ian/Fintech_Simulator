@@ -104,4 +104,8 @@ public abstract class Usuario {
     public Status getStatus() {return this.statusPerfil;}
     public void setStatus(Status statusCliente) {this.statusPerfil = statusCliente;}
 
+    public String getEmail() {return email;}
+    public String getDataNascimento() {return dataNascimento;}
+    public String getTelefone() {return telefone;}
+
 }

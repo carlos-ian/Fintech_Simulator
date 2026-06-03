@@ -8,6 +8,7 @@ import Classes.Model.Usuario.Administrador;
 import Classes.Model.Usuario.Cliente;
 import Classes.Model.Usuario.Usuario;
 import Classes.Util.SwingUtil;
+import Classes.Util.UsuarioBancoRepository;
 import org.mindrot.jbcrypt.BCrypt;
 
 import javax.swing.*;
@@ -55,6 +56,7 @@ public class AplicacaoBancaria {
             }
         }
 
+        UsuarioBancoRepository.carregarUsuariosParaMemoria(AplicacaoBancaria.ListaUsuarios);
         AplicacaoBancaria.menuInicial();
 
     }
@@ -189,10 +191,12 @@ public class AplicacaoBancaria {
             if (ehCliente) {
                 Cliente cliente = new Cliente(nome, cpf, email, senhaCriptografada, dataNascimento, telefone, "Cliente");
                 AplicacaoBancaria.ListaUsuarios.add(cliente);
+                UsuarioBancoRepository.salvarNoBanco(cliente);
             } else {
                 String matricula = dados[6].trim();
                 Administrador administrador = new Administrador(nome, cpf, email, senhaCriptografada, dataNascimento, telefone, "Administrador", matricula);
                 AplicacaoBancaria.ListaUsuarios.add(administrador);
+                UsuarioBancoRepository.salvarNoBanco(administrador);
             }
 
             JOptionPane.showMessageDialog(null, "Perfil Criado com Sucesso!");

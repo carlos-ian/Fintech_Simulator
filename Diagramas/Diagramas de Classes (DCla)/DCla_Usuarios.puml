@@ -25,6 +25,9 @@ package "Módulo Usuários" #EBF5FB {
         + getSenha() : String
         + getCpf() : String
         + getStatus() : Status
+        + getEmail() : String
+        + getDataNascimento() : String
+        + getTelefone() : String
         + setStatus(statusCliente : Status) : void
     }
 

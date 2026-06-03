@@ -1,0 +1,280 @@
+@startuml DCla em Pacotes
+skinparam classAttributeIconSize 0
+left to right direction
+
+' PACKAGES (Estrutura e Organização)
+
+package "Módulo Core" #F9F9F9 {
+    class AplicacaoBancaria {
+        + {static} ListaUsuarios : ArrayList<Usuario>
+        + {static} investimentosDisponiveis : ArrayList<Investimento>
+        - {static} ultimaAplicacaoInvestimento : YearMonth
+        - {static} {final} DIA_ROTINA : int = 5
+        
+        + {static} main(args : String[]) : void
+        + {static} menuInicial():  void
+        - {static} Login() : void
+        - {static} Cadastro() : void
+        + {static} menuGestaoContas(encontrado : Cliente) : void
+        - {static} AberturaConta(encontrado : Cliente) : void
+        + {static} menuPrincipalCliente(conta : Conta, encontrado : Cliente) : void
+        + {static} configuracoes(encontrado : Usuario) : void
+        - {static} gestaoCartoes(conta : Conta, encontrado : Cliente) : void
+        + {static} investimentosEPoupanca(conta : Conta, encontrado : Cliente) : void
+        + {static} menuPrincipalAdministrador(admin : Administrador) : void
+    }
+}
+
+package "Módulo Exceptions" as e #F9F9F9 {
+    class Exception {}
+    class ContaInativaException <<exception>> {
+        + ContaInativaException(mensagem: String)
+    }
+    class SaldoInsuficienteException <<exception>> {
+        + SaldoInsuficienteException(mensagem: String)
+    }
+    class LimiteInsuficienteException <<exception>> {
+        + LimiteInsuficienteException(mensagem: String)
+    }
+
+    Exception <|-- ContaInativaException
+    Exception <|-- SaldoInsuficienteException
+    Exception <|-- LimiteInsuficienteException
+}
+
+package "Util" #F9F9F9 {
+    class SwingUtil {
+    + {static} exibirFormulario(titulo : String, mensagem : String, campos : String...) : String[]
+    + {static} exibirMenuSelecao(titulo : String, mensagem : String, opcoes : String...) : String
+    + {static} exibirMenuBotoes(titulo : String, mensagem : String, botoes : String...) : int
+    + {static} exibirFormularioTransacao(cartoes : ArrayList<Cartao>) : Object[]
+}
+    
+}
+
+package "Módulo Usuários" #EBF5FB {
+    abstract class Usuario {
+        - {static} cod_sequencial : int = 0
+        # id : int
+        # nome : String
+        # cpf : String
+        # email : String
+        # senha : String
+        # dataNascimento : String
+        # telefone : String
+        # tipoUsuario : String
+        # statusPerfil : Status
+        --
+        + Usuario(nome : String, cpf : String, email : String, senha : String, dataNascimento : String, telefone : String, tipoUsuario : String)
+        + {static} autenticar(cpf : String, senha : String) : Usuario
+        + encerrarPerfil(u : Usuario, senha : String) : void
+        + alterarDados(tipoDado : String, novoValor : String) : void
+        + visualizarDados() : String
+        + getTipoUsuario() : String
+        + getNome() : String
+        + getSenha() : String
+        + getCpf() : String
+        + getStatus() : Status
+        + setStatus(statusCliente : Status) : void
+    }
+
+    class Cliente {
+        ~ listaContas : ArrayList<Conta>
+        --
+        + Cliente(nome : String, cpf : String, email : String, senha : String, dataNascimento : String, telefone : String, tipoUsuario : String)
+        + alterarDados(tipoDado : String, novoValor : String) : void 
+        + visualizarDados() : String 
+        + abrirConta(numeroConta : String, agencia : String, saldo : double, tipoConta : String, limiteChequeEspecial : double, cpfResponsavel : String, limiteMensal : double, perfilRisco : String) : void
+        + fecharConta(conta : Conta) : boolean
+        + obterContas() : ArrayList<Conta>
+    }
+
+    class Administrador {
+        - matricula : String
+        --
+        + Administrador(nome : String, cpf : String, email : String, senha : String, dataNascimento : String, telefone : String, tipoUsuario : String, matricula : String)
+        + alterarDados(tipoDado : String, novoValor : String) : void 
+        + visualizarDados() : String 
+        + consultarCliente(cpfBusca : String, bancoDeClientes : ArrayList<Cliente>) : Cliente
+        + desativarConta(conta : Conta, motivo : justificativa) : boolean
+        + ativarConta(conta : Conta) : boolean
+        + desativarPerfilCliente(cliente : Cliente, motivo: justificativa) : boolean
+        + ativarPerfilCliente(cliente : Cliente) : boolean
+        + visualizarHistoricoConta(conta : Conta) : ArrayList<Transacao>
+        + analisarPedidoLimite(cartao : Cartao, conta : Conta, novoLimite : double) : boolean
+        + gerarRelatorioFintech(todosUsuarios : ArrayList<Cliente>, todasContas : ArrayList<Conta>, todasTransacoes : ArrayList<Transacao>) : String
+        + getMatricula() : String
+    }
+    
+    Cliente -up-|> Usuario
+    Administrador -up-|> Usuario
+}
+
+package "Módulo Contas" #FEF9E7 {
+    abstract class Conta {
+        # extrato : ArrayList<Transacao>
+        # cartoes : ArrayList<Cartao>
+        # listaInvestimentos : ArrayList<Investimento>
+        # numeroConta : String
+        # agencia : String
+        # saldo : double
+        # tipoConta : String
+        # statusConta : Status
+        --
+        ~ Conta(numeroConta : String, agencia : String, saldo : double, tipoConta : String)
+        + {abstract} realizarTransacao(valor : double, metodoPagamento : String, cartaoEscolhido : Cartao, category : String, destino : Conta) : boolean
+        + visualizarExtrato(fluxo : String, metodoPagamento : String, categoria : String, diasPeriodo : Integer, dataEspecifica : String) : ArrayList<Transacao>
+        + visualizarDadosConta() : String
+        + getSaldo() : double
+        + getAgencia() : String
+        + getNumeroConta() : String
+        + setSaldo(saldo : double) : void
+        + getCartoes() : ArrayList<Cartao>
+        + getTipoConta() : String
+        + getStatus() : Status
+        + setStatus(statusConta : Status) : void
+        + public getListaInvestimentos() : ArrayList<Investimento>
+        + public getExtrato() : ArrayList<Transacao>
+    }
+
+    class ContaCorrente {
+        - limiteChequeEspecial : double
+        --
+        + ContaCorrente(numeroConta : String, agencia : String, saldo : double, tipoConta : String, limiteChequeEspecial : double)
+        + realizarTransacao(valor : double, metodoPagamento : String, cartaoEscolhido : Cartao, categoria : String, destino : Conta) : boolean
+        + visualizarDadosConta() : String 
+    }
+
+    class ContaPoupanca {
+        - taxaRendimento : double
+        --
+        + ContaPoupanca(numeroConta : String, agencia : String, saldo : double, tipoConta : String)
+        + aplicarRendimento() : void
+        + realizarTransacao(valor : double, metodoPagamento : String, cartaoEscolhido : Cartao, categoria : String, destino : Conta) : boolean <<override>>
+        + visualizarDadosConta() : String
+    }
+
+    class ContaKids {
+        - cpfResponsavel : String
+        - limiteMensal : double
+        - totalGastoNoMes : double
+        --
+        + ContaKids(numeroConta : String, agencia : String, saldo : double, tipoConta : String, cpfResponsavel : String, limiteMensal : double)
+        + resetarMes() : void
+        + realizarTransacao(valor : double, metodoPagamento : String, cartaoEscolhido : Cartao, categoria : String, destino : Conta) : boolean <<override>>
+        + visualizarDadosConta() : String
+    }
+
+    class ContaInvestimento {
+        - titularCPF : String
+        --
+        + ContaInvestimento(numeroConta : String, agencia : String, saldo : double, tipoConta : String, titularCPF : String)
+        + realizarTransacao(valor : double, metodoPagamento : String, cartaoEscolhido : Cartao, categoria : String, destino : Conta) : boolean <<override>>
+        + visualizarDadosConta() : String 
+    }
+    
+    ' Subclasses de Conta
+    ContaCorrente -up-|> Conta
+    ContaPoupanca -up-|> Conta
+    ContaKids -up-|> Conta
+    ContaInvestimento -up-|> Conta
+    
+}
+
+package "Módulo Operações" as op #E8F8F5 {
+    class Investimento {
+        - {static} contador : int = 0
+        - idInvestimento : int
+        - nomeProduto : String
+        - taxaRendimento : double
+        - valorAplicado : double
+        - dataAplicacao : String
+        --
+        + Investimento(nomeProduto : String, taxaRendimento : double, valorAplicado : double, dataAplicacao : String)
+        + aplicarRendimento() : void
+        + realizarInvestimento(conta : Conta, produtoSelecionado : Investimento, valorParaInvestir : double, dataAtual : String) : boolean
+        + resgatarInvestimento(conta : Conta, idInvestimento : int) : boolean
+        + toString() : String <<override>>
+        + getNomeProduto() : String
+        + getTaxaRendimento() : double
+    }
+
+    class Transacao {
+        - {static} codigoSequencial : int = 0
+        - id : int
+        - data : String
+        - hora : String
+        - valor : double
+        - categoria : String
+        - tipoFluxo : String
+        - metodoPagamento : String
+        - status : String
+        - origem : Conta
+        - destino : Conta
+        --
+        + Transacao(data : String, hora : String, valor : double, categoria : String, tipoFluxo : String, metodoPagamento : String, status : String, origem : Conta, destino : Conta)
+        + getData() : String
+        + getCategoria() : String
+        + getFluxo() : String
+        + getMetodoPagamento() : String
+        + getStatus() : String
+        + getValor() : double
+        + getHora() : String
+        + setTipoFluxo(tipoFluxo : String) : void
+    }
+
+    class Cartao {
+        - numeroCartao : String
+        - titular : String
+        - tipoCartao : String
+        - limiteTotal : double
+        - limiteDisponivel : double
+        - estaBloqueado : boolean
+        --
+        + Cartao(numeroCartao : String, titular : String, tipoCartao : String, limiteTotal : double, limiteDisponivel : double)
+        + visualizarDados() : String
+        + bloquearCartao() : boolean
+        + ativarCartao() : boolean
+        + visualizarLimites() : String
+        + solicitarAjusteLimite(novoLimiteSolicitado : double, admin : Administrador, contaVinculada : Conta) : boolean
+        + getLimiteTotal() : double
+        + getTipoCartao() : String
+        + getLimiteDisponivel() : double
+        + getEstaBloqueado() : boolean
+        + setLimiteDisponivel(limiteDisponivel : double) : void
+        + getNumeroCartao() : String
+    }
+
+    enum Status {
+        ATIVO
+        INATIVO
+    }
+
+    enum Justificativa {
+        SUSPEITA_FRAUDE,
+        SOLICITACAO_CLIENTE,
+        INATIVIDADE,
+        ORDEM_JUDICIAL;
+    }
+}
+
+' ========================================================
+' RELACIONAMENTOS INTER-PACOTES
+' ========================================================
+
+AplicacaoBancaria "1" *-- "0..*" Usuario : gerencia >
+AplicacaoBancaria "1" --> "0..*" Investimento : disponibiliza >
+AplicacaoBancaria ..> SwingUtil : usa para entrada de dados
+
+Usuario "1" o-- "0..*" Conta 
+Conta "1" --> "0..*" Investimento : movimenta >
+Usuario --> Status : possui
+
+Conta "1" *-- "0..*" Cartao 
+Conta "1" *-- "0..*" Transacao
+Transacao --> "0..1" Conta : origem
+Transacao --> "0..1" Conta : destino
+Conta --> Status : possui
+op --> e : lança
+
+@enduml

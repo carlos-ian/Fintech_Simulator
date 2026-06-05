@@ -64,4 +64,6 @@ public class ContaInvestimento extends Conta {
         return super.visualizarDadosConta() +
                 String.format("Perfil de Risco: %s\n", this.titularCPF);
     }
+
+    public String getTitularCPF() {return this.titularCPF;}
 }

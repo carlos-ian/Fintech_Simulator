@@ -35,6 +35,7 @@ package "Módulo Contas" #FEF9E7 {
         + ContaCorrente(numeroConta : String, agencia : String, saldo : double, tipoConta : String, limiteChequeEspecial : double)
         + realizarTransacao(valor : double, metodoPagamento : String, cartaoEscolhido : Cartao, categoria : String, destino : Conta) : boolean
         + visualizarDadosConta() : String 
+        + getLimiteChequeEspecial() : double
     }
 
     class ContaPoupanca {
@@ -55,6 +56,8 @@ package "Módulo Contas" #FEF9E7 {
         + resetarMes() : void
         + realizarTransacao(valor : double, metodoPagamento : String, cartaoEscolhido : Cartao, categoria : String, destino : Conta) : boolean <<override>>
         + visualizarDadosConta() : String
+        + getCpfResponsavel() : String
+        + getLimiteMensal() : double
     }
 
     class ContaInvestimento {
@@ -63,6 +66,7 @@ package "Módulo Contas" #FEF9E7 {
         + ContaInvestimento(numeroConta : String, agencia : String, saldo : double, tipoConta : String, titularCPF : String)
         + realizarTransacao(valor : double, metodoPagamento : String, cartaoEscolhido : Cartao, categoria : String, destino : Conta) : boolean <<override>>
         + visualizarDadosConta() : String 
+        + getTitularCPF() : String
     }
     
     ContaCorrente -up-|> Conta

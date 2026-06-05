@@ -79,4 +79,6 @@ public class ContaCorrente extends Conta {
         return super.visualizarDadosConta() +
                 String.format("Limite Cheque Especial: R$ %.2f\n", this.limiteChequeEspecial);
     }
+
+    public double getLimiteChequeEspecial() {return this.limiteChequeEspecial;}
 }

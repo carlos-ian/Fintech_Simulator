@@ -33,6 +33,7 @@ public class UsuarioBancoRepository {
                     );
                 }
 
+                u.setId(rs.getInt("id"));
                 u.setStatus(Status.valueOf(rs.getString("status_perfil")));
                 listaMemoria.add(u);
             }

@@ -29,6 +29,8 @@ package "Módulo Usuários" #EBF5FB {
         + getDataNascimento() : String
         + getTelefone() : String
         + setStatus(statusCliente : Status) : void
+        + getId() : int
+        + setId(id : int) : void
     }
 
     class Cliente {

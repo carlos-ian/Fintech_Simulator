@@ -85,4 +85,7 @@ public class ContaKids extends Conta {
                 String.format("CPF do Responsável: %s\nLimite Mensal: R$ %.2f\nTotal Gasto no Mês: R$ %.2f\n",
                         this.cpfResponsavel, this.limiteMensal, this.totalGastoNoMes);
     }
+
+    public String getCpfResponsavel() {return this.cpfResponsavel;}
+    public double getLimiteMensal() {return this.limiteMensal;}
 }

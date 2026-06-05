@@ -7,6 +7,7 @@ import Classes.Model.Operacoes.*;
 import Classes.Model.Usuario.Administrador;
 import Classes.Model.Usuario.Cliente;
 import Classes.Model.Usuario.Usuario;
+import Classes.Util.ContaBancoRepository;
 import Classes.Util.SwingUtil;
 import Classes.Util.UsuarioBancoRepository;
 import org.mindrot.jbcrypt.BCrypt;
@@ -144,6 +145,7 @@ public class AplicacaoBancaria {
 
             JOptionPane.showMessageDialog(null, "Autenticação " + tipoPerfil + " Concluída com Sucesso!");
             if (tipoPerfil.equals("Cliente")) {
+                ContaBancoRepository.carregarContasDoCliente((Cliente) encontrado);
                 AplicacaoBancaria.menuGestaoContas((Cliente) encontrado);
             } else {
                 AplicacaoBancaria.menuPrincipalAdministrador((Administrador) encontrado);
@@ -261,9 +263,11 @@ public class AplicacaoBancaria {
 
                     try {
                         int id = Integer.parseInt(contaFecharSel.split(" ")[1]);
+                        Conta contaParaRemover = contas.get(id);
                         boolean resultado = encontrado.fecharConta(contas.get(id));
 
                         if (resultado) {
+                            ContaBancoRepository.removerDoBanco(contaParaRemover.getNumeroConta());
                             JOptionPane.showMessageDialog(null, "Conta encerrada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                         } else {
                             JOptionPane.showMessageDialog(null, "Falha ao fechar conta (Verifique se há saldo residual pendente).", "Erro", JOptionPane.ERROR_MESSAGE);
@@ -360,6 +364,12 @@ public class AplicacaoBancaria {
             } else if (tipo.equalsIgnoreCase("Conta Investimento")) {
                 String titular = dados[3].trim();
                 encontrado.abrirConta(num, ag, sal, tipo, 0, null, 0, titular);
+            }
+
+            ArrayList<Conta> contasAtualizadas = encontrado.obterContas();
+            if (!contasAtualizadas.isEmpty()) {
+                Conta contaRecemCriada = contasAtualizadas.get(contasAtualizadas.size() - 1);
+                ContaBancoRepository.salvarNoBanco(contaRecemCriada, encontrado.getId());
             }
 
             JOptionPane.showMessageDialog(null, "Conta bancária criada e vinculada com sucesso!");

@@ -107,5 +107,7 @@ public abstract class Usuario {
     public String getEmail() {return email;}
     public String getDataNascimento() {return dataNascimento;}
     public String getTelefone() {return telefone;}
+    public void setId(int id) {this.id = id;}
+    public int getId() {return id;}
 
 }

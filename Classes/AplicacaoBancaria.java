@@ -135,7 +135,9 @@ public class AplicacaoBancaria {
                         "Perfil Inativo", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
                 if (resposta == JOptionPane.YES_OPTION) {
+
                     encontrado.setStatus(Status.ATIVO);
+                    UsuarioBancoRepository.atualizarStatusNoBanco(encontrado.getId(), Status.ATIVO);
                     JOptionPane.showMessageDialog(null, "Perfil reativado com sucesso! Prossiga com o acesso.");
                 } else {
                     JOptionPane.showMessageDialog(null, "Acesso negado. É necessário ativar o perfil para entrar.", "Aviso", JOptionPane.WARNING_MESSAGE);
@@ -558,6 +560,7 @@ public class AplicacaoBancaria {
 
                     try {
                         encontrado.encerrarPerfil(encontrado, confirmacaoExclusao[0]);
+                        UsuarioBancoRepository.deletarNoBanco(encontrado.getId());
                         JOptionPane.showMessageDialog(null, "Perfil excluído com sucesso. Desconectando do sistema...", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                         System.exit(0);
                     } catch (Exception e) {
@@ -580,6 +583,13 @@ public class AplicacaoBancaria {
 
                     try {
                         encontrado.alterarDados(tipoDado, novoValor);
+
+                        String valorParaOBanco = novoValor;
+                        if ("Senha".equalsIgnoreCase(tipoDado)) {
+                            valorParaOBanco = encontrado.getSenha();
+                        }
+                        UsuarioBancoRepository.atualizarDadoNoBanco(encontrado.getId(), tipoDado, valorParaOBanco);
+
                         JOptionPane.showMessageDialog(null, tipoDado + " atualizado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                     } catch (IllegalArgumentException e) {
                         JOptionPane.showMessageDialog(null, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
@@ -603,6 +613,7 @@ public class AplicacaoBancaria {
                         }
 
                         encontrado.setStatus(novoStatus);
+                        UsuarioBancoRepository.atualizarStatusNoBanco(encontrado.getId(), novoStatus);
                         JOptionPane.showMessageDialog(null, "Status alterado para " + statusEscolhido + " com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
 
                         if (novoStatus == Status.INATIVO) {
@@ -904,6 +915,7 @@ public class AplicacaoBancaria {
         int mpA = 0;
 
         while (mpA != 5) {
+            if (admin.getStatus().equals(Status.INATIVO)) {return;}
             String stringMenu = JOptionPane.showInputDialog(
                     "==================================\n" +
                             "       PAINEL ADMINISTRATIVO      \n" +

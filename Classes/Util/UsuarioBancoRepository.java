@@ -67,4 +67,59 @@ public class UsuarioBancoRepository {
             System.err.println("Erro ao salvar no banco: " + e.getMessage());
         }
     }
+
+    public static void deletarNoBanco(int id) {
+        String sql = "DELETE FROM usuario WHERE id = ?";
+        try (Connection conn = ConexaoBanco.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+            System.out.println("Usuário removido do banco com sucesso.");
+        } catch (SQLException e) {
+            System.err.println("Erro ao deletar usuário do banco: " + e.getMessage());
+        }
+    }
+
+    public static void atualizarDadoNoBanco(int id, String tipoDado, String novoValor) {
+        String colunaSql = "";
+        if ("Nome".equalsIgnoreCase(tipoDado)) {
+            colunaSql = "nome";
+        } else if ("CPF".equalsIgnoreCase(tipoDado)) {
+            colunaSql = "cpf";
+        } else if ("Email".equalsIgnoreCase(tipoDado)) {
+            colunaSql = "email";
+        } else if ("Senha".equalsIgnoreCase(tipoDado)) {
+            colunaSql = "senha";
+        } else if ("Telefone".equalsIgnoreCase(tipoDado)) {
+            colunaSql = "telefone";
+        } else if ("DataNascimento".equalsIgnoreCase(tipoDado)) {
+            colunaSql = "data_nascimento";
+        } else {
+            return;
+        }
+
+        String sql = "UPDATE usuario SET " + colunaSql + " = ? WHERE id = ?";
+        try (Connection conn = ConexaoBanco.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, novoValor);
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+            System.out.println("Coluna " + colunaSql + " atualizada no banco.");
+        } catch (SQLException e) {
+            System.err.println("Erro ao atualizar dado no banco: " + e.getMessage());
+        }
+    }
+
+    public static void atualizarStatusNoBanco(int id, Status novoStatus) {
+        String sql = "UPDATE usuario SET status_perfil = ? WHERE id = ?";
+        try (Connection conn = ConexaoBanco.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, novoStatus.name());
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+            System.out.println("Status atualizado para " + novoStatus.name() + " no banco.");
+        } catch (SQLException e) {
+            System.err.println("Erro ao atualizar status no banco: " + e.getMessage());
+        }
+    }
 }

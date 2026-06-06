@@ -120,6 +120,8 @@ package "Módulo Contas" #FEF9E7 {
         # extrato : ArrayList<Transacao>
         # cartoes : ArrayList<Cartao>
         # listaInvestimentos : ArrayList<Investimento>
+        - {static} codigoSequencial : int = 0
+        # id : int
         # numeroConta : String
         # agencia : String
         # saldo : double
@@ -138,8 +140,10 @@ package "Módulo Contas" #FEF9E7 {
         + getTipoConta() : String
         + getStatus() : Status
         + setStatus(statusConta : Status) : void
-        + public getListaInvestimentos() : ArrayList<Investimento>
-        + public getExtrato() : ArrayList<Transacao>
+        + getListaInvestimentos() : ArrayList<Investimento>
+        + getExtrato() : ArrayList<Transacao>
+        + setId(id: int):void 
+        + getId(): int
     }
 
     class ContaCorrente {
@@ -206,6 +210,8 @@ package "Módulo Operações" as op #E8F8F5 {
         + toString() : String <<override>>
         + getNomeProduto() : String
         + getTaxaRendimento() : double
+        + getValorAplicado() : double
+        + setId() : void
     }
 
     class Transacao {
@@ -252,6 +258,7 @@ package "Módulo Operações" as op #E8F8F5 {
         + getEstaBloqueado() : boolean
         + setLimiteDisponivel(limiteDisponivel : double) : void
         + getNumeroCartao() : String
+        + getTitular() : String
     }
 
     enum Status {

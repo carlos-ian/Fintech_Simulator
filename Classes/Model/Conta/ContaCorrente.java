@@ -22,7 +22,8 @@ public class ContaCorrente extends Conta {
             throws ContaInativaException, SaldoInsuficienteException, LimiteInsuficienteException {
 
         if (this.statusConta != Status.ATIVO) {throw new ContaInativaException("Transação recusada: Sua conta não está ativa.");}
-        if (destino != null || destino.statusConta != Status.ATIVO) {throw new ContaInativaException("Transação recusada: A conta de destino não está ativa.");}
+        if (destino != null && !destino.getStatus().equals(Status.ATIVO)) {throw new ContaInativaException("Transação recusada: A conta de destino não está ativa.");}
+        if (destino == null) {throw new IllegalArgumentException("Conta de Destino não existe");}
 
         if (metodoPagamento.equalsIgnoreCase("PIX")) {
             if (this.saldo + this.limiteChequeEspecial < valor) {
@@ -66,10 +67,9 @@ public class ContaCorrente extends Conta {
         String horaAtual = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
 
         Transacao transacao = new Transacao(dataAtual, horaAtual, valor, categoria, "SAÍDA", metodoPagamento, "CONCLUIDO", this, destino);
-        Transacao transacaoD = transacao;
         this.extrato.add(transacao);
-        transacaoD.setTipoFluxo("ENTRADA");
-        destino.extrato.add(transacaoD);
+        Transacao transacaoEntrada = new Transacao(dataAtual, horaAtual, valor, categoria, "ENTRADA", metodoPagamento, "CONCLUIDO", destino, this);
+        destino.extrato.add(transacaoEntrada);
 
         return true;
     }

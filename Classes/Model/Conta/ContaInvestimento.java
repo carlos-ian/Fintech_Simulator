@@ -51,10 +51,9 @@ public class ContaInvestimento extends Conta {
                 destino
         );
 
-        Transacao transacaoD = transacao;
         this.extrato.add(transacao);
-        transacaoD.setTipoFluxo("ENTRADA");
-        destino.extrato.add(transacaoD);
+        Transacao transacaoEntrada = new Transacao(dataAtual, horaAtual, valor, categoria, "ENTRADA", metodoPagamento, "CONCLUIDO", destino, this);
+        destino.extrato.add(transacaoEntrada);
 
         return true;
     }

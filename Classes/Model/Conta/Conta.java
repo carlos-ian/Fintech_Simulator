@@ -18,6 +18,9 @@ public abstract class Conta {
     protected ArrayList<Cartao> cartoes = new ArrayList<>();
     protected ArrayList<Investimento> listaInvestimentos = new ArrayList<>();
 
+    private static int codigoSequencial = 0;
+
+    protected int id;
     protected String numeroConta;
     protected String agencia;
     protected double saldo;
@@ -30,6 +33,7 @@ public abstract class Conta {
         this.saldo = saldo;
         this.tipoConta = tipoConta;
         this.statusConta = Status.ATIVO;
+        this.id = codigoSequencial++;
     }
 
     public abstract boolean realizarTransacao(double valor, String metodoPagamento, Cartao cartaoEscolhido, String category, Conta destino)
@@ -113,4 +117,6 @@ public abstract class Conta {
     public void setStatus(Status status) {this.statusConta = status;}
     public ArrayList<Investimento> getListaInvestimentos() {return listaInvestimentos;}
     public ArrayList<Transacao> getExtrato() {return extrato;}
+    public void setId(int id) {this.id = id;}
+    public int getId() {return id;}
 }

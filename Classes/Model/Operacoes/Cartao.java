@@ -103,4 +103,5 @@ public class Cartao {
     public boolean getEstaBloqueado() {return this.estaBloqueado;}
     public void setLimiteDisponivel (double limiteDisponivel) {this.limiteDisponivel = limiteDisponivel;}
     public String getNumeroCartao() {return numeroCartao;}
+    public String getTitular() {return titular;}
 }

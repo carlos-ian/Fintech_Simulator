@@ -79,4 +79,7 @@ public class Investimento {
 
     public String getNomeProduto() {return nomeProduto;}
     public double getTaxaRendimento() {return taxaRendimento;}
+    public double  getValorAplicado() {return valorAplicado;}
+    public void setId(int id) {this.idInvestimento = id;}
+    public int getId() {return idInvestimento;}
 }

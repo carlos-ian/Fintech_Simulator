@@ -28,8 +28,9 @@ public class ContaKids extends Conta {
             throws ContaInativaException, SaldoInsuficienteException, LimiteInsuficienteException {
 
         if (this.statusConta != Status.ATIVO) {throw new ContaInativaException("Transação recusada: Esta conta Kids não está ativa.");}
-        if (destino != null || destino.statusConta != Status.ATIVO) {throw new ContaInativaException("Transação recusada: A conta de destino não está ativa.");}
+        if (destino != null && destino.statusConta != Status.ATIVO) {throw new ContaInativaException("Transação recusada: A conta de destino não está ativa.");}
         if (metodoPagamento.equalsIgnoreCase("CREDITO")) {throw new IllegalArgumentException("Transação recusada: Contas para menores de idade não possuem a função Crédito disponível.");}
+        if (destino == null) {throw new IllegalArgumentException("Conta de Destino não existe");}
 
         if (this.totalGastoNoMes + valor > this.limiteMensal) {throw new LimiteInsuficienteException("Transação recusada: O limite mensal de gastos definido pelos seus responsáveis foi atingido.");}
 
@@ -73,8 +74,8 @@ public class ContaKids extends Conta {
 
         Transacao transacaoD = transacao;
         this.extrato.add(transacao);
-        transacaoD.setTipoFluxo("ENTRADA");
-        destino.extrato.add(transacaoD);
+        Transacao transacaoEntrada = new Transacao(dataAtual, horaAtual, valor, categoria, "ENTRADA", metodoPagamento, "CONCLUIDO", destino, this);
+        destino.extrato.add(transacaoEntrada);
 
         return true;
     }

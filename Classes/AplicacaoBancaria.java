@@ -7,9 +7,7 @@ import Classes.Model.Operacoes.*;
 import Classes.Model.Usuario.Administrador;
 import Classes.Model.Usuario.Cliente;
 import Classes.Model.Usuario.Usuario;
-import Classes.Util.ContaBancoRepository;
-import Classes.Util.SwingUtil;
-import Classes.Util.UsuarioBancoRepository;
+import Classes.Util.*;
 import org.mindrot.jbcrypt.BCrypt;
 
 import javax.swing.*;
@@ -368,13 +366,20 @@ public class AplicacaoBancaria {
                 encontrado.abrirConta(num, ag, sal, tipo, 0, null, 0, titular);
             }
 
-            ArrayList<Conta> contasAtualizadas = encontrado.obterContas();
-            if (!contasAtualizadas.isEmpty()) {
-                Conta contaRecemCriada = contasAtualizadas.get(contasAtualizadas.size() - 1);
-                ContaBancoRepository.salvarNoBanco(contaRecemCriada, encontrado.getId());
+            Conta contaParaSalvar = null;
+            for (Conta c : encontrado.obterContas()) {
+                if (c.getNumeroConta().equals(num)) {
+                    contaParaSalvar = c;
+                    break;
+                }
             }
-
-            JOptionPane.showMessageDialog(null, "Conta bancária criada e vinculada com sucesso!");
+            if (contaParaSalvar != null) {
+                int idDoUsuarioLogado = encontrado.getId();
+                ContaBancoRepository.salvarNoBanco(contaParaSalvar, idDoUsuarioLogado);
+                JOptionPane.showMessageDialog(null, "Conta bancária criada e vinculada com sucesso!");
+            } else {
+                JOptionPane.showMessageDialog(null, "Erro local: A conta foi criada na memória, mas não pôde ser localizada para salvar no banco.", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
 
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "Erro: Verifique a formatação dos campos numéricos.");
@@ -445,16 +450,7 @@ public class AplicacaoBancaria {
 
                         Conta contaDestino = null;
                         if (!cpfDest.isEmpty() && !numContaDest.isEmpty()) {
-                            for (Usuario u : AplicacaoBancaria.ListaUsuarios) {
-                                if (u instanceof Cliente && u.getCpf().equals(cpfDest)) {
-                                    for (Conta c : ((Cliente) u).obterContas()) {
-                                        if (c.getNumeroConta().equals(numContaDest)) {
-                                            contaDestino = c;
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
+                            contaDestino = ContaBancoRepository.buscarContaDestinoNoBanco(cpfDest, numContaDest);
                         }
 
                         if(!cpfDest.equals(encontrado.getCpf()) && conta.getTipoConta().equals("Conta Investimento")) {
@@ -463,6 +459,35 @@ public class AplicacaoBancaria {
 
                         boolean sucesso = conta.realizarTransacao(valor, metodo, cartaoEscolhido, categoria, contaDestino);
                         if (sucesso) {
+                            ArrayList<Transacao> extratoAtual = conta.getExtrato();
+                            Transacao ultimaTx = extratoAtual.get(extratoAtual.size() - 1);
+
+                            Integer idDestino = (contaDestino != null) ? contaDestino.getId() : null;
+                            Double saldoDestino = (contaDestino != null) ? contaDestino.getSaldo() : null;
+
+                            TransacaoBancoRepository.registrarTransacaoNoBanco(
+                                    ultimaTx,
+                                    conta.getId(),
+                                    conta.getSaldo(),
+                                    idDestino,
+                                    saldoDestino
+                            );
+
+                            if (contaDestino != null) {
+                                Transacao txEntrada = new Transacao(
+                                        ultimaTx.getData(),
+                                        ultimaTx.getHora(),
+                                        valor,
+                                        categoria,
+                                        "ENTRADA",
+                                        metodo,
+                                        ultimaTx.getStatus(),
+                                        conta,
+                                        contaDestino
+                                );
+
+                                contaDestino.getExtrato().add(txEntrada);
+                            }
                             JOptionPane.showMessageDialog(null, "Transação concluída com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                         }
 
@@ -702,6 +727,8 @@ public class AplicacaoBancaria {
                         Cartao novoCartao = new Cartao(numero, encontrado.getNome(), tipo, limiteInicial, limiteInicial);
                         conta.getCartoes().add(novoCartao);
 
+                        CartaoBancoRepository.salvarNoBanco(novoCartao, conta.getId());
+
                         JOptionPane.showMessageDialog(null, "Cartão gerado e vinculado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                     } catch (NumberFormatException e) {
                         JOptionPane.showMessageDialog(null, "Erro: Insira um valor numérico válido para o limite.", "Erro", JOptionPane.ERROR_MESSAGE);
@@ -714,6 +741,7 @@ public class AplicacaoBancaria {
 
                 case 3:
                     if (cartaoSelecionado.bloquearCartao()) {
+                        CartaoBancoRepository.atualizarBloqueioNoBanco(cartaoSelecionado.getNumeroCartao(), true);
                         JOptionPane.showMessageDialog(null, "O cartão foi bloqueado com sucesso.", "Status", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(null, "Este cartão já se encontra bloqueado.", "Aviso", JOptionPane.WARNING_MESSAGE);
@@ -722,6 +750,7 @@ public class AplicacaoBancaria {
 
                 case 4:
                     if (cartaoSelecionado.ativarCartao()) {
+                        CartaoBancoRepository.atualizarBloqueioNoBanco(cartaoSelecionado.getNumeroCartao(), false);
                         JOptionPane.showMessageDialog(null, "O cartão foi ativado/desbloqueado com sucesso.", "Status", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(null, "Este cartão já está ativo no sistema.", "Aviso", JOptionPane.WARNING_MESSAGE);
@@ -748,6 +777,7 @@ public class AplicacaoBancaria {
                         }
 
                         if (cartaoSelecionado.solicitarAjusteLimite(novoLimite, admSistema, conta)) {
+                            CartaoBancoRepository.atualizarLimitesNoBanco(cartaoSelecionado.getNumeroCartao(), cartaoSelecionado.getLimiteTotal(), cartaoSelecionado.getLimiteDisponivel());
                             JOptionPane.showMessageDialog(null, "Ajuste aprovado pelo Administrador!\nNovo limite estabelecido com sucesso.", "Análise Concluída", JOptionPane.INFORMATION_MESSAGE);
                         } else {
                             JOptionPane.showMessageDialog(null, "Ajuste recusado após análise de perfil de crédito ou valor inválido.", "Análise Concluída", JOptionPane.WARNING_MESSAGE);
@@ -866,6 +896,7 @@ public class AplicacaoBancaria {
                         String dataAtual = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
                         if (helper.realizarInvestimento(conta, produtoSelecionado, valorInvestir, dataAtual)) {
+                            InvestimentoBancoRepository.registrarAplicacao(conta, produtoSelecionado, valorInvestir, dataAtual);
                             JOptionPane.showMessageDialog(null, "Aplicação realizada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                         }
                     } catch (NumberFormatException e) {
@@ -890,9 +921,15 @@ public class AplicacaoBancaria {
                     if (resgateSel == null) break;
 
                     try {
-                        int idInvestimento = Integer.parseInt(resgateSel.split(" ")[1]);
+                        int posicaoSelecionada = Integer.parseInt(resgateSel.split(" ")[1]);
 
-                        if (helper.resgatarInvestimento(conta, idInvestimento)) {
+                        Investimento invParaResgatar = conta.getListaInvestimentos().get(posicaoSelecionada);
+                        String nomeAtivo = invParaResgatar.getNomeProduto();
+                        double valorAtivo = invParaResgatar.getValorAplicado();
+                        int idInternoDoObjeto = invParaResgatar.getId();
+
+                        if (helper.resgatarInvestimento(conta, idInternoDoObjeto)) {
+                            InvestimentoBancoRepository.registrarResgate(conta, nomeAtivo, valorAtivo);
                             JOptionPane.showMessageDialog(null, "Resgate concluído! O valor retornou ao seu saldo livre.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                         }
                     } catch (Exception e) {
@@ -959,6 +996,7 @@ public class AplicacaoBancaria {
 
                     if (acaoCliente == 0) {
                         boolean mudou = admin.ativarPerfilCliente(clienteEncontrado);
+                        UsuarioBancoRepository.atualizarStatusNoBanco(clienteEncontrado.getId(), clienteEncontrado.getStatus());
                         JOptionPane.showMessageDialog(null, mudou ? "Perfil ativado com sucesso!" : "O perfil já estava ativo.");
                     } else if (acaoCliente == 1) {
                             Justificativa motivoSel = (Justificativa) JOptionPane.showInputDialog(
@@ -973,6 +1011,7 @@ public class AplicacaoBancaria {
 
                             if (motivoSel != null) {
                                 boolean mudou = admin.desativarPerfilCliente(clienteEncontrado, motivoSel);
+                                UsuarioBancoRepository.atualizarStatusNoBanco(clienteEncontrado.getId(), clienteEncontrado.getStatus());
                                 JOptionPane.showMessageDialog(null, mudou ? "Perfil desativado com sucesso!" : "O perfil já estava inativo.");
                             }
                         }
@@ -1020,10 +1059,12 @@ public class AplicacaoBancaria {
 
                         if (motivoSel != null) {
                             boolean ok = admin.desativarConta(contaAlvo, motivoSel);
+                            ContaBancoRepository.atualizarStatusContaNoBanco(contaAlvo.getId(), contaAlvo.getStatus());
                             JOptionPane.showMessageDialog(null, ok ? "Conta bloqueada com sucesso." : "A conta já está bloqueada.");
                         }
                     } else if (acaoConta == 1) {
                         boolean ok = admin.ativarConta(contaAlvo);
+                        ContaBancoRepository.atualizarStatusContaNoBanco(contaAlvo.getId(), contaAlvo.getStatus());
                         JOptionPane.showMessageDialog(null, ok ? "Conta desbloqueada com sucesso." : "A conta não estava bloqueada.");
                     } else if (acaoConta == 2) {
                         ArrayList<Transacao> historico = admin.visualizarHistoricoConta(contaAlvo);

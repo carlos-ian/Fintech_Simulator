@@ -50,7 +50,8 @@ public class ContaPoupanca extends Conta {
             throws ContaInativaException, SaldoInsuficienteException, LimiteInsuficienteException {
 
         if (this.statusConta != Status.ATIVO) {throw new ContaInativaException("Transação recusada: Sua conta poupança não está ativa.");}
-        if (destino != null || destino.statusConta != Status.ATIVO) {throw new ContaInativaException("Transação recusada: A conta de destino não está ativa.");}
+        if (destino != null && destino.statusConta != Status.ATIVO) {throw new ContaInativaException("Transação recusada: A conta de destino não está ativa.");}
+        if (destino == null) {throw new IllegalArgumentException("Conta de Destino não existe");}
 
         if (metodoPagamento.equalsIgnoreCase("PIX")) {
             if (this.saldo < valor) {
@@ -101,10 +102,9 @@ public class ContaPoupanca extends Conta {
                 destino
         );
 
-        Transacao transacaoD = transacao;
         this.extrato.add(transacao);
-        transacaoD.setTipoFluxo("ENTRADA");
-        destino.extrato.add(transacao);
+        Transacao transacaoEntrada = new Transacao(dataAtual, horaAtual, valor, categoria, "ENTRADA", metodoPagamento, "CONCLUIDO", destino, this);
+        destino.extrato.add(transacaoEntrada);
 
         return true;
     }

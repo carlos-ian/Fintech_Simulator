@@ -18,16 +18,25 @@ public class ConexaoBanco {
         }
     }
 
-    private static final String URL = "jdbc:postgresql://localhost:5432/sistema_bancario";
-    private static final String USUARIO = "postgres";
-    private static final String SENHA = "postgres";
+    private static final String HOST = "ep-hidden-math-aqg4q940-pooler.c-8.us-east-1.aws.neon.tech";
+    private static final String PORTA = "5432";
+    private static final String BANCO = "neondb";
 
-    public static Connection conectar() throws SQLException {
+    private static final String URL = "jdbc:postgresql://" + HOST + ":" + PORTA + "/" + BANCO + "?sslmode=require";
+
+    private static final String USUARIO = "neondb_owner";
+    private static final String SENHA = "npg_SRAZ80OxTBLC";
+
+    public static Connection conectar() {
         try {
             Class.forName("org.postgresql.Driver");
             return DriverManager.getConnection(URL, USUARIO, SENHA);
         } catch (ClassNotFoundException e) {
-            throw new SQLException("Driver não encontrado na pasta lib.", e);
+            System.err.println("Driver do PostgreSQL não encontrado: " + e.getMessage());
+            return null;
+        } catch (SQLException e) {
+            System.err.println("Erro ao conectar ao banco na nuvem: " + e.getMessage());
+            return null;
         }
     }
 }

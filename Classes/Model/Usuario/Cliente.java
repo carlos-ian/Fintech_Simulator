@@ -36,26 +36,31 @@ public class Cliente extends Usuario {
                 "\nSTATUS DO CLIENTE: " + this.statusPerfil + dadosContas;
     }
 
-    public void abrirConta(String numeroConta, String agencia, double saldo, String tipoConta,
+    public Conta abrirConta(String numeroConta, String agencia, double saldo, String tipoConta,
                            double limiteChequeEspecial, String cpfResponsavel,
                            double limiteMensal, String perfilRisco) {
 
         if (tipoConta.equalsIgnoreCase("Conta Corrente")) {
             ContaCorrente contaCorrente = new ContaCorrente(numeroConta, agencia, saldo, tipoConta, limiteChequeEspecial);
             listaContas.add(contaCorrente);
+            return contaCorrente;
 
         } else if (tipoConta.equalsIgnoreCase("Conta Poupança")) {
             ContaPoupanca contaPoupanca = new ContaPoupanca(numeroConta, agencia, saldo, tipoConta);
             listaContas.add(contaPoupanca);
+            return contaPoupanca;
 
         } else if (tipoConta.equalsIgnoreCase("Conta Kids")) {
             ContaKids contaKids = new ContaKids(numeroConta, agencia, saldo, tipoConta, cpfResponsavel, limiteMensal);
             listaContas.add(contaKids);
+            return contaKids;
 
         } else if (tipoConta.equalsIgnoreCase("Conta Investimento")) {
             ContaInvestimento contaInvestimento = new ContaInvestimento(numeroConta, agencia, saldo, tipoConta, perfilRisco);
             listaContas.add(contaInvestimento);
+            return contaInvestimento;
         }
+        return null;
     }
 
     public boolean fecharConta(Conta conta) {

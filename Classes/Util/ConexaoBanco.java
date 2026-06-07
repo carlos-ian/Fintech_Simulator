@@ -1,10 +1,30 @@
 package Classes.Util;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConexaoBanco {
+    private static final Dotenv dotenv;
+    static {
+        Dotenv temp = null;
+        try {
+            temp = Dotenv.configure().ignoreIfMissing().load();
+        } catch (Exception e) {
+            System.out.println("Erro crítico ao inicializar Dotenv: " + e.getMessage());
+        }
+        dotenv = temp;
+    }
+
+    private static final String HOST = (dotenv != null) ? dotenv.get("DB_HOST") : null;
+    private static final String PORTA = (dotenv != null) ? dotenv.get("DB_PORT") : null;
+    private static final String BANCO = (dotenv != null) ? dotenv.get("DB_NAME") : null;
+    private static final String USUARIO = (dotenv != null) ? dotenv.get("DB_USER") : null;
+    private static final String SENHA = (dotenv != null) ? dotenv.get("DB_PASSWORD") : null;
+
+    private static final String URL = "jdbc:postgresql://" + HOST + ":" + PORTA + "/" + BANCO + "?sslmode=require";
+
     public static void main(String[] args) {
         try {
             Connection conn = conectar();
@@ -17,15 +37,6 @@ public class ConexaoBanco {
             e.printStackTrace();
         }
     }
-
-    private static final String HOST = "ep-hidden-math-aqg4q940-pooler.c-8.us-east-1.aws.neon.tech";
-    private static final String PORTA = "5432";
-    private static final String BANCO = "neondb";
-
-    private static final String URL = "jdbc:postgresql://" + HOST + ":" + PORTA + "/" + BANCO + "?sslmode=require";
-
-    private static final String USUARIO = "neondb_owner";
-    private static final String SENHA = "npg_SRAZ80OxTBLC";
 
     public static Connection conectar() {
         try {

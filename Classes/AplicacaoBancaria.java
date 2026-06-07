@@ -9,7 +9,6 @@ import Classes.Model.Usuario.Cliente;
 import Classes.Model.Usuario.Usuario;
 import Classes.Util.*;
 import org.mindrot.jbcrypt.BCrypt;
-
 import javax.swing.*;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -27,42 +26,31 @@ public class AplicacaoBancaria {
         AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("Fundo de Ações", 18.5, 0, null));
         AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("Poupança", 6.17, 0, null));
 
+        UsuarioBancoRepository.carregarUsuariosParaMemoria(AplicacaoBancaria.ListaUsuarios);
+
         java.time.LocalDate hoje = java.time.LocalDate.now();
         YearMonth mesAtual = YearMonth.now();
 
         if (hoje.getDayOfMonth() == DIA_ROTINA && !mesAtual.equals(ultimaAplicacaoRendimento)) {
             for (Usuario usuario : AplicacaoBancaria.ListaUsuarios) {
-                if (usuario instanceof Cliente) {
-                    Cliente cliente = (Cliente) usuario;
+                if (usuario instanceof Cliente) { Cliente cliente = (Cliente) usuario;
 
                     for (Conta conta : cliente.obterContas()) {
-                        if (conta instanceof ContaPoupanca) {
-                            ((ContaPoupanca) conta).aplicarRendimento();
-                        }
-
-                        if (conta instanceof ContaKids) {
-                            ((ContaKids) conta).resetarMes();
-                        }
-
+                        if (conta instanceof ContaPoupanca) {((ContaPoupanca) conta).aplicarRendimento();}
+                        if (conta instanceof ContaKids) {((ContaKids) conta).resetarMes();}
                         if (conta.getListaInvestimentos() != null && conta.getListaInvestimentos().isEmpty()) {
-                            for (Investimento inv : conta.getListaInvestimentos()) {
-                                inv.aplicarRendimento();
-                            }
+                            for (Investimento inv : conta.getListaInvestimentos()) {inv.aplicarRendimento();}
                         }
                     }
                 }
                 ultimaAplicacaoRendimento = mesAtual;
             }
         }
-
-        UsuarioBancoRepository.carregarUsuariosParaMemoria(AplicacaoBancaria.ListaUsuarios);
         AplicacaoBancaria.menuInicial();
-
     }
 
     public static void menuInicial() {
-        int menu = 0;
-        while (menu == 0) {
+        while (true) {
             String stringMenu = JOptionPane.showInputDialog(
                     "===============================\n" +
                             "                   SEJA BEM VINDO\n" +
@@ -73,11 +61,11 @@ public class AplicacaoBancaria {
 
             if (stringMenu == null) {System.out.println("--- ENCERRANDO SISTEMA ---"); return;}
 
+            int menu;
             try {
                 menu = Integer.parseInt(stringMenu);
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(null, "Opção inválida! Digite apenas números.");
-                menu = 0;
                 continue;
             }
 
@@ -85,13 +73,11 @@ public class AplicacaoBancaria {
                 case 1:
                     String loginTipo = SwingUtil.exibirMenuSelecao("Identificação de Login", "Quem é você?", "Sou Cliente", "Sou Administrador");
                     if (loginTipo != null) {Login(loginTipo);}
-                    menu = 0;
                     break;
 
                 case 2:
                     String tipoCadastro = SwingUtil.exibirMenuSelecao("Criação de Perfil", "Qual perfil deseja-se criar?", "Perfil para Cliente", "Perfil para Administrador");
                     if (tipoCadastro != null) {Cadastro(tipoCadastro);}
-                    menu = 0;
                     break;
 
                 case 3:
@@ -100,7 +86,6 @@ public class AplicacaoBancaria {
 
                 default:
                     JOptionPane.showMessageDialog(null, "Opção inválida!");
-                    menu = 0;
                     break;
             }
         }
@@ -133,7 +118,6 @@ public class AplicacaoBancaria {
                         "Perfil Inativo", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
                 if (resposta == JOptionPane.YES_OPTION) {
-
                     encontrado.setStatus(Status.ATIVO);
                     UsuarioBancoRepository.atualizarStatusNoBanco(encontrado.getId(), Status.ATIVO);
                     JOptionPane.showMessageDialog(null, "Perfil reativado com sucesso! Prossiga com o acesso.");
@@ -145,7 +129,6 @@ public class AplicacaoBancaria {
 
             JOptionPane.showMessageDialog(null, "Autenticação " + tipoPerfil + " Concluída com Sucesso!");
             if (tipoPerfil.equals("Cliente")) {
-                ContaBancoRepository.carregarContasDoCliente((Cliente) encontrado);
                 AplicacaoBancaria.menuGestaoContas((Cliente) encontrado);
             } else {
                 AplicacaoBancaria.menuPrincipalAdministrador((Administrador) encontrado);
@@ -171,10 +154,7 @@ public class AplicacaoBancaria {
 
             boolean temCampoVazio = false;
             for (String campo : dados) {
-                if (campo.trim().isEmpty()) {
-                    temCampoVazio = true;
-                    break;
-                }
+                if (campo.trim().isEmpty()) { temCampoVazio = true; break; }
             }
 
             if (temCampoVazio) {
@@ -207,24 +187,23 @@ public class AplicacaoBancaria {
     }
 
     public static void menuGestaoContas(Cliente encontrado) {
-        int mpC = 0;
-        while (mpC == 0) {
+        while (true) {
             if (encontrado.getStatus().equals(Status.INATIVO)) {return;}
-            String stringMenu = JOptionPane.showInputDialog(
-                    "=====  Menu de Contas  =====\n" + "1 - Listar Contas\n" + "2 - Abrir Nova Conta\n" +
-                            "3 - Fechar Conta\n" + "4 - Entrar com Conta\n" + "5 - Sair"
-            );
+            String stringMenu = JOptionPane.showInputDialog("=====  Menu de Contas  =====\n" +
+                    "1 - Listar Contas\n" + "2 - Abrir Nova Conta\n" + "3 - Fechar Conta\n" +
+                    "4 - Entrar com Conta\n" + "5 - Sair");
 
             if (stringMenu == null) return;
 
+            int mpC;
             try {
                 mpC = Integer.parseInt(stringMenu);
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(null, "Opção inválida! Digite apenas números.");
-                mpC = 0;
                 continue;
             }
 
+            ContaBancoRepository.carregarContasDoCliente(encontrado);
             ArrayList<Conta> contas = encontrado.obterContas();
 
             switch (mpC) {
@@ -238,28 +217,23 @@ public class AplicacaoBancaria {
                         }
                         JOptionPane.showMessageDialog(null, sb.toString(), "Lista de Contas", JOptionPane.INFORMATION_MESSAGE);
                     }
-                    mpC = 0;
                     break;
 
                 case 2:
                     AberturaConta(encontrado);
-                    mpC = 0;
                     break;
 
                 case 3:
                     if (contas.isEmpty()) {
                         JOptionPane.showMessageDialog(null, "Você não possui contas para fechar.");
-                        mpC = 0;
                         break;
                     }
 
                     String[] opcoesFechar = new String[contas.size()];
-                    for (int i = 0; i < contas.size(); i++) {
-                        opcoesFechar[i] = "ID: " + i + " | Conta: " + contas.get(i).getNumeroConta() + " [" + contas.get(i).getTipoConta() + "]";
-                    }
+                    for (int i = 0; i < contas.size(); i++) {opcoesFechar[i] = " Conta: " + contas.get(i).getNumeroConta() + " [" + contas.get(i).getTipoConta() + "]";}
 
                     String contaFecharSel = SwingUtil.exibirMenuSelecao("Encerrar Conta", "Selecione a conta que deseja fechar permanentemente:", opcoesFechar);
-                    if (contaFecharSel == null) { mpC = 0; break; }
+                    if (contaFecharSel == null) { break; }
 
                     try {
                         int id = Integer.parseInt(contaFecharSel.split(" ")[1]);
@@ -275,23 +249,19 @@ public class AplicacaoBancaria {
                     } catch (Exception e) {
                         JOptionPane.showMessageDialog(null, "Erro ao processar o encerramento.");
                     }
-                    mpC = 0;
                     break;
 
                 case 4:
                     if (contas.isEmpty()) {
                         JOptionPane.showMessageDialog(null, "Você não possui contas. Abra uma primeiro.");
-                        mpC = 0;
                         break;
                     }
 
                     String[] opcoesEntrar = new String[contas.size()];
-                    for (int i = 0; i < contas.size(); i++) {
-                        opcoesEntrar[i] = "ID: " + i + " | Conta: " + contas.get(i).getNumeroConta() + " [" + contas.get(i).getTipoConta() + "]";
-                    }
+                    for (int i = 0; i < contas.size(); i++) {opcoesEntrar[i] = " Conta: " + contas.get(i).getNumeroConta() + " [" + contas.get(i).getTipoConta() + "]";}
 
                     String contaEntrarSel = SwingUtil.exibirMenuSelecao("Acessar Conta", "Escolha em qual conta deseja entrar:", opcoesEntrar);
-                    if (contaEntrarSel == null) { mpC = 0; break; }
+                    if (contaEntrarSel == null) { break; }
 
                     try {
                         int id = Integer.parseInt(contaEntrarSel.split(" ")[1]);
@@ -300,15 +270,12 @@ public class AplicacaoBancaria {
                     } catch (Exception e) {
                         JOptionPane.showMessageDialog(null, "Erro ao tentar acessar a conta selecionada.");
                     }
-                    mpC = 0;
                     break;
 
-                case 5:
-                    return;
+                case 5: return;
 
                 default:
                     JOptionPane.showMessageDialog(null, "Opção inválida!");
-                    mpC = 0;
                     break;
             }
         }
@@ -324,7 +291,7 @@ public class AplicacaoBancaria {
                 dados = SwingUtil.exibirFormulario("Nova Conta Corrente", null, "Número da Conta:", "Agência:", "Saldo Inicial:", "Limite Cheque Especial:");
                 break;
             case "Conta Poupança":
-                dados = SwingUtil.exibirFormulario("Nova Conta Poupança", null, "Número da Conta:", "Agência:", "Saldo Inicial:", "Taxa de Rendimento Mensal:");
+                dados = SwingUtil.exibirFormulario("Nova Conta Poupança", null, "Número da Conta:", "Agência:", "Saldo Inicial:");
                 break;
             case "Conta Kids":
                 dados = SwingUtil.exibirFormulario("Nova Conta Kids", null, "Número da Conta:", "Agência:", "Saldo Inicial:", "CPF do Responsável Legal:", "Limite de Movimentação Mensal:");
@@ -348,37 +315,27 @@ public class AplicacaoBancaria {
 
             double sal = Double.parseDouble(saldoStr.replace(",", "."));
 
+            Conta contaCriada = null;
+
             if (tipo.equalsIgnoreCase("Conta Corrente")) {
                 double limite = Double.parseDouble(dados[3].replace(",", "."));
-                encontrado.abrirConta(num, ag, sal, tipo, limite, null, 0, null);
-
+                contaCriada = encontrado.abrirConta(num, ag, sal, tipo, limite, null, 0, null);
             } else if (tipo.equalsIgnoreCase("Conta Poupança")) {
-                double taxa = Double.parseDouble(dados[3].replace(",", "."));
-                encontrado.abrirConta(num, ag, sal, tipo, 0, null, 0, null);
-
+                contaCriada = encontrado.abrirConta(num, ag, sal, tipo, 0, null, 0, null);
             } else if (tipo.equalsIgnoreCase("Conta Kids")) {
                 String cpfResp = dados[3].trim();
                 double limMes = Double.parseDouble(dados[4].replace(",", "."));
-                encontrado.abrirConta(num, ag, sal, tipo, 0, cpfResp, limMes, null);
-
+                contaCriada = encontrado.abrirConta(num, ag, sal, tipo, 0, cpfResp, limMes, null);
             } else if (tipo.equalsIgnoreCase("Conta Investimento")) {
                 String titular = dados[3].trim();
-                encontrado.abrirConta(num, ag, sal, tipo, 0, null, 0, titular);
+                contaCriada = encontrado.abrirConta(num, ag, sal, tipo, 0, null, 0, titular);
             }
 
-            Conta contaParaSalvar = null;
-            for (Conta c : encontrado.obterContas()) {
-                if (c.getNumeroConta().equals(num)) {
-                    contaParaSalvar = c;
-                    break;
-                }
-            }
-            if (contaParaSalvar != null) {
-                int idDoUsuarioLogado = encontrado.getId();
-                ContaBancoRepository.salvarNoBanco(contaParaSalvar, idDoUsuarioLogado);
+            if (contaCriada != null) {
+                ContaBancoRepository.salvarNoBanco(contaCriada, encontrado.getId());
                 JOptionPane.showMessageDialog(null, "Conta bancária criada e vinculada com sucesso!");
             } else {
-                JOptionPane.showMessageDialog(null, "Erro local: A conta foi criada na memória, mas não pôde ser localizada para salvar no banco.", "Erro", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Erro local: A conta não pôde ser criada.", "Erro", JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (NumberFormatException e) {
@@ -416,7 +373,6 @@ public class AplicacaoBancaria {
             switch (opcaoDash) {
                 case 1:
                     AplicacaoBancaria.configuracoes(encontrado);
-                    opcaoDash = 0;
                     break;
 
                 case 2:
@@ -444,7 +400,7 @@ public class AplicacaoBancaria {
                         String numContaDest = (String) dadosTx[5];
 
                         Cartao cartaoEscolhido = null;
-                        if (indiceCartao > 0 && cartoesDaConta != null && !cartoesDaConta.isEmpty()) {
+                        if (indiceCartao > 0 && !cartoesDaConta.isEmpty()) {
                             cartaoEscolhido = cartoesDaConta.get(indiceCartao - 1);
                         }
 
@@ -465,27 +421,10 @@ public class AplicacaoBancaria {
                             Integer idDestino = (contaDestino != null) ? contaDestino.getId() : null;
                             Double saldoDestino = (contaDestino != null) ? contaDestino.getSaldo() : null;
 
-                            TransacaoBancoRepository.registrarTransacaoNoBanco(
-                                    ultimaTx,
-                                    conta.getId(),
-                                    conta.getSaldo(),
-                                    idDestino,
-                                    saldoDestino
-                            );
+                            TransacaoBancoRepository.registrarTransacaoNoBanco(ultimaTx, conta.getId(), conta.getSaldo(), idDestino, saldoDestino);
 
                             if (contaDestino != null) {
-                                Transacao txEntrada = new Transacao(
-                                        ultimaTx.getData(),
-                                        ultimaTx.getHora(),
-                                        valor,
-                                        categoria,
-                                        "ENTRADA",
-                                        metodo,
-                                        ultimaTx.getStatus(),
-                                        conta,
-                                        contaDestino
-                                );
-
+                                Transacao txEntrada = new Transacao(ultimaTx.getData(), ultimaTx.getHora(), valor, categoria, "ENTRADA", metodo, ultimaTx.getStatus(), conta, contaDestino);
                                 contaDestino.getExtrato().add(txEntrada);
                             }
                             JOptionPane.showMessageDialog(null, "Transação concluída com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
@@ -557,7 +496,6 @@ public class AplicacaoBancaria {
 
     public static void configuracoes(Usuario encontrado) {
         int config = 0;
-
         while (config != 5) {
             String stringConfig = JOptionPane.showInputDialog(
                     "==================================\n" +
@@ -610,9 +548,7 @@ public class AplicacaoBancaria {
                         encontrado.alterarDados(tipoDado, novoValor);
 
                         String valorParaOBanco = novoValor;
-                        if ("Senha".equalsIgnoreCase(tipoDado)) {
-                            valorParaOBanco = encontrado.getSenha();
-                        }
+                        if ("Senha".equalsIgnoreCase(tipoDado)) {valorParaOBanco = encontrado.getSenha();}
                         UsuarioBancoRepository.atualizarDadoNoBanco(encontrado.getId(), tipoDado, valorParaOBanco);
 
                         JOptionPane.showMessageDialog(null, tipoDado + " atualizado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);

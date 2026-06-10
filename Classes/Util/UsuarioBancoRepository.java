@@ -45,8 +45,9 @@ public class UsuarioBancoRepository {
 
     public static void salvarNoBanco(Usuario usuario) {
         String sql = "INSERT INTO usuario (nome, cpf, email, senha, data_nascimento, telefone, tipo_usuario, status_perfil, matricula) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
         try (Connection conn = ConexaoBanco.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, usuario.getNome());
             stmt.setString(2, usuario.getCpf());
@@ -62,7 +63,16 @@ public class UsuarioBancoRepository {
             } else {
                 stmt.setNull(9, Types.VARCHAR);
             }
+
             stmt.executeUpdate();
+
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    int idGerado = generatedKeys.getInt(1);
+                    usuario.setId(idGerado);
+                }
+            }
+
         } catch (SQLException e) {
             System.err.println("Erro ao salvar no banco: " + e.getMessage());
         }

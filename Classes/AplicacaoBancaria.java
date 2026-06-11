@@ -188,7 +188,7 @@ public class AplicacaoBancaria {
 
     public static void menuGestaoContas(Cliente encontrado) {
         while (true) {
-            if (encontrado.getStatus().equals(Status.INATIVO)) {return;}
+            if (encontrado.getStatus().equals(Status.INATIVO)) { return; }
             String stringMenu = JOptionPane.showInputDialog("=====  Menu de Contas  =====\n" +
                     "1 - Listar Contas\n" + "2 - Abrir Nova Conta\n" + "3 - Fechar Conta\n" +
                     "4 - Entrar com Conta\n" + "5 - Sair");
@@ -230,21 +230,33 @@ public class AplicacaoBancaria {
                     }
 
                     String[] opcoesFechar = new String[contas.size()];
-                    for (int i = 0; i < contas.size(); i++) {opcoesFechar[i] = " Conta: " + contas.get(i).getNumeroConta() + " [" + contas.get(i).getTipoConta() + "]";}
+                    for (int i = 0; i < contas.size(); i++) {
+                        opcoesFechar[i] = "Conta: " + contas.get(i).getNumeroConta().trim() + " [" + contas.get(i).getTipoConta() + "]";
+                    }
 
                     String contaFecharSel = SwingUtil.exibirMenuSelecao("Encerrar Conta", "Selecione a conta que deseja fechar permanentemente:", opcoesFechar);
                     if (contaFecharSel == null) { break; }
 
                     try {
-                        int id = Integer.parseInt(contaFecharSel.split(" ")[1]);
-                        Conta contaParaRemover = contas.get(id);
-                        boolean resultado = encontrado.fecharConta(contas.get(id));
+                        String numeroContaFechar = contaFecharSel.split("\\[")[0].replace("Conta:", "").trim();
+                        Conta contaParaRemover = null;
+                        for (Conta c : contas) {
+                            if (c.getNumeroConta().trim().equals(numeroContaFechar)) {
+                                contaParaRemover = c;
+                                break;
+                            }
+                        }
 
-                        if (resultado) {
-                            ContaBancoRepository.removerDoBanco(contaParaRemover.getNumeroConta());
-                            JOptionPane.showMessageDialog(null, "Conta encerrada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                        if (contaParaRemover != null) {
+                            boolean resultado = encontrado.fecharConta(contaParaRemover);
+                            if (resultado) {
+                                ContaBancoRepository.removerDoBanco(contaParaRemover.getNumeroConta());
+                                JOptionPane.showMessageDialog(null, "Conta encerrada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Falha ao fechar conta (Verifique se há saldo residual pendente).", "Erro", JOptionPane.ERROR_MESSAGE);
+                            }
                         } else {
-                            JOptionPane.showMessageDialog(null, "Falha ao fechar conta (Verifique se há saldo residual pendente).", "Erro", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(null, "Conta não encontrada na memória do sistema.");
                         }
                     } catch (Exception e) {
                         JOptionPane.showMessageDialog(null, "Erro ao processar o encerramento.");
@@ -258,17 +270,30 @@ public class AplicacaoBancaria {
                     }
 
                     String[] opcoesEntrar = new String[contas.size()];
-                    for (int i = 0; i < contas.size(); i++) {opcoesEntrar[i] = " Conta: " + contas.get(i).getNumeroConta() + " [" + contas.get(i).getTipoConta() + "]";}
+                    for (int i = 0; i < contas.size(); i++) {
+                        opcoesEntrar[i] = "Conta: " + contas.get(i).getNumeroConta().trim() + " [" + contas.get(i).getTipoConta() + "]";
+                    }
 
                     String contaEntrarSel = SwingUtil.exibirMenuSelecao("Acessar Conta", "Escolha em qual conta deseja entrar:", opcoesEntrar);
                     if (contaEntrarSel == null) { break; }
 
                     try {
-                        int id = Integer.parseInt(contaEntrarSel.split(" ")[1]);
-                        Conta contaSelecionada = contas.get(id);
-                        menuPrincipalCliente(contaSelecionada, encontrado);
+                        String numeroContaEntrar = contaEntrarSel.split("\\[")[0].replace("Conta:", "").trim();
+                        Conta contaSelecionada = null;
+                        for (Conta c : contas) {
+                            if (c.getNumeroConta().trim().equals(numeroContaEntrar)) {
+                                contaSelecionada = c;
+                                break;
+                            }
+                        }
+
+                        if (contaSelecionada != null) {
+                            menuPrincipalCliente(contaSelecionada, encontrado);
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Erro ao tentar acessar a conta selecionada.");
+                        }
                     } catch (Exception e) {
-                        JOptionPane.showMessageDialog(null, "Erro ao tentar acessar a conta selecionada.");
+                        JOptionPane.showMessageDialog(null, "Erro ao processar os dados da conta selecionada.");
                     }
                     break;
 

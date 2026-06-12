@@ -61,6 +61,32 @@ package "Util" #F9F9F9 {
         + atualizarUsuario(int id, String tipoDado, String novoValor) : void
     }
 
+    class ContaBancoRepository {
+        + carregarContas(cliente : cliente) : void
+        + salvarConta(conta : Conta) : boolean
+        + deletarConta(numeroConta : String) : void
+        + atualizarStatusConta(idConta : int, novoValor : Status) : void
+        + buscarContaDestino(cpfDestino : String, numeroContaDestino : String) : Conta
+    }
+
+    class InvestimentoBancoRepository {
+        + carregarInvestimentos(conta : conta) : void
+        + registrarInvestimento(conta : conta, produto : Investimento, valor : double, data : String) : boolean
+        + resgatarInvestimento(conta : conta, nomeProduto : String, valorAntigo : double) : void
+    }
+
+    class TransacaoBancoRepository {
+        + carregarTransacoes(contaAtual : conta, listaExtratoMemoria : ArrayList<Transacao>) : void
+        + registrarTransacao(t : Transacao, contaOrigemId : int, novoSaldoOrigem : double, contaDestinoId : int, novoSaldoDestino : double) : boolean
+    }
+
+    class CartaoBancoRepository {
+        + carregarCartoes(contaId : int, listaCartoesMemoria : ArrayList<Cartao>) : void
+        + salvarCartao(cartao : Cartao, contaId : int) : void
+        + atualizarBloqueioCartao(numeroCartao : String, estaBloqueado : boolean) : void
+        + atualizarLimiteCartao(numeroCartao : String, limiteTotal : double, limiteDisponivel : double) : void
+    }
+
     
 }
 

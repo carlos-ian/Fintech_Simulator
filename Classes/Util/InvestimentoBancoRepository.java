@@ -10,7 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class InvestimentoBancoRepository {
-    public static void registrarAplicacao(Conta conta, Investimento produto, double valor, String data) {
+    public static void registrarInvestimento(Conta conta, Investimento produto, double valor, String data) {
         String sqlAplicacao = "INSERT INTO investimento_conta (conta_id, nome_produto, valor_aplicado, data_aplicacao) VALUES (?, ?, ?, ?)";
         String sqlAtualizarSaldo = "UPDATE conta SET saldo = ? WHERE id = ?";
 
@@ -38,7 +38,7 @@ public class InvestimentoBancoRepository {
         }
     }
 
-    public static void registrarResgate(Conta conta, String nomeProduto, double valorAntigo) {
+    public static void resgatarInvestimento(Conta conta, String nomeProduto, double valorAntigo) {
         String sqlDeletar = "DELETE FROM investimento_conta WHERE id = " +
                 "(SELECT id FROM investimento_conta WHERE conta_id = ? AND nome_produto = ? AND valor_aplicado = ? LIMIT 1)";
         String sqlAtualizarSaldo = "UPDATE conta SET saldo = ? WHERE id = ?";
@@ -66,7 +66,7 @@ public class InvestimentoBancoRepository {
         }
     }
 
-    public static void carregarInvestimentosDaConta(Conta conta) {
+    public static void carregarInvestimentos(Conta conta) {
         conta.getListaInvestimentos().clear();
         String sql = "SELECT id, nome_produto, valor_aplicado, data_aplicacao FROM investimento_conta WHERE conta_id = ?";
 

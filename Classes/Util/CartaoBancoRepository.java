@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class CartaoBancoRepository {
 
-    public static void salvarNoBanco(Cartao cartao, int contaId) {
+    public static void salvarCartao(Cartao cartao, int contaId) {
         String sql = "INSERT INTO cartao (numero_cartao, titular, tipo_cartao, limite_total, limite_disponivel, esta_bloqueado, conta_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = ConexaoBanco.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -25,7 +25,7 @@ public class CartaoBancoRepository {
         }
     }
 
-    public static void atualizarBloqueioNoBanco(String numeroCartao, boolean estaBloqueado) {
+    public static void atualizarBloqueioCartao(String numeroCartao, boolean estaBloqueado) {
         String sql = "UPDATE cartao SET esta_bloqueado = ? WHERE numero_cartao = ?";
         try (Connection conn = ConexaoBanco.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -38,7 +38,7 @@ public class CartaoBancoRepository {
         }
     }
 
-    public static void atualizarLimitesNoBanco(String numeroCartao, double limiteTotal, double limiteDisponivel) {
+    public static void atualizarLimitesCartao(String numeroCartao, double limiteTotal, double limiteDisponivel) {
         String sql = "UPDATE cartao SET limite_total = ?, limite_disponivel = ? WHERE numero_cartao = ?";
         try (Connection conn = ConexaoBanco.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -52,7 +52,7 @@ public class CartaoBancoRepository {
         }
     }
 
-    public static void carregarCartoesDaConta(int contaId, ArrayList<Cartao> listaCartoesMemoria) {
+    public static void carregarCartoes(int contaId, ArrayList<Cartao> listaCartoesMemoria) {
         String sql = "SELECT * FROM cartao WHERE conta_id = ?";
         try (Connection conn = ConexaoBanco.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

@@ -4,15 +4,15 @@ import Classes.Model.Conta.Conta;
 import Classes.Model.Conta.ContaCorrente;
 import Classes.Model.Conta.ContaInvestimento;
 import Classes.Model.Conta.ContaKids;
-import Classes.Model.Operacoes.Status;
 import Classes.Model.Usuario.Cliente;
+import Classes.Model.Operacoes.Status;
 
 import java.sql.*;
 import java.util.ArrayList;
 
 public class ContaBancoRepository {
 
-    public static void salvarNoBanco(Conta conta, int usuarioId) {
+    public static void salvarConta(Conta conta, int usuarioId) {
         String sql = "INSERT INTO conta (numero_conta, agencia, saldo, tipo_conta, status_conta, " +
                 "limite_cheque_especial, cpf_responsavel, limite_mensal, titular_cpf, usuario_id) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -43,12 +43,11 @@ public class ContaBancoRepository {
             stmt.setInt(10, usuarioId);
             stmt.executeUpdate();
 
-        } catch (SQLException e) {System.err.println("Erro ao salvar conta no banco: " + e.getMessage());}
+        } catch (SQLException e) { System.err.println("Erro ao salvar conta no banco: " + e.getMessage()); }
     }
 
-    public static void carregarContasDoCliente(Cliente cliente) {
+    public static void carregarContas(Cliente cliente) {
         String sql = "SELECT * FROM conta WHERE usuario_id = ?";
-
         cliente.obterContas().clear();
 
         try (Connection conn = ConexaoBanco.conectar();
@@ -58,7 +57,6 @@ public class ContaBancoRepository {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     int idContaBanco = rs.getInt("id");
-
                     String tipo = rs.getString("tipo_conta");
                     String num = rs.getString("numero_conta");
                     String ag = rs.getString("agencia");
@@ -76,36 +74,29 @@ public class ContaBancoRepository {
 
                     ArrayList<Conta> contas = cliente.obterContas();
                     if (!contas.isEmpty()) {
-                        contas.get(contas.size() - 1).setId(idContaBanco);
-                        contas.get(contas.size() - 1).setStatus(Status.valueOf(rs.getString("status_conta")));
-                        CartaoBancoRepository.carregarCartoesDaConta(idContaBanco, contas.get(contas.size() - 1).getCartoes()); // <--- ADICIONADO AQUI
-
                         Conta contaRecemCarregada = contas.get(contas.size() - 1);
                         contaRecemCarregada.setId(idContaBanco);
                         contaRecemCarregada.setStatus(Status.valueOf(rs.getString("status_conta")));
 
-                        InvestimentoBancoRepository.carregarInvestimentosDaConta(contaRecemCarregada);
-                        TransacaoBancoRepository.carregarTransacoesDaConta(contaRecemCarregada, contaRecemCarregada.getExtrato());
+                        CartaoBancoRepository.carregarCartoes(idContaBanco, contaRecemCarregada.getCartoes());
+                        InvestimentoBancoRepository.carregarInvestimentos(contaRecemCarregada);
+                        TransacaoBancoRepository.carregarTransacoes(contaRecemCarregada, contaRecemCarregada.getExtrato());
                     }
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("Erro ao carregar contas do cliente: " + e.getMessage());
-        }
+        } catch (SQLException e) { System.err.println("Erro ao carregar contas do cliente: " + e.getMessage()); }
     }
 
-    public static void removerDoBanco(String numeroConta) {
+    public static void deletarConta(String numeroConta) {
         String sql = "DELETE FROM conta WHERE numero_conta = ?";
         try (Connection conn = ConexaoBanco.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, numeroConta);
             stmt.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("Erro ao deletar conta do banco: " + e.getMessage());
-        }
+        } catch (SQLException e) { System.err.println("Erro ao deletar conta do banco: " + e.getMessage()); }
     }
 
-    public static Conta buscarContaDestinoNoBanco(String cpfDestino, String numeroContaDestino) {
+    public static Conta buscarContaDestino(String cpfDestino, String numeroContaDestino) {
         String sql = "SELECT c.* FROM conta c " +
                 "JOIN usuario u ON c.usuario_id = u.id " +
                 "WHERE u.cpf = ? AND c.numero_conta = ?";
@@ -127,13 +118,13 @@ public class ContaBancoRepository {
                     Conta contaDest = null;
 
                     if (tipo.equalsIgnoreCase("Conta Corrente")) {
-                        contaDest = new Classes.Model.Conta.ContaCorrente(num, ag, sal, "Conta Corrente",rs.getDouble("limite_cheque_especial"));
+                        contaDest = new Classes.Model.Conta.ContaCorrente(num, ag, sal, "Conta Corrente", rs.getDouble("limite_cheque_especial"));
                     } else if (tipo.equalsIgnoreCase("Conta Poupança")) {
                         contaDest = new Classes.Model.Conta.ContaPoupanca(num, ag, sal, "Conta Poupança");
                     } else if (tipo.equalsIgnoreCase("Conta Kids")) {
-                        contaDest = new Classes.Model.Conta.ContaKids(num, ag, sal, "Conta Kids",rs.getString("cpf_responsavel"), rs.getDouble("limite_mensal"));
+                        contaDest = new Classes.Model.Conta.ContaKids(num, ag, sal, "Conta Kids", rs.getString("cpf_responsavel"), rs.getDouble("limite_mensal"));
                     } else if (tipo.equalsIgnoreCase("Conta Investimento")) {
-                        contaDest = new Classes.Model.Conta.ContaInvestimento(num, ag, sal, "Conta Investimento",rs.getString("titular_cpf"));
+                        contaDest = new Classes.Model.Conta.ContaInvestimento(num, ag, sal, "Conta Investimento", rs.getString("titular_cpf"));
                     }
 
                     if (contaDest != null) {
@@ -145,13 +136,11 @@ public class ContaBancoRepository {
                     return contaDest;
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("Erro ao buscar conta de destino: " + e.getMessage());
-        }
+        } catch (SQLException e) { System.err.println("Erro ao buscar conta de destino: " + e.getMessage()); }
         return null;
     }
 
-    public static void atualizarStatusContaNoBanco(int idConta, Classes.Model.Operacoes.Status novoStatus) {
+    public static void atualizarStatusConta(int idConta, Classes.Model.Operacoes.Status novoStatus) {
         String sql = "UPDATE conta SET status_conta = ? WHERE id = ?";
         try (Connection conn = ConexaoBanco.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -161,8 +150,6 @@ public class ContaBancoRepository {
             stmt.executeUpdate();
             System.out.println("Status da conta ID " + idConta + " atualizado para " + novoStatus.name() + " no banco.");
 
-        } catch (SQLException e) {
-            System.err.println("Erro ao atualizar status da conta no banco: " + e.getMessage());
-        }
+        } catch (SQLException e) { System.err.println("Erro ao atualizar status da conta no banco: " + e.getMessage()); }
     }
 }

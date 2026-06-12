@@ -60,7 +60,9 @@ public class Investimento {
         }
 
         double valorParaDevolver = investimentoEncontrado.valorAplicado;
+
         conta.setSaldo(conta.getSaldo() + valorParaDevolver);
+        conta.getListaInvestimentos().remove(investimentoEncontrado);
 
         System.out.printf("Resgate de R$ %.2f do produto '%s' realizado com sucesso!\n",
                 valorParaDevolver, investimentoEncontrado.nomeProduto);

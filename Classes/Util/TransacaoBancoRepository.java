@@ -6,7 +6,7 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class TransacaoBancoRepository {
-    public static void registrarTransacaoNoBanco(Transacao t, int contaOrigemId, double novoSaldoOrigem, Integer contaDestinoId, Double novoSaldoDestino) {
+    public static void registrarTransacao(Transacao t, int contaOrigemId, double novoSaldoOrigem, Integer contaDestinoId, Double novoSaldoDestino) {
         String sqlTransacao = "INSERT INTO transacao (data_transacao, hora_transacao, valor, categoria, tipo_fluxo, metodo_pagamento, status, conta_origem_id, conta_destino_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlAtualizarSaldo = "UPDATE conta SET saldo = ? WHERE id = ?";
 
@@ -69,7 +69,7 @@ public class TransacaoBancoRepository {
         }
     }
 
-    public static void carregarTransacoesDaConta(Conta contaAtual, ArrayList<Transacao> listaExtratoMemoria) {
+    public static void carregarTransacoes(Conta contaAtual, ArrayList<Transacao> listaExtratoMemoria) {
         String sql = "SELECT * FROM transacao WHERE conta_origem_id = ?";
         try (Connection conn = ConexaoBanco.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

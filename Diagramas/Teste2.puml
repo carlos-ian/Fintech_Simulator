@@ -1,0 +1,54 @@
+@startuml
+skinparam classAttributeIconSize 0
+left to right direction
+
+package "Módulo Usuários" #EBF5FB {
+    enum Status {
+        ATIVO
+        INATIVO
+    }
+
+    abstract class Usuario {
+        # id : int
+        # nome : String
+        # cpf : String
+        # email : String
+        # senha : String
+        # statusPerfil : Status
+        --
+        + {static} autenticar(cpf : String, senha : String) : Usuario
+        + encerrarPerfil(u : Usuario, senha : String) : void
+    }
+
+    class Cliente {
+        ~ listaContas : ArrayList<Conta>
+        --
+        + abrirConta(...) : void
+        + fecharConta(conta : Conta) : boolean
+        + obterContas() : ArrayList<Conta>
+    }
+
+    class Administrador {
+        - matricula : String
+        --
+        + consultarCliente(...) : Cliente
+        + desativarConta(conta : Conta) : boolean
+        + visualizarHistoricoConta(conta : Conta) : ArrayList<Transacao>
+    }
+    
+    Cliente -up-|> Usuario
+    Administrador -up-|> Usuario
+    Usuario --> Status : possui
+}
+
+' Classes de Fronteira (Stubs para manter a consistência)
+package "Módulo Contas Bancárias" #FEF9E7 {
+    class Conta <<external>> {
+        # numeroConta : String
+    }
+    class Transacao <<external>> {}
+}
+
+Cliente "1" o-- "0..*" Conta 
+Administrador ..> Transacao : visualiza histórico
+@enduml

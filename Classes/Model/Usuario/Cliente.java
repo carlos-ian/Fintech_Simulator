@@ -64,6 +64,9 @@ public class Cliente extends Usuario {
     }
 
     public boolean fecharConta(Conta conta) {
+        if (conta == null || conta.getSaldo() != 0) {
+            return false;
+        }
         return listaContas.remove(conta);
     }
 

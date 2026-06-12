@@ -17,7 +17,7 @@ public class AplicacaoBancaria {
     public static ArrayList<Usuario> ListaUsuarios = new ArrayList<>();
     public static ArrayList<Investimento> investimentosDisponiveis = new ArrayList<>();
     private static YearMonth ultimaAplicacaoRendimento = YearMonth.now().minusMonths(1);
-    private static final int DIA_ROTINA = 5;
+    private static final int DIA_ROTINA = 12;
 
     public static void main(String[] args) {
         AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("CDB Pós-Fixado", 11.5, 0, null));
@@ -322,7 +322,7 @@ public class AplicacaoBancaria {
                 dados = SwingUtil.exibirFormulario("Nova Conta Kids", null, "Número da Conta:", "Agência:", "Saldo Inicial:", "CPF do Responsável Legal:", "Limite de Movimentação Mensal:");
                 break;
             default:
-                dados = SwingUtil.exibirFormulario("Nova Conta Investimento", null, "Número da Conta:", "Agência:", "CPF do Titular:");
+                dados = SwingUtil.exibirFormulario("Nova Conta Investimento", null, "Número da Conta:", "Agência:", "Saldo Inicial:", "CPF do Titular:");
                 break;
         }
 
@@ -721,6 +721,7 @@ public class AplicacaoBancaria {
                 case 5:
                     JOptionPane.showMessageDialog(null, cartaoSelecionado.visualizarLimites(), "Limites Comerciais", JOptionPane.INFORMATION_MESSAGE);
                     break;
+
 
                 case 6:
                     String[] novoLimiteForm = SwingUtil.exibirFormulario("Ajuste de Limite", "Solicitação de alteração de linha de crédito:", "Informe o novo limite total desejado:");

@@ -10,6 +10,9 @@ package "Módulo Core" #F9F9F9 {
         - {static} {final} DIA_ROTINA : int = 5
         
         + {static} main(args : String[]) : void
+        - {static} inicializarCatalogoInvestimentos() : void
+        - {static} verificarRotinas(): void
+        
         + {static} menuInicial():  void
         - {static} Login() : void
         - {static} Cadastro() : void

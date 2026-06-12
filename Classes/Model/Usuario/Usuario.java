@@ -31,10 +31,9 @@ public abstract class Usuario {
     }
 
     public static Usuario autenticar(String cpf, String senha) {
-
-        for (Usuario u : AplicacaoBancaria.ListaUsuarios) {
+        for (Usuario u : AplicacaoBancaria.listaUsuarios) {
             if (u.getCpf().equals(cpf)) {
-                if(BCrypt.checkpw(senha, u.getSenha())) {
+                if (BCrypt.checkpw(senha, u.getSenha())) {
                     return u;
                 }
             }
@@ -60,7 +59,7 @@ public abstract class Usuario {
                 throw new IllegalStateException("Não é possível encerrar: o cliente possui saldo em conta.");
             }
         }
-        AplicacaoBancaria.ListaUsuarios.remove(u);
+        AplicacaoBancaria.listaUsuarios.remove(u);
     }
 
     public void alterarDados(String tipoDado, String novoValor) {

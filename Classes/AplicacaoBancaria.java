@@ -14,40 +14,57 @@ import java.time.YearMonth;
 import java.util.ArrayList;
 
 public class AplicacaoBancaria {
-    public static ArrayList<Usuario> ListaUsuarios = new ArrayList<>();
+    public static ArrayList<Usuario> listaUsuarios = new ArrayList<>();
     public static ArrayList<Investimento> investimentosDisponiveis = new ArrayList<>();
     private static YearMonth ultimaAplicacaoRendimento = YearMonth.now().minusMonths(1);
     private static final int DIA_ROTINA = 12;
 
     public static void main(String[] args) {
-        AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("CDB Pós-Fixado", 11.5, 0, null));
-        AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("LCI Isento", 9.8, 0, null));
-        AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("Tesouro IPCA+", 6.2, 0, null));
-        AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("Fundo de Ações", 18.5, 0, null));
-        AplicacaoBancaria.investimentosDisponiveis.add(new Investimento("Poupança", 6.17, 0, null));
+        inicializarCatalogoInvestimentos();
+        UsuarioBancoRepository.carregarUsuarios(listaUsuarios);
+        verificarRotinas();
+        AplicacaoBancaria.menuInicial();
+    }
 
-        UsuarioBancoRepository.carregarUsuariosParaMemoria(AplicacaoBancaria.ListaUsuarios);
+    // --------- Metodos Auxiliares --------
+    private static void inicializarCatalogoInvestimentos() {
+        investimentosDisponiveis.add(new Investimento("CDB Pós-Fixado", 11.5, 0, null));
+        investimentosDisponiveis.add(new Investimento("LCI Isento", 9.8, 0, null));
+        investimentosDisponiveis.add(new Investimento("Tesouro IPCA+", 6.2, 0, null));
+        investimentosDisponiveis.add(new Investimento("Fundo de Ações", 18.5, 0, null));
+        investimentosDisponiveis.add(new Investimento("Poupança", 6.17, 0, null));
+    }
 
+    private static void verificarRotinas() {
         java.time.LocalDate hoje = java.time.LocalDate.now();
         YearMonth mesAtual = YearMonth.now();
 
         if (hoje.getDayOfMonth() == DIA_ROTINA && !mesAtual.equals(ultimaAplicacaoRendimento)) {
-            for (Usuario usuario : AplicacaoBancaria.ListaUsuarios) {
-                if (usuario instanceof Cliente) { Cliente cliente = (Cliente) usuario;
+            for (Usuario usuario : listaUsuarios) {
+                if (usuario instanceof Cliente) {
+                    Cliente cliente = (Cliente) usuario;
 
                     for (Conta conta : cliente.obterContas()) {
-                        if (conta instanceof ContaPoupanca) {((ContaPoupanca) conta).aplicarRendimento();}
-                        if (conta instanceof ContaKids) {((ContaKids) conta).resetarMes();}
-                        if (conta.getListaInvestimentos() != null && conta.getListaInvestimentos().isEmpty()) {
-                            for (Investimento inv : conta.getListaInvestimentos()) {inv.aplicarRendimento();}
+                        if (conta instanceof ContaPoupanca) { ((ContaPoupanca) conta).aplicarRendimento(); }
+                        if (conta instanceof ContaKids) { ((ContaKids) conta).resetarMes(); }
+
+                        if (conta.getListaInvestimentos() != null && !conta.getListaInvestimentos().isEmpty()) {
+                            for (Investimento inv : conta.getListaInvestimentos()) {
+                                inv.aplicarRendimento();
+                            }
                         }
                     }
                 }
-                ultimaAplicacaoRendimento = mesAtual;
             }
+            ultimaAplicacaoRendimento = mesAtual;
         }
-        AplicacaoBancaria.menuInicial();
     }
+
+
+
+    // -------- Metodos Menus ---------------
+
+
 
     public static void menuInicial() {
         while (true) {
@@ -59,7 +76,10 @@ public class AplicacaoBancaria {
                             "2 - Criar Perfil de Usuário\n" +
                             "3 - Sair\n");
 
-            if (stringMenu == null) {System.out.println("--- ENCERRANDO SISTEMA ---"); return;}
+            if (stringMenu == null) {
+                JOptionPane.showMessageDialog(null, "--- ENCERRANDO SISTEMA ---");
+                return;
+            }
 
             int menu;
             try {
@@ -72,12 +92,12 @@ public class AplicacaoBancaria {
             switch (menu) {
                 case 1:
                     String loginTipo = SwingUtil.exibirMenuSelecao("Identificação de Login", "Quem é você?", "Sou Cliente", "Sou Administrador");
-                    if (loginTipo != null) {Login(loginTipo);}
+                    if (loginTipo != null) { Login(loginTipo); }
                     break;
 
                 case 2:
                     String tipoCadastro = SwingUtil.exibirMenuSelecao("Criação de Perfil", "Qual perfil deseja-se criar?", "Perfil para Cliente", "Perfil para Administrador");
-                    if (tipoCadastro != null) {Cadastro(tipoCadastro);}
+                    if (tipoCadastro != null) { Cadastro(tipoCadastro); }
                     break;
 
                 case 3:
@@ -96,7 +116,7 @@ public class AplicacaoBancaria {
             String tipoPerfil = perfilSelecionado.equals("Sou Cliente") ? "Cliente" : "Administrador";
 
             String[] dados = SwingUtil.exibirFormulario("Autenticação de Segurança - " + tipoPerfil, "Entre com as suas credenciais de acesso:", "CPF:", "Senha:");
-            if (dados == null) { System.out.println("Login cancelado."); break; }
+            if (dados == null) { break; }
 
             String cpf = dados[0].trim();
             String senha = dados[1].trim();
@@ -113,13 +133,14 @@ public class AplicacaoBancaria {
             }
 
             if (encontrado.getStatus() == Status.INATIVO) {
-                int resposta = JOptionPane.showConfirmDialog(null,
+                String[] opcoes = {"Sim", "Não"};
+                int resposta = JOptionPane.showOptionDialog(null,
                         "Seu perfil está atualmente INATIVO.\nDeseja reativar seu perfil para acessar a aplicação?",
-                        "Perfil Inativo", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                        "Perfil Inativo", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, opcoes, opcoes[0]);
 
                 if (resposta == JOptionPane.YES_OPTION) {
                     encontrado.setStatus(Status.ATIVO);
-                    UsuarioBancoRepository.atualizarStatusNoBanco(encontrado.getId(), Status.ATIVO);
+                    UsuarioBancoRepository.atualizarUsuario(encontrado.getId(), "Status", Status.ATIVO.name());
                     JOptionPane.showMessageDialog(null, "Perfil reativado com sucesso! Prossiga com o acesso.");
                 } else {
                     JOptionPane.showMessageDialog(null, "Acesso negado. É necessário ativar o perfil para entrar.", "Aviso", JOptionPane.WARNING_MESSAGE);
@@ -150,7 +171,7 @@ public class AplicacaoBancaria {
                         "Nome:", "CPF:", "Telefone:", "Data de Nascimento (dd/mm/aaaa):", "E-mail:", "Senha:", "Matrícula:");
             }
 
-            if (dados == null) { System.out.println("Cadastro cancelado."); break; }
+            if (dados == null) { break; }
 
             boolean temCampoVazio = false;
             for (String campo : dados) {
@@ -168,23 +189,46 @@ public class AplicacaoBancaria {
             String dataNascimento = dados[3].trim();
             String email = dados[4].trim();
             String senha = dados[5].trim();
+
+            boolean duplicado = false;
+            for (Usuario u : AplicacaoBancaria.listaUsuarios) {
+                if (u.getCpf().equals(cpf) || u.getEmail().equalsIgnoreCase(email)) {
+                    duplicado = true;
+                    break;
+                }
+            }
+
+            if (duplicado) {
+                JOptionPane.showMessageDialog(null, "CPF ou E-mail já cadastrados no sistema!", "Erro", JOptionPane.ERROR_MESSAGE);
+                continue;
+            }
+
             String senhaCriptografada = BCrypt.hashpw(senha, BCrypt.gensalt(12));
 
             if (ehCliente) {
                 Cliente cliente = new Cliente(nome, cpf, email, senhaCriptografada, dataNascimento, telefone, "Cliente");
-                AplicacaoBancaria.ListaUsuarios.add(cliente);
-                UsuarioBancoRepository.salvarNoBanco(cliente);
+                if (UsuarioBancoRepository.salvarUsuario(cliente)) {
+                    AplicacaoBancaria.listaUsuarios.add(cliente);
+                    JOptionPane.showMessageDialog(null, "Perfil Criado com Sucesso!");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Erro ao salvar o perfil no banco de dados. Tente novamente.", "Erro", JOptionPane.ERROR_MESSAGE);
+                }
             } else {
                 String matricula = dados[6].trim();
                 Administrador administrador = new Administrador(nome, cpf, email, senhaCriptografada, dataNascimento, telefone, "Administrador", matricula);
-                AplicacaoBancaria.ListaUsuarios.add(administrador);
-                UsuarioBancoRepository.salvarNoBanco(administrador);
+                if (UsuarioBancoRepository.salvarUsuario(administrador)) {
+                    AplicacaoBancaria.listaUsuarios.add(administrador);
+                    JOptionPane.showMessageDialog(null, "Perfil Criado com Sucesso!");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Erro ao salvar o perfil no banco de dados. Tente novamente.", "Erro", JOptionPane.ERROR_MESSAGE);
+                }
             }
-
-            JOptionPane.showMessageDialog(null, "Perfil Criado com Sucesso!");
             break;
         }
     }
+
+
+
 
     public static void menuGestaoContas(Cliente encontrado) {
         while (true) {
@@ -548,7 +592,7 @@ public class AplicacaoBancaria {
 
                     try {
                         encontrado.encerrarPerfil(encontrado, confirmacaoExclusao[0]);
-                        UsuarioBancoRepository.deletarNoBanco(encontrado.getId());
+                        UsuarioBancoRepository.deletarUsuario(encontrado.getId());
                         JOptionPane.showMessageDialog(null, "Perfil excluído com sucesso. Desconectando do sistema...", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                         System.exit(0);
                     } catch (Exception e) {
@@ -574,7 +618,7 @@ public class AplicacaoBancaria {
 
                         String valorParaOBanco = novoValor;
                         if ("Senha".equalsIgnoreCase(tipoDado)) {valorParaOBanco = encontrado.getSenha();}
-                        UsuarioBancoRepository.atualizarDadoNoBanco(encontrado.getId(), tipoDado, valorParaOBanco);
+                        UsuarioBancoRepository.atualizarUsuario(encontrado.getId(), tipoDado, valorParaOBanco);
 
                         JOptionPane.showMessageDialog(null, tipoDado + " atualizado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                     } catch (IllegalArgumentException e) {
@@ -599,7 +643,7 @@ public class AplicacaoBancaria {
                         }
 
                         encontrado.setStatus(novoStatus);
-                        UsuarioBancoRepository.atualizarStatusNoBanco(encontrado.getId(), novoStatus);
+                        UsuarioBancoRepository.atualizarUsuario(encontrado.getId(), "Status", Status.ATIVO.name());
                         JOptionPane.showMessageDialog(null, "Status alterado para " + statusEscolhido + " com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
 
                         if (novoStatus == Status.INATIVO) {
@@ -731,7 +775,7 @@ public class AplicacaoBancaria {
                         double novoLimite = Double.parseDouble(novoLimiteForm[0].replace(",", "."));
 
                         Administrador admSistema = null;
-                        for (Usuario u : AplicacaoBancaria.ListaUsuarios) {
+                        for (Usuario u : AplicacaoBancaria.listaUsuarios) {
                             if (u instanceof Administrador) {
                                 admSistema = (Administrador) u;
                                 break;
@@ -958,7 +1002,7 @@ public class AplicacaoBancaria {
 
                     if (acaoCliente == 0) {
                         boolean mudou = admin.ativarPerfilCliente(clienteEncontrado);
-                        UsuarioBancoRepository.atualizarStatusNoBanco(clienteEncontrado.getId(), clienteEncontrado.getStatus());
+                        UsuarioBancoRepository.atualizarUsuario(clienteEncontrado.getId(), "Status", clienteEncontrado.getStatus().name());
                         JOptionPane.showMessageDialog(null, mudou ? "Perfil ativado com sucesso!" : "O perfil já estava ativo.");
                     } else if (acaoCliente == 1) {
                             Justificativa motivoSel = (Justificativa) JOptionPane.showInputDialog(
@@ -973,7 +1017,7 @@ public class AplicacaoBancaria {
 
                             if (motivoSel != null) {
                                 boolean mudou = admin.desativarPerfilCliente(clienteEncontrado, motivoSel);
-                                UsuarioBancoRepository.atualizarStatusNoBanco(clienteEncontrado.getId(), clienteEncontrado.getStatus());
+                                UsuarioBancoRepository.atualizarUsuario(clienteEncontrado.getId(), "Status", clienteEncontrado.getStatus().name());
                                 JOptionPane.showMessageDialog(null, mudou ? "Perfil desativado com sucesso!" : "O perfil já estava inativo.");
                             }
                         }
@@ -1052,7 +1096,7 @@ public class AplicacaoBancaria {
                     ArrayList<Conta> todasContas = new ArrayList<>();
                     ArrayList<Transacao> todasTransacoes = new ArrayList<>();
 
-                    for (Usuario u : AplicacaoBancaria.ListaUsuarios) {
+                    for (Usuario u : AplicacaoBancaria.listaUsuarios) {
                         if (u instanceof Cliente) {
                             Cliente c = (Cliente) u;
                             todosClientes.add(c);

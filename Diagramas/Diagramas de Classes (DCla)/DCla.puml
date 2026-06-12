@@ -9,9 +9,13 @@ package "Módulo Core" #F9F9F9 {
         + {static} ListaUsuarios : ArrayList<Usuario>
         + {static} investimentosDisponiveis : ArrayList<Investimento>
         - {static} ultimaAplicacaoInvestimento : YearMonth
-        - {static} {final} DIA_ROTINA : int = 5
+        - {static} {final} DIA_ROTINA : int = 12
         
         + {static} main(args : String[]) : void
+        - {static} inicializarCatalogoInvestimentos() : void
+        - {static} verificarRotinas(): void
+
+
         + {static} menuInicial():  void
         - {static} Login() : void
         - {static} Cadastro() : void
@@ -49,6 +53,14 @@ package "Util" #F9F9F9 {
     + {static} exibirMenuBotoes(titulo : String, mensagem : String, botoes : String...) : int
     + {static} exibirFormularioTransacao(cartoes : ArrayList<Cartao>) : Object[]
 }
+
+    class UsuarioBancoRepository {
+        + carregarUsuarios(listaMemoria : ArrayList<Usuario>) : void
+        + salvarUsuario(usuario : usuario) : boolean
+        + deletarUsuario(int id) : void
+        + atualizarUsuario(int id, String tipoDado, String novoValor) : void
+    }
+
     
 }
 

@@ -9,7 +9,7 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class UsuarioBancoRepository {
-    public static void carregarUsuariosParaMemoria(ArrayList<Usuario> listaMemoria) {
+    public static void carregarUsuarios(ArrayList<Usuario> listaMemoria) {
         String sql = "SELECT * FROM usuario";
         try (Connection conn = ConexaoBanco.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -43,7 +43,19 @@ public class UsuarioBancoRepository {
         }
     }
 
-    public static void salvarNoBanco(Usuario usuario) {
+    public static void deletarUsuario(int id) {
+        String sql = "DELETE FROM usuario WHERE id = ?";
+        try (Connection conn = ConexaoBanco.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+            System.out.println("Usuário removido do banco com sucesso.");
+        } catch (SQLException e) {
+            System.err.println("Erro ao deletar usuário do banco: " + e.getMessage());
+        }
+    }
+
+    public static boolean salvarUsuario(Usuario usuario) {
         String sql = "INSERT INTO usuario (nome, cpf, email, senha, data_nascimento, telefone, tipo_usuario, status_perfil, matricula) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = ConexaoBanco.conectar();
@@ -72,25 +84,15 @@ public class UsuarioBancoRepository {
                     usuario.setId(idGerado);
                 }
             }
+            return true;
 
         } catch (SQLException e) {
             System.err.println("Erro ao salvar no banco: " + e.getMessage());
+            return false;
         }
     }
 
-    public static void deletarNoBanco(int id) {
-        String sql = "DELETE FROM usuario WHERE id = ?";
-        try (Connection conn = ConexaoBanco.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
-            System.out.println("Usuário removido do banco com sucesso.");
-        } catch (SQLException e) {
-            System.err.println("Erro ao deletar usuário do banco: " + e.getMessage());
-        }
-    }
-
-    public static void atualizarDadoNoBanco(int id, String tipoDado, String novoValor) {
+    public static void atualizarUsuario(int id, String tipoDado, String novoValor) {
         String colunaSql = "";
         if ("Nome".equalsIgnoreCase(tipoDado)) {
             colunaSql = "nome";
@@ -104,6 +106,8 @@ public class UsuarioBancoRepository {
             colunaSql = "telefone";
         } else if ("DataNascimento".equalsIgnoreCase(tipoDado)) {
             colunaSql = "data_nascimento";
+        } else if ("Status".equalsIgnoreCase(tipoDado)) {
+            colunaSql = "status_perfil";
         } else {
             return;
         }
@@ -114,22 +118,9 @@ public class UsuarioBancoRepository {
             stmt.setString(1, novoValor);
             stmt.setInt(2, id);
             stmt.executeUpdate();
-            System.out.println("Coluna " + colunaSql + " atualizada no banco.");
+            System.out.println("Coluna " + colunaSql + " updated no banco.");
         } catch (SQLException e) {
             System.err.println("Erro ao atualizar dado no banco: " + e.getMessage());
-        }
-    }
-
-    public static void atualizarStatusNoBanco(int id, Status novoStatus) {
-        String sql = "UPDATE usuario SET status_perfil = ? WHERE id = ?";
-        try (Connection conn = ConexaoBanco.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, novoStatus.name());
-            stmt.setInt(2, id);
-            stmt.executeUpdate();
-            System.out.println("Status atualizado para " + novoStatus.name() + " no banco.");
-        } catch (SQLException e) {
-            System.err.println("Erro ao atualizar status no banco: " + e.getMessage());
         }
     }
 }

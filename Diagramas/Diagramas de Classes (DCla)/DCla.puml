@@ -84,7 +84,7 @@ package "Util" #F9F9F9 {
 
     class CartaoBancoRepository {
         + carregarCartoes(contaId : int, listaCartoesMemoria : ArrayList<Cartao>) : void
-        + salvarCartao(cartao : Cartao, contaId : int) : void
+        + salvarCartao(cartao : Cartao, contaId : int) : boolean
         + atualizarBloqueioCartao(numeroCartao : String, estaBloqueado : boolean) : void
         + atualizarLimiteCartao(numeroCartao : String, limiteTotal : double, limiteDisponivel : double) : void
     }

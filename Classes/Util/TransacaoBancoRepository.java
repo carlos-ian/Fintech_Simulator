@@ -6,7 +6,7 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class TransacaoBancoRepository {
-    public static void registrarTransacao(Transacao t, int contaOrigemId, double novoSaldoOrigem, Integer contaDestinoId, Double novoSaldoDestino) {
+    public static boolean registrarTransacao(Transacao t, int contaOrigemId, double novoSaldoOrigem, Integer contaDestinoId, Double novoSaldoDestino) {
         String sqlTransacao = "INSERT INTO transacao (data_transacao, hora_transacao, valor, categoria, tipo_fluxo, metodo_pagamento, status, conta_origem_id, conta_destino_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlAtualizarSaldo = "UPDATE conta SET saldo = ? WHERE id = ?";
 
@@ -61,9 +61,11 @@ public class TransacaoBancoRepository {
             }
 
             conn.commit();
+            return true;
         } catch (SQLException e) {
             if (conn != null) { try { conn.rollback(); } catch (SQLException ex) {} }
             System.err.println("Erro ao registrar transação: " + e.getMessage());
+            return false;
         } finally {
             if (conn != null) { try { conn.close(); } catch (SQLException e) {} }
         }

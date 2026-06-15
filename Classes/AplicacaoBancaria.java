@@ -536,23 +536,32 @@ public class AplicacaoBancaria {
                             break;
                         }
 
-                        boolean sucesso = conta.realizarTransacao(valor, metodo, cartaoEscolhido, categoria, contaDestino);
-                        if (sucesso) {
-                            ArrayList<Transacao> extratoAtual = conta.getExtrato();
-                            Transacao ultimaTx = extratoAtual.get(extratoAtual.size() - 1);
+                        Integer idDestino = contaDestino.getId();
+                        Double saldoDestino = contaDestino.getSaldo() + valor;
+                        Double novoSaldoOrigem = conta.getSaldo() - valor;
 
-                            Integer idDestino = (contaDestino != null) ? contaDestino.getId() : null;
-                            Double saldoDestino = (contaDestino != null) ? contaDestino.getSaldo() : null;
+                        String dataAtual = java.time.LocalDate.now().toString();
+                        String horaAtual = java.time.LocalTime.now().toString().substring(0, 5);
 
-                            TransacaoBancoRepository.registrarTransacao(ultimaTx, conta.getId(), conta.getSaldo(), idDestino, saldoDestino);
+                        Transacao txPrevia = new Transacao(dataAtual, horaAtual, valor, categoria, "SAIDA", metodo, "CONCLUIDA", conta, contaDestino);
 
-                            if (contaDestino != null) {
-                                Transacao txEntrada = new Transacao(ultimaTx.getData(), ultimaTx.getHora(), valor, categoria, "ENTRADA", metodo, ultimaTx.getStatus(), conta, contaDestino);
-                                contaDestino.getExtrato().add(txEntrada);
-                                contaDestino.setSaldo(saldoDestino);
+                        boolean salvouNoBanco = TransacaoBancoRepository.registrarTransacao(txPrevia, conta.getId(), novoSaldoOrigem, idDestino, saldoDestino);
+
+                        if (salvouNoBanco) {
+                            boolean sucesso = conta.realizarTransacao(valor, metodo, cartaoEscolhido, categoria, contaDestino);
+
+                            if (sucesso) {
+                                if (contaDestino != null) {
+                                    Transacao txEntrada = new Transacao(txPrevia.getData(), txPrevia.getHora(), valor, categoria, "ENTRADA", metodo, txPrevia.getStatus(), conta, contaDestino);
+                                    contaDestino.getExtrato().add(txEntrada);
+                                    contaDestino.setSaldo(saldoDestino);
+                                }
+                                JOptionPane.showMessageDialog(null, "Transação concluída com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                             }
-                            JOptionPane.showMessageDialog(null, "Transação concluída com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Erro ao registrar transação no banco de dados.", "Erro", JOptionPane.ERROR_MESSAGE);
                         }
+
 
                     } catch (NumberFormatException e) {
                         JOptionPane.showMessageDialog(null, "Erro: Formato de valor inválido.", "Erro", JOptionPane.ERROR_MESSAGE);
@@ -791,11 +800,11 @@ public class AplicacaoBancaria {
                         }
 
                         Cartao novoCartao = new Cartao(numero, encontrado.getNome(), tipo, limiteInicial, limiteInicial);
-                        conta.getCartoes().add(novoCartao);
 
-                        CartaoBancoRepository.salvarCartao(novoCartao, conta.getId());
-
-                        JOptionPane.showMessageDialog(null, "Cartão gerado e vinculado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                        if (CartaoBancoRepository.salvarCartao(novoCartao, conta.getId())) {
+                            conta.getCartoes().add(novoCartao);
+                            JOptionPane.showMessageDialog(null, "Cartão gerado e vinculado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                        }
                     } catch (NumberFormatException e) {
                         JOptionPane.showMessageDialog(null, "Erro: Insira um valor numérico válido para o limite.", "Erro", JOptionPane.ERROR_MESSAGE);
                     }
@@ -961,8 +970,8 @@ public class AplicacaoBancaria {
                         Investimento produtoSelecionado = disponiveis.get(indexSelecionado);
                         String dataAtual = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-                        if (helper.realizarInvestimento(conta, produtoSelecionado, valorInvestir, dataAtual)) {
-                            InvestimentoBancoRepository.registrarInvestimento(conta, produtoSelecionado, valorInvestir, dataAtual);
+                        if (InvestimentoBancoRepository.registrarInvestimento(conta, produtoSelecionado, valorInvestir, dataAtual)) {
+                            helper.realizarInvestimento(conta, produtoSelecionado, valorInvestir, dataAtual);
                             JOptionPane.showMessageDialog(null, "Aplicação realizada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                         }
                     } catch (NumberFormatException e) {

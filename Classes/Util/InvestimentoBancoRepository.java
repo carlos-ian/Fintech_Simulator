@@ -10,7 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class InvestimentoBancoRepository {
-    public static void registrarInvestimento(Conta conta, Investimento produto, double valor, String data) {
+    public static boolean registrarInvestimento(Conta conta, Investimento produto, double valor, String data) {
         String sqlAplicacao = "INSERT INTO investimento_conta (conta_id, nome_produto, valor_aplicado, data_aplicacao) VALUES (?, ?, ?, ?)";
         String sqlAtualizarSaldo = "UPDATE conta SET saldo = ? WHERE id = ?";
 
@@ -33,8 +33,10 @@ public class InvestimentoBancoRepository {
 
             conn.commit();
             System.out.println("DEBUG: Aplicação de " + produto.getNomeProduto() + " salva com sucesso!");
+            return true;
         } catch (SQLException e) {
             System.err.println("Erro ao registrar aplicação no banco: " + e.getMessage());
+            return false;
         }
     }
 

@@ -67,12 +67,14 @@ package "Util" #F9F9F9 {
         + deletarConta(numeroConta : String) : void
         + atualizarStatusConta(idConta : int, novoValor : Status) : void
         + buscarContaDestino(cpfDestino : String, numeroContaDestino : String) : Conta
+        + atualizarSaldoConta(idConta : int, novoSaldo : double) : void
     }
 
     class InvestimentoBancoRepository {
         + carregarInvestimentos(conta : conta) : void
         + registrarInvestimento(conta : conta, produto : Investimento, valor : double, data : String) : boolean
         + resgatarInvestimento(conta : conta, nomeProduto : String, valorAntigo : double) : void
+        + atualizarValorInvestimento(investimentoId : int, novoValor : double) : void
     }
 
     class TransacaoBancoRepository {

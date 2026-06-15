@@ -152,4 +152,18 @@ public class ContaBancoRepository {
 
         } catch (SQLException e) { System.err.println("Erro ao atualizar status da conta no banco: " + e.getMessage()); }
     }
+
+    public static void atualizarSaldoConta(int contaId, double novoSaldo) {
+        String sql = "UPDATE conta SET saldo = ? WHERE id = ?";
+        try (Connection conn = ConexaoBanco.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setDouble(1, novoSaldo);
+            stmt.setInt(2, contaId);
+            stmt.executeUpdate();
+            System.out.println("DEBUG: Saldo da conta ID " + contaId + " atualizado para R$ " + novoSaldo);
+        } catch (SQLException e) {
+            System.err.println("Erro ao atualizar saldo da conta: " + e.getMessage());
+        }
+    }
 }

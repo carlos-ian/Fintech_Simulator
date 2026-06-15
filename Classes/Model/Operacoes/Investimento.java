@@ -20,9 +20,7 @@ public class Investimento {
         this.dataAplicacao = dataAplicacao;
     }
 
-    public void aplicarRendimento() {
-        this.valorAplicado += this.valorAplicado * this.taxaRendimento;
-    }
+    public void aplicarRendimento() {this.valorAplicado += this.valorAplicado * (this.taxaRendimento / 100.0);}
 
     public boolean realizarInvestimento(Conta conta, Investimento produtoSelecionado, double valorParaInvestir, String dataAtual) throws SaldoInsuficienteException {
 
@@ -72,8 +70,7 @@ public class Investimento {
     @Override
     public String toString() {
 
-        return "\nID: " + idInvestimento +
-                "\nProduto: " + nomeProduto +
+        return "\nProduto: " + nomeProduto +
                 "\nTaxa de rendimento: " + taxaRendimento + "%" +
                 "\nValor aplicado: R$ " + valorAplicado +
                 "\nData aplicação: " + dataAplicacao + "\n";

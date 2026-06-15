@@ -38,7 +38,7 @@ public class Cliente extends Usuario {
 
     public Conta abrirConta(String numeroConta, String agencia, double saldo, String tipoConta,
                            double limiteChequeEspecial, String cpfResponsavel,
-                           double limiteMensal, String perfilRisco) {
+                           double limiteMensal, String titularCPF) {
 
         if (tipoConta.equalsIgnoreCase("Conta Corrente")) {
             ContaCorrente contaCorrente = new ContaCorrente(numeroConta, agencia, saldo, tipoConta, limiteChequeEspecial);
@@ -56,7 +56,7 @@ public class Cliente extends Usuario {
             return contaKids;
 
         } else if (tipoConta.equalsIgnoreCase("Conta Investimento")) {
-            ContaInvestimento contaInvestimento = new ContaInvestimento(numeroConta, agencia, saldo, tipoConta, perfilRisco);
+            ContaInvestimento contaInvestimento = new ContaInvestimento(numeroConta, agencia, saldo, tipoConta, titularCPF);
             listaContas.add(contaInvestimento);
             return contaInvestimento;
         }

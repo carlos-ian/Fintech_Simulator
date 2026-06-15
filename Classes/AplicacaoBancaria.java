@@ -1,7 +1,6 @@
 package Classes;
 
 import Classes.Model.Conta.Conta;
-import Classes.Model.Conta.ContaKids;
 import Classes.Model.Conta.ContaPoupanca;
 import Classes.Model.Operacoes.*;
 import Classes.Model.Usuario.Administrador;
@@ -9,7 +8,12 @@ import Classes.Model.Usuario.Cliente;
 import Classes.Model.Usuario.Usuario;
 import Classes.Util.*;
 import org.mindrot.jbcrypt.BCrypt;
+
 import javax.swing.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.YearMonth;
 import java.util.ArrayList;
 
@@ -17,11 +21,18 @@ public class AplicacaoBancaria {
     public static ArrayList<Usuario> listaUsuarios = new ArrayList<>();
     public static ArrayList<Investimento> investimentosDisponiveis = new ArrayList<>();
     private static YearMonth ultimaAplicacaoRendimento = YearMonth.now().minusMonths(1);
-    private static final int DIA_ROTINA = 12;
+    private static final int DIA_ROTINA = 15;
 
     public static void main(String[] args) {
         inicializarCatalogoInvestimentos();
         UsuarioBancoRepository.carregarUsuarios(listaUsuarios);
+
+        for (Usuario usuario : listaUsuarios) {
+            if (usuario instanceof Cliente) {
+                ContaBancoRepository.carregarContas((Cliente) usuario);
+            }
+        }
+
         verificarRotinas();
         AplicacaoBancaria.menuInicial();
     }
@@ -37,26 +48,60 @@ public class AplicacaoBancaria {
 
     private static void verificarRotinas() {
         java.time.LocalDate hoje = java.time.LocalDate.now();
-        YearMonth mesAtual = YearMonth.now();
 
-        if (hoje.getDayOfMonth() == DIA_ROTINA && !mesAtual.equals(ultimaAplicacaoRendimento)) {
-            for (Usuario usuario : listaUsuarios) {
-                if (usuario instanceof Cliente) {
-                    Cliente cliente = (Cliente) usuario;
+        if (hoje.getDayOfMonth() == DIA_ROTINA) {
+            String mesAnoAtual = hoje.format(java.time.format.DateTimeFormatter.ofPattern("MM/yyyy"));
+            String sqlCheck = "SELECT 1 FROM controle_sistema WHERE ultima_rotina = ?";
+            String sqlInsert = "INSERT INTO controle_sistema (ultima_rotina) VALUES (?)";
 
-                    for (Conta conta : cliente.obterContas()) {
-                        if (conta instanceof ContaPoupanca) { ((ContaPoupanca) conta).aplicarRendimento(); }
-                        if (conta instanceof ContaKids) { ((ContaKids) conta).resetarMes(); }
+            try (Connection conn = ConexaoBanco.conectar()) {
 
-                        if (conta.getListaInvestimentos() != null && !conta.getListaInvestimentos().isEmpty()) {
-                            for (Investimento inv : conta.getListaInvestimentos()) {
-                                inv.aplicarRendimento();
+                try (PreparedStatement stmtCheck = conn.prepareStatement(sqlCheck)) {
+                    stmtCheck.setString(1, mesAnoAtual);
+                    try (ResultSet rs = stmtCheck.executeQuery()) {
+                        if (rs.next()) {
+                            System.out.println("DEBUG: Entrou no IF - Já rodou este mês e travou!");
+                            return;
+                        }
+                    }
+                }
+
+                System.out.println("DEBUG: Aplicando rendimentos do mês...");
+
+                for (Usuario usuario : listaUsuarios) {
+                    if (usuario instanceof Cliente) {
+                        Cliente cliente = (Cliente) usuario;
+
+                        System.out.println("Cliente: " + cliente.getNome() + " | Contas na memória: " + cliente.obterContas().size());
+
+                        for (Conta conta : cliente.obterContas()) {
+                            if (conta instanceof ContaPoupanca) {
+                                ((ContaPoupanca) conta).aplicarRendimento();
+                                ContaBancoRepository.atualizarSaldoConta(conta.getId(), conta.getSaldo());
+                            }
+
+                            if (conta.getListaInvestimentos() != null) {
+                                System.out.println("-> Conta: " + conta.getNumeroConta() + " | Investimentos na memória: " + conta.getListaInvestimentos().size());
+
+                                for (Investimento inv : conta.getListaInvestimentos()) {
+                                    inv.aplicarRendimento();
+                                    InvestimentoBancoRepository.atualizarValorInvestimento(inv.getId(), inv.getValorAplicado());
+                                }
                             }
                         }
                     }
                 }
+
+                try (PreparedStatement stmtInsert = conn.prepareStatement(sqlInsert)) {
+                    stmtInsert.setString(1, mesAnoAtual);
+                    stmtInsert.executeUpdate();
+                }
+
+                System.out.println("DEBUG: Rendimentos salvos com sucesso!");
+
+            } catch (SQLException e) {
+                System.err.println("Erro na rotina de investimentos: " + e.getMessage());
             }
-            ultimaAplicacaoRendimento = mesAtual;
         }
     }
 
@@ -881,7 +926,7 @@ public class AplicacaoBancaria {
                         StringBuilder sbFeitos = new StringBuilder("=== INVESTIMENTOS FEITOS ===\n\n");
                         for (int i = 0; i < feitos.size(); i++) {
                             Investimento inv = feitos.get(i);
-                            sbFeitos.append("ID: ").append(i).append("\n");
+                            sbFeitos.append("ID: ").append(i);
                             sbFeitos.append(inv.toString()).append("\n-----------------------\n");
                         }
 

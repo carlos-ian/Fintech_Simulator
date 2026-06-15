@@ -99,4 +99,18 @@ public class InvestimentoBancoRepository {
             System.err.println("Erro ao carregar investimentos da conta: " + e.getMessage());
         }
     }
+
+    public static void atualizarValorInvestimento(int investimentoId, double novoValor) {
+        String sql = "UPDATE investimento_conta SET valor_aplicado = ? WHERE id = ?";
+        try (Connection conn = ConexaoBanco.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setDouble(1, novoValor);
+            stmt.setInt(2, investimentoId);
+            stmt.executeUpdate();
+            System.out.println("DEBUG: Valor do investimento ID " + investimentoId + " atualizado para R$ " + novoValor);
+        } catch (SQLException e) {
+            System.err.println("Erro ao atualizar valor do investimento: " + e.getMessage());
+        }
+    }
 }

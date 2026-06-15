@@ -1,0 +1,41 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+package "Módulo Core" #F9F9F9 {
+    class AplicacaoBancaria {
+        + {static} ListaUsuarios : ArrayList<Usuario>
+        + {static} investimentosDisponiveis : ArrayList<Investimento>
+        --
+        + {static} main(args : String[]) : void
+        + {static} menuPrincipalCliente(...) : void
+        + {static} investimentosEPoupanca(...) : void
+    }
+    
+    class SwingUtil {
+        + {static} exibirFormulario(...) : String[]
+    }
+}
+
+package "Módulo Investimentos" #E8F8F5 {
+    class Investimento {
+        - idInvestimento : int
+        - nomeProduto : String
+        - taxaRendimento : double
+        --
+        + realizarInvestimento(conta : Conta, ...) : boolean
+        + resgatarInvestimento(conta : Conta, ...) : boolean
+    }
+}
+
+package "Módulo Contas Bancárias" #FEF9E7 {
+    class Conta <<external>> {}
+}
+package "Módulo Usuários" #EBF5FB {
+    class Usuario <<external>> {}
+}
+
+AplicacaoBancaria "1" *-- "0..*" Usuario : gerencia
+AplicacaoBancaria "1" --> "0..*" Investimento : disponibiliza
+AplicacaoBancaria ..> SwingUtil : usa
+Conta "1" --> "0..*" Investimento : movimenta
+@enduml

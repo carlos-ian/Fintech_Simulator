@@ -1,0 +1,13 @@
+@startuml
+skinparam packageStyle rectangle
+
+package "Módulo Core" #F9F9F9 {}
+package "Módulo Usuários" #EBF5FB {}
+package "Módulo Contas Bancárias" #FEF9E7 {}
+package "Módulo Investimentos" #E8F8F5 {}
+
+"Módulo Core" ..> "Módulo Usuários" : gerencia
+"Módulo Core" ..> "Módulo Investimentos" : disponibiliza
+"Módulo Usuários" ..> "Módulo Contas Bancárias" : possui
+"Módulo Contas Bancárias" ..> "Módulo Investimentos" : movimenta
+@enduml

@@ -1,0 +1,76 @@
+@startuml
+skinparam classAttributeIconSize 0
+left to right direction
+
+package "Módulo Contas Bancárias" #FEF9E7 {
+    enum Status {
+        ATIVO
+        INATIVO
+    }
+
+    abstract class Conta {
+        # extrato : ArrayList<Transacao>
+        # cartoes : ArrayList<Cartao>
+        # numeroConta : String
+        # agencia : String
+        # saldo : double
+        # statusConta : Status
+        --
+        + {abstract} realizarTransacao(valor : double, metodoPagamento : String, cartaoEscolhido : Cartao, category : String, destino : Conta) : boolean
+        + visualizarExtrato(fluxo : String, metodoPagamento : String, categoria : String, diasPeriodo : Integer, dataEspecifica : String) : ArrayList<Transacao>
+    }
+
+    class ContaCorrente { 
+        - limiteChequeEspecial : double 
+    }
+    class ContaPoupanca { 
+        - taxaRendimento : double 
+    }
+    class ContaKids { 
+        - limiteMensal : double 
+    }
+    class ContaInvestimento { 
+        - perfilRisco : String 
+    }
+
+    class Cartao {
+        - numeroCartao : String
+        - limiteDisponivel : double
+        - estaBloqueado : boolean
+        --
+        + bloquearCartao() : boolean
+        + solicitarAjusteLimite(novoLimiteSolicitado : double, admin : Administrador, contaVinculada : Conta) : boolean
+    }
+
+    class Transacao {
+        - id : int
+        - valor : double
+        - origem : Conta
+        - destino : Conta
+    }
+    
+    ' Heranças ajustadas para o fluxo "left to right"
+    ContaCorrente --|> Conta
+    ContaPoupanca --|> Conta
+    ContaKids --|> Conta
+    ContaInvestimento --|> Conta
+    
+    Conta "1" *-- "0..*" Cartao 
+    Conta "1" *-- "0..*" Transacao
+    Transacao --> "0..1" Conta : origem
+    Transacao --> "0..1" Conta : destino
+    Conta --> Status : possui
+}
+
+package "Módulo Usuários" #EBF5FB {
+    class Usuario <<external>> {}
+}
+
+package "Módulo Investimentos" #E8F8F5 {
+    class Investimento <<external>> {}
+}
+
+' Relacionamentos com as classes de fronteira externa
+Usuario "1" o-- "0..*" Conta
+Conta "1" --> "0..*" Investimento : movimenta >
+@enduml

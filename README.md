@@ -53,10 +53,7 @@ realização de transações, registro e resgate de aplicações/investimentos, 
   * *Nas Contas:* Os métodos `realizarTransacao()` e `visualizarDadosConta()` reagem dinamicamente em tempo de execução dependendo de qual subclasse específica de `Conta` está invocando a ação.
 
 ### 2. Manipulação de Listas (Collections)
-Uso massivo da API de Collections do Java através de estruturas `ArrayList` para o gerenciamento dinâmico em memória de listas de usuários, transações, contas, cartões e investimentos. A manipulação dessas coleções ocorre através de métodos nativos especializados, tais como:
-* `.add()` para inclusão de novos registros.
-* `.remove()` ou `.removeIf()` para encerramentos e exclusões lógicas.
-* `.stream().filter()` para a aplicação dos multi-filtros dinâmicos exigidos nos extratos (filtragem por período, categoria e tipo de fluxo).
+Uso massivo da API de Collections do Java através de estruturas `ArrayList` para o gerenciamento dinâmico em memória de listas de usuários, transações, contas, cartões e investimentos. A manipulação dessas coleções ocorre através de métodos nativos especializados, tais como .add() e .remove().
 
 ### 3. Controle e Tratamento de Exceções
 Implementação de uma arquitetura robusta de tratamento de erros orientada a objetos para blindar a aplicação principal contra comportamentos inesperados. Foram criadas três classes de exceções personalizadas (*Custom Exceptions*) que estendem `Exception`:
@@ -70,7 +67,7 @@ O armazenamento de longo prazo é realizado em um banco de dados relacional **Po
 * `UsuarioBancoRepository`, `ContaBancoRepository`, `TransacaoBancoRepository`, `CartaoBancoRepository` e `InvestimentoBancoRepository`: Responsáveis pelas instruções de CRUD (Create, Read, Update, Delete) e mapeamento dos resultados SQL para objetos Java.
 
 ### 5. Manipulação de Arquivos e Relatórios
-Implementação de rotinas de Entrada/Saída de dados (I/O) utilizando as classes `FileWriter` e `BufferedWriter` do Java. O sistema consolida as informações financeiras de gestão armazenadas para exportar o **Relatório Geral da Fintech** diretamente em arquivos de formato texto (`.txt`/`.csv`), permitindo auditoria externa pelo módulo do Administrador.
+O sistema consolida as informações financeiras de gestão armazenadas para exportar o **Relatório Geral da Fintech** diretamente em arquivos de formato texto, permitindo auditoria externa pelo módulo do Administrador.
 
 ### 6. Interface Gráfica (UI)
 * **JOptionPane:** Utilizado de forma rápida e direta na classe de aplicação principal para caixas de diálogos simples, alertas de erro e confirmações rápidas do sistema.

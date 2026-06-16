@@ -105,7 +105,7 @@ Fintech_Simulator/
     ├── Diagrama de Classes Conceituais
     ├── Diagramas de Casos de Uso (DCdu)
     └── Diagramas de Classes (DCla)
-'''
+```
 
 🛠️ Tecnologias Utilizadas
 O projeto foi construído utilizando um ecossistema nativo Java focado em performance, robustez e isolamento de responsabilidades:

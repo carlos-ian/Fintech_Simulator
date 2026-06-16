@@ -42,12 +42,17 @@ realização de transações, registro e resgate de aplicações/investimentos, 
 
 ### 1. Pilares Clássicos de POO
 * **Encapsulamento:** Como boa prática de design, todos os atributos sensíveis (como `saldo`, `senha` e `limite`) utilizam o modificador de acesso `private`, sendo expostos controladamente via *getters* e *setters*. Para permitir que as subclasses acessem diretamente os atributos estruturais da árvore de herança sem quebrar o encapsulamento para classes externas, utilizou-se o modificador `protected` nas superclasses.
+
 * **Atributos Estáticos (`static`):** Aplicados nas classes `Usuario`, `Conta`, `Investimento` e `Transacao` para gerenciar contadores globais em memória. Isso garante a geração incremental e automatizada de IDs e códigos identificadores únicos para cada nova instância gerada.
+
 * **Classes Abstratas:** As classes `Usuario` e `Conta` foram definidas com o modificador `abstract`. Elas funcionam estritamente como moldes conceituais e contratos arquiteturais. O sistema impede terminantemente a criação de um usuário ou conta "genéricos", exigindo que eles sejam materializados através de suas especializações reais.
+
 * **Herança:** Organizada em duas grandes ramificações para reaproveitamento de código e padronização:
   * `Usuario` baseia a existência de `Cliente` e `Administrador`.
   * `Conta` estende sua estrutura para `ContaCorrente`, `ContaPoupanca`, `ContaKids` e `ContaInvestimento`.
+
 * **Métodos Abstratos:** A classe `Conta` dita o comportamento obrigatório de movimentação financeira através do método abstrato `public abstract void realizarTransacao(...)`. Como cada modelo de conta possui regras fiscais, limites de segurança e restrições de idade distintas, a implementação do método foi completamente delegada às classes filhas.
+
 * **Polimorfismo:** Explorou-se o polimorfismo de sobreposição de duas formas principais:
   * *Nos Perfis:* Os métodos `visualizarDados()` e `alterarDados()` possuem implementações especializadas em `Cliente` e `Administrador`, permitindo manipular as informações adicionais exclusivas que cada papel exige no sistema.
   * *Nas Contas:* Os métodos `realizarTransacao()` e `visualizarDadosConta()` reagem dinamicamente em tempo de execução dependendo de qual subclasse específica de `Conta` está invocando a ação.
@@ -107,58 +112,23 @@ Fintech_Simulator/
 ## 🛠️ Tecnologias Utilizadas
 O projeto foi construído utilizando um ecossistema nativo Java focado em performance, robustez e isolamento de responsabilidades:
 
-Linguagem Principal: Java 17, explorando recursos modernos da linguagem.
+**Linguagem Principal:** Java 17, explorando recursos modernos da linguagem.
 
-Interface Gráfica Desktop: Java Swing (via SwingUtil) e JOptionPane.
+**Interface Gráfica Desktop:** Java Swing (via SwingUtil) e JOptionPane.
 
-Persistência de Dados Relacional: PostgreSQL e JDBC API pura (padrão Repository).
+**Persistência de Dados Relacional:** PostgreSQL e JDBC API pura (padrão Repository).
 
-Automação de Build e Dependências: Maven (pom.xml).
+**Automação de Build e Dependências:** Maven (pom.xml).
 
-Testes Automatizados: JUnit 5.
+**Testes Automatizados:** JUnit 5.
 
-Segurança e Configuração: Arquivo .env para isolamento de credenciais do banco.
+**Segurança e Configuração:** Arquivo .env para isolamento de credenciais do banco.
 
-Documentação: Javadoc.
+**Documentação:** Javadoc.
 
 ## ⚙️ Como Executar o Projeto
 Siga os passos abaixo para configurar o ambiente e rodar o simulador bancário na sua máquina local:
 
-1. Pré-requisitos
-Antes de começar, você precisará ter instalado em sua máquina:
-
-Java Development Kit (JDK) 17 ou superior.
-
-IDE IntelliJ IDEA ou Eclipse com suporte a projetos Maven.
-
-Banco de dados PostgreSQL ativo e rodando.
-
-2. Configuração do Banco de Dados
-Abra o seu gerenciador do PostgreSQL e crie um novo banco de dados chamado fintech_simulator.
-
-Execute os scripts SQL de criação de tabelas.
-
-Na raiz do projeto, certifique-se de configurar o arquivo .env com as suas credenciais locais:
-
-DB_URL=jdbc:postgresql://localhost:5432/fintech_simulator
-
-DB_USER=seu_usuario
-
-DB_PASSWORD=sua_senha
-
-3. Compilação e Instalação de Dependências (Maven)
-Abra o IntelliJ IDEA e importe a pasta raiz Fintech_Simulator como um projeto Maven.
-
-Aguarde a IDE baixar todas as dependências contidas no pom.xml.
-
-Se preferir rodar via terminal, execute: mvn clean install
-
-4. Inicializando a Aplicação
-No painel de navegação do seu projeto, expanda a pasta Classes.
-
-Localize o arquivo AplicacaoBancaria.java.
-
-Clique com o botão direito sobre ele e selecione a opção Run 'AplicacaoBancaria.main()'.
 
 ## ✒️ Autores
 Brenno Soares de Aguiar |

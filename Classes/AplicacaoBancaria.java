@@ -804,6 +804,8 @@ public class AplicacaoBancaria {
                         if (CartaoBancoRepository.salvarCartao(novoCartao, conta.getId())) {
                             conta.getCartoes().add(novoCartao);
                             JOptionPane.showMessageDialog(null, "Cartão gerado e vinculado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Não foi possível criar este cartão");
                         }
                     } catch (NumberFormatException e) {
                         JOptionPane.showMessageDialog(null, "Erro: Insira um valor numérico válido para o limite.", "Erro", JOptionPane.ERROR_MESSAGE);
@@ -973,6 +975,8 @@ public class AplicacaoBancaria {
                         if (InvestimentoBancoRepository.registrarInvestimento(conta, produtoSelecionado, valorInvestir, dataAtual)) {
                             helper.realizarInvestimento(conta, produtoSelecionado, valorInvestir, dataAtual);
                             JOptionPane.showMessageDialog(null, "Aplicação realizada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Não foi possível realizar este investimento");
                         }
                     } catch (NumberFormatException e) {
                         JOptionPane.showMessageDialog(null, "Erro: Valor numérico digitado incorretamente.", "Erro", JOptionPane.ERROR_MESSAGE);

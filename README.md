@@ -160,7 +160,7 @@ Localize o arquivo AplicacaoBancaria.java.
 
 Clique com o botão direito sobre ele e selecione a opção Run 'AplicacaoBancaria.main()'.
 
-✒️ Autores
+## ✒️ Autores
 Brenno Soares de Aguiar
 Davi Alves Mugayar
 Ian Carlos Lima Tavares

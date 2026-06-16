@@ -104,7 +104,7 @@ Fintech_Simulator/
     └── Diagramas de Classes (DCla)
 ```
 
-🛠️ Tecnologias Utilizadas
+## 🛠️ Tecnologias Utilizadas
 O projeto foi construído utilizando um ecossistema nativo Java focado em performance, robustez e isolamento de responsabilidades:
 
 Linguagem Principal: Java 17, explorando recursos modernos da linguagem.
@@ -121,7 +121,7 @@ Segurança e Configuração: Arquivo .env para isolamento de credenciais do banc
 
 Documentação: Javadoc.
 
-⚙️ Como Executar o Projeto
+## ⚙️ Como Executar o Projeto
 Siga os passos abaixo para configurar o ambiente e rodar o simulador bancário na sua máquina local:
 
 1. Pré-requisitos

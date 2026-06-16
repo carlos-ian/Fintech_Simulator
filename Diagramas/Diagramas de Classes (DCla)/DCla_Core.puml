@@ -38,9 +38,21 @@ package "Módulo Operações" #E8F8F5 {
 
 package "Util" #F9F9F9 {
     class SwingUtil
+    class UsuarioBancoRepository
+    class ContaBancoRepository
+    class TransacaoBancoRepository
+    class CartaoBancoRepository
+    class InvestimentoBancoRepository
+    class ConexaoBanco
 }
 
 AplicacaoBancaria "1" *-- "0..*" Usuario : gerencia >
 AplicacaoBancaria "1" --> "0..*" Investimento : disponibiliza >
 AplicacaoBancaria ..> SwingUtil : usa para entrada de dados
+AplicacaoBancaria ..> UsuarioBancoRepository : usa para gerenciar usuários
+AplicacaoBancaria ..> ContaBancoRepository : usa para gerenciar contas
+AplicacaoBancaria ..> TransacaoBancoRepository : usa para gerenciar transações
+AplicacaoBancaria ..> CartaoBancoRepository : usa para gerenciar cartões
+AplicacaoBancaria ..> InvestimentoBancoRepository : usa para gerenciar investimentos
+AplicacaoBancaria ..> ConexaoBanco : usa para conectar ao banco de dados
 @enduml

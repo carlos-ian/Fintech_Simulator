@@ -13,6 +13,12 @@ package "Módulo Core" as core #F9F9F9 {
 
 package "Util" as util #F9F9F9 {
     class SwingUtil
+    class UsuarioBancoRepository
+    class ContaBancoRepository
+    class TransacaoBancoRepository
+    class CartaoBancoRepository
+    class InvestimentoBancoRepository
+    class ConexaoBanco
 }
 
 package "Módulo Exceptions" as exc #F9F9F9 {

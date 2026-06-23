@@ -12,12 +12,51 @@ import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 
+    /**
+     * Representa uma conta poupança da fintech.
+     *
+     * <p>A conta poupança permite armazenar dinheiro com rendimento
+     * automático sobre o saldo disponível. As movimentações podem ser
+     * realizadas por PIX e Débito, não sendo permitido o uso da função
+     * Crédito.</p>
+     *
+     * <p>Esta classe herda as funcionalidades básicas da classe
+     * {@link Classes.Model.Conta.Conta} e adiciona o cálculo de rendimento periódico
+     * característico das contas poupança.</p>
+     *
+     * @author Joel Antônio
+     * @version 1.0
+     * @since 2026
+     */
+
 public class ContaPoupanca extends Conta {
     private static final double taxaRendimento = 0.005;
+
+    /**
+     * Cria uma nova conta poupança.
+     *
+     * @param numeroConta Número identificador da conta.
+     * @param agencia Agência à qual a conta pertence.
+     * @param saldo Saldo inicial da conta.
+     * @param tipoConta Tipo da conta.
+     */
 
     public ContaPoupanca(String numeroConta, String agencia, double saldo, String tipoConta) {
         super(numeroConta, agencia, saldo, tipoConta);
     }
+
+    /**
+     * Método que implementa o RF23: Conta Poupança.
+     *
+     * <p>Aplica o rendimento da poupança sobre o saldo atual.<p/>
+     *
+     * <p>O valor do rendimento é calculado utilizando a taxa
+     * definida para a conta e adicionado ao saldo disponível.</p>
+     *
+     * <p>Após a aplicação do rendimento, uma transação de entrada
+     * é registrada no extrato da conta para manter o histórico
+     * da operação.</p>
+     */
 
     public void aplicarRendimento() {
         LocalDate dataHoje = LocalDate.now();
@@ -44,6 +83,46 @@ public class ContaPoupanca extends Conta {
 
         this.extrato.add(transacaoRendimento);
     }
+
+    /**
+     * Método que implementa o RF23: Conta Poupança.
+     *
+     * <p>Realiza uma transação financeira utilizando os recursos
+     * disponíveis da conta poupança.</p>
+     *
+     * <p>São permitidos os seguintes métodos de pagamento:</p>
+     *
+     * <ul>
+     *     <li>PIX;</li>
+     *     <li>Cartão de Débito.</li>
+     * </ul>
+     *
+     * <p>A função Crédito não está disponível para contas poupança.</p>
+     *
+     * <p>Após a conclusão da operação, uma transação de saída é
+     * registrada na conta de origem e uma transação de entrada
+     * é registrada na conta de destino.</p>
+     *
+     * @param valor Valor da transação.
+     * @param metodoPagamento Método utilizado para pagamento.
+     * @param cartaoEscolhido Cartão utilizado na operação.
+     * @param categoria Categoria da movimentação financeira.
+     * @param destino Conta que receberá o valor transferido.
+     *
+     * @return {@code true} caso a transação seja concluída com sucesso.
+     *
+     * @throws ContaInativaException Caso a conta de origem ou destino
+     * esteja inativa.
+     *
+     * @throws SaldoInsuficienteException Caso o saldo da poupança
+     * seja insuficiente para realizar a operação.
+     *
+     * @throws LimiteInsuficienteException Caso o cartão informado
+     * esteja bloqueado.
+     *
+     * @throws IllegalArgumentException Caso seja informado um método
+     * de pagamento inválido ou não suportado pela conta poupança.
+     */
 
     @Override
     public boolean realizarTransacao(double valor, String metodoPagamento, Cartao cartaoEscolhido, String categoria, Conta destino)
@@ -108,6 +187,19 @@ public class ContaPoupanca extends Conta {
 
         return true;
     }
+
+    /**
+     * Método que implementa o RF06: Visualização de Dados da Conta.
+     *
+     * <p>Exibe os dados completos da conta poupança.</p>
+     *
+     * <p>Além das informações básicas fornecidas pela classe
+     * {@link Classes.Model.Conta.Conta}, apresenta a taxa de rendimento
+     * atualmente utilizada pela conta.</p>
+     *
+     * @return String formatada contendo os dados da conta
+     * e a taxa de rendimento.
+     */
 
     @Override
     public String visualizarDadosConta() {

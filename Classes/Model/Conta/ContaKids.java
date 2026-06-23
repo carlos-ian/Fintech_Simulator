@@ -9,10 +9,36 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+    /**
+     * Representa uma Conta Kids da fintech.
+     *
+     * <p>Esta modalidade de conta é destinada a menores de idade e possui
+     * mecanismos de controle financeiro definidos pelos responsáveis legais,
+     * como limite mensal de gastos e restrição ao uso da função crédito.</p>
+     *
+     * <p>As movimentações podem ser realizadas apenas por PIX e Débito,
+     * respeitando o saldo disponível e o limite mensal configurado.</p>
+     *
+     * @author Joel Antônio
+     * @version 1.0
+     * @since 2026
+     */
+
 public class ContaKids extends Conta {
     private String cpfResponsavel;
     private double limiteMensal;
     private double totalGastoNoMes;
+
+    /**
+     * Cria uma nova Conta Kids.
+     *
+     * @param numeroConta Número identificador da conta.
+     * @param agencia Agência à qual a conta pertence.
+     * @param saldo Saldo inicial da conta.
+     * @param tipoConta Tipo da conta.
+     * @param cpfResponsavel CPF do responsável legal.
+     * @param limiteMensal Limite máximo de gastos permitido por mês.
+     */
 
     public ContaKids(String numeroConta, String agencia, double saldo, String tipoConta, String cpfResponsavel, double limiteMensal) {
         super(numeroConta, agencia, saldo, tipoConta);
@@ -21,7 +47,64 @@ public class ContaKids extends Conta {
         this.totalGastoNoMes = 0.0;
     }
 
+    /**
+     * Método que implementa o RF24: Conta Kids.
+     *
+     * <p>Reinicia o controle de gastos mensais da conta.</p>
+     *
+     * <p>Este método deve ser utilizado no início de um novo mês para
+     * permitir que o limite mensal seja reutilizado.</p>
+     */
+
     public void resetarMes() {this.totalGastoNoMes = 0.0;}
+
+    /**
+     * Método que implementa o RF24: Conta Kids.
+     *
+     * <p>Realiza uma transação financeira utilizando os recursos da Conta Kids.</p>
+     *
+     * <p>São permitidos apenas os seguintes métodos de pagamento:</p>
+     *
+     * <ul>
+     *     <li>PIX;</li>
+     *     <li>Cartão de Débito.</li>
+     * </ul>
+     *
+     * <p>A função Crédito não está disponível para este tipo de conta.</p>
+     *
+     * <p>Antes da operação, são realizadas validações de:</p>
+     * <ul>
+     *     <li>Status da conta de origem;</li>
+     *     <li>Status da conta de destino;</li>
+     *     <li>Saldo disponível;</li>
+     *     <li>Limite mensal de gastos;</li>
+     *     <li>Validade do cartão informado.</li>
+     * </ul>
+     *
+     * <p>Após a conclusão da operação, uma transação de saída é registrada
+     * na conta de origem e uma transação de entrada é registrada na conta
+     * de destino.</p>
+     *
+     * @param valor Valor da transação.
+     * @param metodoPagamento Método utilizado para pagamento.
+     * @param cartaoEscolhido Cartão utilizado na operação.
+     * @param categoria Categoria da movimentação financeira.
+     * @param destino Conta que receberá o valor transferido.
+     *
+     * @return {@code true} caso a transação seja realizada com sucesso.
+     *
+     * @throws Classes.Exceptions.ContaInativaException Caso a conta de origem ou destino
+     * esteja inativa.
+     *
+     * @throws Classes.Exceptions.SaldoInsuficienteException Caso não exista saldo suficiente
+     * para realizar a operação.
+     *
+     * @throws Classes.Exceptions.LimiteInsuficienteException Caso o limite mensal de gastos
+     * seja ultrapassado ou o cartão esteja bloqueado.
+     *
+     * @throws IllegalArgumentException Caso seja informado um método de
+     * pagamento inválido ou não permitido para a Conta Kids.
+     */
 
     @Override
     public boolean realizarTransacao(double valor, String metodoPagamento, Cartao cartaoEscolhido, String categoria, Conta destino)
@@ -79,6 +162,18 @@ public class ContaKids extends Conta {
 
         return true;
     }
+
+    /**
+     * Método que implementa o RF06: Visualização de Dados da Conta.
+     *
+     * <p>Exibe os dados completos da Conta Kids.</p>
+     *
+     * <p>Além das informações básicas fornecidas pela classe
+     * {@link Classes.Model.Conta.Conta}, são exibidos os dados do responsável legal,
+     * o limite mensal definido e o total gasto no mês atual.</p>
+     *
+     * @return String formatada contendo os dados da conta.
+     */
 
     @Override
     public String visualizarDadosConta() {

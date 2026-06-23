@@ -17,11 +17,72 @@ import java.sql.SQLException;
 import java.time.YearMonth;
 import java.util.ArrayList;
 
+    /**
+     * Classe principal da aplicação bancária (Fintech).
+     * <p>Esta classe é responsável por inicializar o sistema,
+     * carregar os dados persistidos, executar rotinas automáticas
+     * de rendimento e disponibilizar toda a navegação entre os
+     * menus da aplicação.</p>
+     * <p>A aplicação implementa funcionalidades relacionadas ao
+     * gerenciamento de usuários, contas bancárias, cartões,
+     * investimentos, transações financeiras e administração
+     * da fintech.</p>
+     *
+     * <p>Os requisitos funcionais implementados por esta classe incluem,
+     * entre outros:</p>
+     * <ul>
+     *     <li>RF01 - Criação de Perfil de Usuário</li>
+     *     <li>RF02 - Autenticação</li>
+     *     <li>RF03 - Abertura e Encerramento de Contas</li>
+     *     <li>RF04 - Visualização da Lista de Contas</li>
+     *     <li>RF05 - Escolha e Alternação de Contas</li>
+     *     <li>RF06 - Visualização de Dados da Conta</li>
+     *     <li>RF07 - Visualização de Perfil</li>
+     *     <li>RF08 - Alteração de Perfil</li>
+     *     <li>RF09 - Ativar e Desativar Perfil</li>
+     *     <li>RF10 - Exclusão de Perfil</li>
+     *     <li>RF11 ao RF14 - Gerenciamento de Cartões</li>
+     *     <li>RF15 e RF16 - Transações e Extratos</li>
+     *     <li>RF17 ao RF19 - Investimentos</li>
+     *     <li>RF20 ao RF22 - Funcionalidades Administrativas</li>
+     *     <li>RF23 ao RF25 - Regras específicas dos tipos de conta</li>
+     * </ul>
+     *
+     * @author Davi Mugayar
+     * @version 1.0
+     * @since 2026
+     */
+
 public class AplicacaoBancaria {
     public static ArrayList<Usuario> listaUsuarios = new ArrayList<>();
     public static ArrayList<Investimento> investimentosDisponiveis = new ArrayList<>();
     private static YearMonth ultimaAplicacaoRendimento = YearMonth.now().minusMonths(1);
     private static final int DIA_ROTINA = 15;
+
+    /**
+     * Método principal da aplicação.
+     *
+     * <p>Representa o ponto de entrada do sistema fintech,
+     * sendo responsável pela inicialização dos recursos
+     * essenciais antes da interação do usuário.</p>
+     * <p>Durante a execução deste método são realizadas
+     * as seguintes etapas:</p>
+     *
+     * <ol>
+     *     <li>Inicialização do catálogo de investimentos disponíveis;</li>
+     *     <li>Carregamento dos usuários persistidos no banco de dados;</li>
+     *     <li>Execução das rotinas automáticas mensais do sistema;</li>
+     *     <li>Exibição do menu inicial da aplicação.</li>
+     * </ol>
+     *
+     * <p>Este método participa diretamente da inicialização dos
+     * requisitos funcionais relacionados à autenticação,
+     * gerenciamento de contas, investimentos e administração
+     * da fintech.</p>
+     *
+     * @param args Argumentos recebidos pela linha de comando.
+     *             Não utilizados pela aplicação.
+     */
 
     public static void main(String[] args) {
         inicializarCatalogoInvestimentos();
@@ -38,6 +99,27 @@ public class AplicacaoBancaria {
     }
 
     // --------- Metodos Auxiliares --------
+
+    /**
+     * Inicializa o catálogo padrão de investimentos disponíveis.
+     *
+     * <p>Este método é executado durante a inicialização da
+     * aplicação e cadastra os produtos financeiros que poderão
+     * ser visualizados e selecionados pelos clientes para
+     * realização de aplicações.</p>
+     *
+     * <p>Os investimentos cadastrados compõem o portfólio
+     * disponível da fintech e são utilizados pelas
+     * funcionalidades relacionadas aos requisitos
+     * RF17 (Realização de Investimentos),
+     * RF18 (Resgate de Investimentos) e
+     * RF19 (Visualização de Investimentos).</p>
+     *
+     * <p>Cada produto recebe uma taxa de rendimento anual
+     * previamente definida para simulação dos ganhos
+     * financeiros do usuário.</p>
+     */
+
     private static void inicializarCatalogoInvestimentos() {
         investimentosDisponiveis.add(new Investimento("CDB Pós-Fixado", 11.5, 0, null));
         investimentosDisponiveis.add(new Investimento("LCI Isento", 9.8, 0, null));
@@ -45,6 +127,35 @@ public class AplicacaoBancaria {
         investimentosDisponiveis.add(new Investimento("Fundo de Ações", 18.5, 0, null));
         investimentosDisponiveis.add(new Investimento("Poupança", 6.17, 0, null));
     }
+
+    /**
+     * Executa as rotinas automáticas mensais da aplicação.
+     *
+     * <p>O processamento ocorre apenas uma vez por mês,
+     * no dia definido pela constante {@code DIA_ROTINA},
+     * evitando execuções duplicadas através do controle
+     * realizado pela variável {@code ultimaAplicacaoRendimento}.</p>
+     * <p>As operações realizadas por esta rotina incluem:</p>
+     *
+     * <ul>
+     *     <li>Aplicação de rendimento das contas poupança;</li>
+     *     <li>Reinicialização do limite mensal das contas Kids;</li>
+     *     <li>Aplicação de rendimento em investimentos ativos;</li>
+     * </ul>
+     *
+     * <p>Esta funcionalidade implementa regras de negócio
+     * relacionadas aos requisitos:</p>
+     *
+     * <ul>
+     *     <li>RF17 - Realização de Investimentos;</li>
+     *     <li>RF19 - Visualização de Investimentos;</li>
+     *     <li>RF23 - Conta Poupança;</li>
+     *     <li>RF25 - Conta Kids.</li>
+     * </ul>
+     *
+     * <p>Ao final da execução, o mês atual é registrado
+     * para impedir novo processamento dentro do mesmo período.</p>
+     */
 
     private static void verificarRotinas() {
         java.time.LocalDate hoje = java.time.LocalDate.now();
@@ -107,6 +218,30 @@ public class AplicacaoBancaria {
 
 
     // -------- Metodos Menus ---------------
+
+    /**
+     * Método que implementa o menu inicial da aplicação.
+     *
+     * <p>Este menu representa o primeiro ponto de interação
+     * entre o usuário e a fintech após a inicialização do sistema.</p>
+     * <p>Através deste menu o usuário pode:</p>
+     *
+     * <ul>
+     *     <li>Realizar autenticação no sistema;</li>
+     *     <li>Criar um novo perfil de usuário;</li>
+     *     <li>Encerrar a execução da aplicação.</li>
+     * </ul>
+     *
+     * <p>O método permanece em execução contínua até que o usuário
+     * escolha encerrar o sistema ou feche a janela de interação.</p>
+     * <p>Este método está diretamente relacionado aos requisitos:</p>
+     *
+     * <ul>
+     *     <li>RF01 - Criação de Perfil de Usuário;</li>
+     *     <li>RF02 - Autenticação.</li>
+     * </ul>
+     */
+
     public static void menuInicial() {
         while (true) {
             String stringMenu = JOptionPane.showInputDialog(
@@ -151,6 +286,37 @@ public class AplicacaoBancaria {
             }
         }
     }
+
+    /**
+     * Método que implementa o RF02: Autenticação.
+     *
+     * <p>Realiza o processo de autenticação de clientes e
+     * administradores da aplicação.</p>
+     * <p>O método solicita as credenciais de acesso,
+     * valida CPF e senha informados e verifica se o
+     * perfil corresponde ao tipo selecionado no menu
+     * inicial.</p>
+     * <p>Além da autenticação, também controla o acesso
+     * de perfis inativos, permitindo que o usuário
+     * reative a sua conta antes de prosseguir para as
+     * funcionalidades do sistema.</p>
+     *
+     * <p>Após a validação das credenciais, o usuário é
+     * redirecionado para o menu correspondente ao seu
+     * perfil:</p>
+     *
+     * <ul>
+     *     <li>Cliente → Menu de Gestão de Contas;</li>
+     *     <li>Administrador → Painel Administrativo.</li>
+     * </ul>
+     *
+     * <p>Este método também participa da implementação
+     * do RF09 (Ativar/Desativar Perfil), permitindo a
+     * reativação de perfis anteriormente desativados.</p>
+     *
+     * @param perfilSelecionado Tipo de perfil escolhido
+     * pelo usuário no menu inicial.
+     */
 
     private static void Login(String perfilSelecionado) {
         while (true) {
@@ -198,6 +364,32 @@ public class AplicacaoBancaria {
             break;
         }
     }
+
+    /**
+     * Método que implementa o RF01: Cadastro de Usuários.
+     *
+     * <p>Realiza o processo de criação de novos perfis
+     * na aplicação bancária, permitindo o cadastro de
+     * clientes e administradores.</p>
+     * <p>O método exibe formulários específicos de acordo
+     * com o perfil selecionado, coleta os dados pessoais
+     * informados pelo usuário e valida o preenchimento
+     * dos campos obrigatórios.</p>
+     *
+     * <p>Antes da criação do perfil, são realizadas
+     * verificações para impedir a duplicidade de CPF
+     * e endereço de e-mail já cadastrados no sistema.
+     * Por questões de segurança, a senha informada
+     * é criptografada utilizando o algoritmo BCrypt
+     * antes de ser armazenada na base de dados.</p>
+     *
+     * <p>Após a validação dos dados, o novo usuário é
+     * persistido no banco de dados e adicionado à lista
+     * de usuários carregada em memória pela aplicação.</p>
+     *
+     * @param perfilSelecionado Tipo de perfil escolhido
+     * pelo usuário durante o processo de cadastro.
+     */
 
     private static void Cadastro(String perfilSelecionado) {
         while (true) {
@@ -267,6 +459,40 @@ public class AplicacaoBancaria {
             break;
         }
     }
+
+    /**
+     * Método que implementa o RF03: Gerenciamento de Contas.
+     *
+     * <p>Exibe o menu principal de contas do cliente
+     * autenticado, permitindo o gerenciamento de todas
+     * as contas vinculadas ao seu perfil.</p>
+     * <p>Por meio deste menu, o cliente pode executar
+     * as seguintes operações:</p>
+     *
+     * <ul>
+     *     <li>Listar todas as contas cadastradas;</li>
+     *     <li>Abrir uma nova conta bancária;</li>
+     *     <li>Encerrar uma conta existente;</li>
+     *     <li>Acessar uma conta específica;</li>
+     *     <li>Retornar ao menu principal.</li>
+     * </ul>
+     *
+     * <p>O método também verifica continuamente o status
+     * do perfil do cliente, encerrando o acesso caso o
+     * usuário esteja com o perfil inativo.</p>
+     *
+     * <p>Quando uma conta é selecionada para acesso,
+     * o sistema redireciona o usuário para o dashboard
+     * principal da conta, onde ficam disponíveis as
+     * operações financeiras e administrativas.</p>
+     *
+     * <p>Este método participa diretamente da implementação
+     * dos requisitos funcionais relacionados à abertura,
+     * encerramento, consulta e acesso de contas bancárias.</p>
+     *
+     * @param encontrado Cliente autenticado que terá
+     * acesso às funcionalidades de gerenciamento de contas.
+     */
 
     public static void menuGestaoContas(Cliente encontrado) {
         ContaBancoRepository.carregarContas(encontrado);
@@ -397,6 +623,39 @@ public class AplicacaoBancaria {
         }
     }
 
+    /**
+     * Método que implementa o RF03: Abertura de Conta Bancária.
+     *
+     * <p>Permite que um cliente crie uma nova conta bancária
+     * vinculada ao seu perfil dentro da aplicação.</p>
+     *
+     * <p>O método apresenta os tipos de contas disponíveis
+     * para abertura e solicita os dados necessários de acordo
+     * com a modalidade escolhida:</p>
+     *
+     * <ul>
+     *     <li>Conta Corrente;</li>
+     *     <li>Conta Poupança;</li>
+     *     <li>Conta Kids;</li>
+     *     <li>Conta Investimento.</li>
+     * </ul>
+     *
+     * <p>Durante o processo são realizadas validações para
+     * garantir o correto preenchimento dos campos obrigatórios,
+     * bem como impedir a criação de contas com números já
+     * cadastrados para o cliente.</p>
+     *
+     * <p>Após a validação das informações, a conta é criada,
+     * vinculada ao cliente e persistida no banco de dados.</p>
+     *
+     * <p>Em caso de erro de preenchimento ou inconsistência
+     * nos dados informados, o sistema exibe mensagens de
+     * orientação ao usuário.</p>
+     *
+     * @param encontrado Cliente autenticado que receberá
+     * a nova conta bancária.
+     */
+
     private static void AberturaConta(Cliente encontrado) {
         String tipo = SwingUtil.exibirMenuSelecao("Abertura de Conta", "Selecione o tipo de conta que deseja criar:", "Conta Corrente", "Conta Poupança", "Conta Kids", "Conta Investimento");
         if (tipo == null) return;
@@ -464,6 +723,45 @@ public class AplicacaoBancaria {
             JOptionPane.showMessageDialog(null, "Erro: Verifique a formatação dos campos numéricos.");
         }
     }
+
+    /**
+     * Método responsável por exibir o Dashboard Principal
+     * da Conta Bancária do cliente.
+     *
+     * <p>Após selecionar uma conta no menu de gestão de
+     * contas, o cliente é direcionado para este painel,
+     * onde poderá acessar todas as funcionalidades
+     * relacionadas à conta selecionada.</p>
+     *
+     * <p>O dashboard disponibiliza as seguintes opções:</p>
+     *
+     * <ul>
+     *     <li>Configurações e gerenciamento do perfil;</li>
+     *     <li>Visualização dos dados da conta;</li>
+     *     <li>Realização de transações financeiras;</li>
+     *     <li>Consulta e filtragem do extrato bancário;</li>
+     *     <li>Gestão de cartões vinculados à conta;</li>
+     *     <li>Gerenciamento de investimentos;</li>
+     *     <li>Retorno ao menu de contas.</li>
+     * </ul>
+     *
+     * <p>O método permanece em execução enquanto o usuário
+     * permanecer navegando pelo dashboard ou até que
+     * solicite o retorno ao menu anterior.</p>
+     *
+     * <p>Também verifica continuamente a situação do perfil
+     * do cliente, encerrando o acesso caso o perfil esteja
+     * marcado como inativo.</p>
+     *
+     * <p>Este método atua como ponto central de acesso às
+     * funcionalidades dos requisitos relacionados às
+     * movimentações financeiras, extrato, cartões,
+     * investimentos e gerenciamento de perfil.</p>
+     *
+     * @param conta Conta bancária selecionada pelo cliente.
+     * @param encontrado Cliente autenticado proprietário
+     * da conta acessada.
+     */
 
     public static void menuPrincipalCliente(Conta conta, Cliente encontrado) {
         int opcaoDash = 0;
@@ -627,6 +925,42 @@ public class AplicacaoBancaria {
         }
     }
 
+    /**
+     * Método responsável pelo gerenciamento das configurações
+     * e informações do perfil do usuário autenticado.
+     *
+     * <p>Disponibiliza funcionalidades relacionadas à
+     * manutenção cadastral e ao controle do estado do perfil,
+     * permitindo ao usuário realizar alterações nos seus
+     * dados pessoais e gerenciar a sua permanência no sistema.</p>
+     *
+     * <p>As operações disponíveis incluem:</p>
+     *
+     * <ul>
+     *     <li>Exclusão definitiva do perfil;</li>
+     *     <li>Alteração de dados cadastrais;</li>
+     *     <li>Visualização dos dados do perfil;</li>
+     *     <li>Ativação ou desativação do perfil;</li>
+     *     <li>Retorno ao dashboard principal.</li>
+     * </ul>
+     *
+     * <p>O método realiza validações de segurança para
+     * operações críticas, como exclusão de perfil e
+     * alteração de informações sensíveis.</p>
+     *
+     * <p>Também implementa funcionalidades relacionadas
+     * aos requisitos de gerenciamento cadastral e controle
+     * de acesso, permitindo que o usuário atualize os seus
+     * dados e altere o status de sua conta no sistema.</p>
+     *
+     * <p>Caso o perfil seja desativado, o acesso do usuário
+     * é imediatamente encerrado, exigindo nova autenticação
+     * para utilização futura da aplicação.</p>
+     *
+     * @param encontrado Usuário autenticado que terá as suas
+     * informações e configurações gerenciadas.
+     */
+
     public static void configuracoes(Usuario encontrado) {
         int config = 0;
         while (config != 5) {
@@ -729,6 +1063,47 @@ public class AplicacaoBancaria {
             }
         }
     }
+
+    /**
+     * Método responsável pelo gerenciamento dos cartões
+     * vinculados a uma conta bancária.
+     *
+     * <p>Disponibiliza todas as funcionalidades relacionadas
+     * ao ciclo de vida dos cartões emitidos para a conta,
+     * permitindo a sua criação, consulta e administração.</p>
+     *
+     * <p>As operações disponíveis incluem:</p>
+     *
+     * <ul>
+     *     <li>Criação de novos cartões;</li>
+     *     <li>Visualização dos dados do cartão;</li>
+     *     <li>Bloqueio de cartões;</li>
+     *     <li>Desbloqueio de cartões;</li>
+     *     <li>Consulta de limites disponíveis;</li>
+     *     <li>Solicitação de ajuste de limite de crédito;</li>
+     *     <li>Retorno ao dashboard da conta.</li>
+     * </ul>
+     *
+     * <p>O método realiza validações para garantir que a
+     * conta possua cartões cadastrados antes da execução
+     * das operações que exigem um cartão previamente
+     * selecionado.</p>
+     *
+     * <p>As solicitações de ajuste de limite passam por
+     * análise administrativa e, quando aprovadas, têm
+     * os seus dados atualizados e persistidos no banco de
+     * dados da aplicação.</p>
+     *
+     * <p>Também controla operações relacionadas ao status
+     * dos cartões, permitindo o bloqueio e desbloqueio
+     * de forma segura e registrando as alterações
+     * realizadas no sistema.</p>
+     *
+     * @param conta Conta bancária que possui os cartões
+     * a serem gerenciados.
+     * @param encontrado Cliente autenticado proprietário
+     * da conta e dos cartões vinculados.
+     */
 
     private static void gestaoCartoes(Conta conta, Cliente encontrado) {
         int opcaoCartao = 0;
@@ -878,6 +1253,35 @@ public class AplicacaoBancaria {
         }
     }
 
+    /**
+     * Método que implementa o RF07: Investimentos.
+     *
+     * <p>Disponibiliza ao cliente o acesso aos produtos
+     * de investimento cadastrados pela instituição
+     * financeira.</p>
+     *
+     * <p>O módulo permite:</p>
+     *
+     * <ul>
+     *     <li>Consultar investimentos disponíveis;</li>
+     *     <li>Visualizar aplicações realizadas;</li>
+     *     <li>Aplicar recursos financeiros;</li>
+     *     <li>Resgatar investimentos ativos.</li>
+     * </ul>
+     *
+     * <p>Durante a realização das aplicações, o sistema
+     * verifica saldo disponível e registra todas as
+     * movimentações na base de dados.</p>
+     *
+     * <p>Os resgates devolvem automaticamente os valores
+     * aplicados para o saldo disponível da conta.</p>
+     *
+     * @param conta Conta bancária que realizará as
+     * operações de investimento.
+     * @param encontrado Cliente autenticado responsável
+     * pela conta selecionada.
+     */
+
     public static void MenuInvestimentos(Conta conta, Cliente encontrado) {
         int opcaoInv = 0;
 
@@ -1026,6 +1430,39 @@ public class AplicacaoBancaria {
             }
         }
     }
+
+    /**
+     * Método que implementa o Painel Administrativo
+     * da instituição financeira.
+     *
+     * <p>Disponibiliza ao administrador todas as
+     * funcionalidades de supervisão e controle
+     * operacional do sistema.</p>
+     *
+     * <p>Entre os recursos disponíveis estão:</p>
+     *
+     * <ul>
+     *     <li>Gerenciamento do próprio perfil;</li>
+     *     <li>Consulta e gerenciamento de clientes;</li>
+     *     <li>Bloqueio e desbloqueio de contas;</li>
+     *     <li>Auditoria de transações;</li>
+     *     <li>Geração de relatórios gerenciais.</li>
+     * </ul>
+     *
+     * <p>O método centraliza as funcionalidades
+     * administrativas previstas nos requisitos
+     * funcionais da aplicação e garante que apenas
+     * administradores ativos possam executar ações
+     * de controle e supervisão.</p>
+     *
+     * <p>Também permite a geração de relatórios
+     * consolidados contendo informações sobre
+     * clientes, contas e transações da fintech.</p>
+     *
+     * @param admin Administrador autenticado que
+     * possui acesso às funcionalidades gerenciais
+     * da plataforma.
+     */
 
     public static void menuPrincipalAdministrador(Administrador admin) {
         int mpA = 0;

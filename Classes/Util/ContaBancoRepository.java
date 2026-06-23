@@ -10,7 +10,46 @@ import Classes.Model.Operacoes.Status;
 import java.sql.*;
 import java.util.ArrayList;
 
+    /**
+     * Classe responsável pela persistência e recuperação de contas bancárias
+     * no banco de dados PostgreSQL.
+     *
+     * <p>Esta classe implementa o padrão Repository e centraliza todas as
+     * operações relacionadas à entidade {@link Conta}, incluindo:</p>
+     *
+     * <ul>
+     *     <li>Cadastro de contas;</li>
+     *     <li>Carregamento de contas vinculadas a um cliente;</li>
+     *     <li>Exclusão de contas;</li>
+     *     <li>Busca de contas para transferências;</li>
+     *     <li>Atualização de status das contas.</li>
+     * </ul>
+     *
+     * <p>Também é responsável por carregar os dados associados a cada conta,
+     * como cartões, investimentos e transações.</p>
+     *
+     * @author Ian Carlos
+     * @version 1.0
+     * @since 2026
+     */
+
 public class ContaBancoRepository {
+
+    /**
+     * Salva uma conta bancária no banco de dados.
+     *
+     * <p>O método identifica automaticamente o tipo da conta e armazena
+     * os atributos específicos de cada modalidade:</p>
+     *
+     * <ul>
+     *     <li>Conta Corrente → Limite de cheque especial;</li>
+     *     <li>Conta Kids → CPF do responsável e limite mensal;</li>
+     *     <li>Conta Investimento → CPF do titular.</li>
+     * </ul>
+     *
+     * @param conta Conta que será persistida.
+     * @param usuarioId Identificador do cliente proprietário da conta.
+     */
 
     public static void salvarConta(Conta conta, int usuarioId) {
         String sql = "INSERT INTO conta (numero_conta, agencia, saldo, tipo_conta, status_conta, " +
@@ -45,6 +84,22 @@ public class ContaBancoRepository {
 
         } catch (SQLException e) { System.err.println("Erro ao salvar conta no banco: " + e.getMessage()); }
     }
+
+    /**
+     * Carrega todas as contas pertencentes a um cliente a partir do banco de dados.
+     *
+     * <p>Além das informações básicas da conta, este método também carrega:</p>
+     *
+     * <ul>
+     *     <li>Cartões vinculados;</li>
+     *     <li>Investimentos realizados;</li>
+     *     <li>Histórico de transações.</li>
+     * </ul>
+     *
+     * <p>As contas recuperadas são adicionadas à lista de contas do cliente.</p>
+     *
+     * @param cliente Cliente cujas contas serão carregadas.
+     */
 
     public static void carregarContas(Cliente cliente) {
         String sql = "SELECT * FROM conta WHERE usuario_id = ?";
@@ -87,6 +142,12 @@ public class ContaBancoRepository {
         } catch (SQLException e) { System.err.println("Erro ao carregar contas do cliente: " + e.getMessage()); }
     }
 
+    /**
+     * Remove uma conta do banco de dados.
+     *
+     * @param numeroConta Número da conta que será excluída.
+     */
+
     public static void deletarConta(String numeroConta) {
         String sql = "DELETE FROM conta WHERE numero_conta = ?";
         try (Connection conn = ConexaoBanco.conectar();
@@ -95,6 +156,17 @@ public class ContaBancoRepository {
             stmt.executeUpdate();
         } catch (SQLException e) { System.err.println("Erro ao deletar conta do banco: " + e.getMessage()); }
     }
+
+    /**
+     * Busca uma conta de destino para operações de transferência.
+     *
+     * <p>A pesquisa é realizada utilizando o CPF do proprietário e o
+     * número da conta informados.</p>
+     *
+     * @param cpfDestino CPF do titular da conta.
+     * @param numeroContaDestino Número da conta de destino.
+     * @return Objeto {@link Conta} encontrado ou {@code null} caso não exista.
+     */
 
     public static Conta buscarContaDestino(String cpfDestino, String numeroContaDestino) {
         String sql = "SELECT c.* FROM conta c " +
@@ -139,6 +211,16 @@ public class ContaBancoRepository {
         } catch (SQLException e) { System.err.println("Erro ao buscar conta de destino: " + e.getMessage()); }
         return null;
     }
+
+    /**
+     * Atualiza o status de uma conta armazenada no banco de dados.
+     *
+     * <p>O status pode ser alterado para {@link Status#ATIVO}
+     * ou {@link Status#INATIVO}.</p>
+     *
+     * @param idConta Identificador da conta.
+     * @param novoStatus Novo status a ser aplicado.
+     */
 
     public static void atualizarStatusConta(int idConta, Classes.Model.Operacoes.Status novoStatus) {
         String sql = "UPDATE conta SET status_conta = ? WHERE id = ?";

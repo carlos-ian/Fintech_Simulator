@@ -30,11 +30,12 @@ public class CartaoBancoRepository {
      * <code>cartao</code> e associados à conta informada
      * por meio da chave estrangeira <code>conta_id</code>.</p>
      *
-     * @param cartao Cartão que será persistido.
+     * @param cartao  Cartão que será persistido.
      * @param contaId Identificador da conta à qual o cartão pertence.
+     * @return
      */
 
-    public static void salvarCartao(Cartao cartao, int contaId) {
+    public static boolean salvarCartao(Cartao cartao, int contaId) {
         String sql = "INSERT INTO cartao (numero_cartao, titular, tipo_cartao, limite_total, limite_disponivel, esta_bloqueado, conta_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = ConexaoBanco.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -48,9 +49,11 @@ public class CartaoBancoRepository {
             stmt.setInt(7, contaId);
 
             stmt.executeUpdate();
+            return true;
         } catch (SQLException e) {
             System.err.println("Erro ao salvar cartão no banco: " + e.getMessage());
         }
+        return false;
     }
 
         /**

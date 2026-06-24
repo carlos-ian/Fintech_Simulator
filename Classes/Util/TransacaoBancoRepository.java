@@ -34,16 +34,17 @@ public class TransacaoBancoRepository {
      * <p>Todas as operações são executadas dentro de uma única transação SQL,
      * sendo revertidas automaticamente em caso de erro.</p>
      *
-     * @param t objeto contendo os dados da transação realizada.
-     * @param contaOrigemId identificador da conta de origem.
-     * @param novoSaldoOrigem saldo atualizado da conta de origem após a operação.
-     * @param contaDestinoId identificador da conta de destino. Pode ser
-     *                       {@code null} quando não houver destinatário.
+     * @param t                objeto contendo os dados da transação realizada.
+     * @param contaOrigemId    identificador da conta de origem.
+     * @param novoSaldoOrigem  saldo atualizado da conta de origem após a operação.
+     * @param contaDestinoId   identificador da conta de destino. Pode ser
+     *                         {@code null} quando não houver destinatário.
      * @param novoSaldoDestino saldo atualizado da conta de destino.
      *                         Pode ser {@code null} quando não houver destinatário.
+     * @return
      */
 
-    public static void registrarTransacao(Transacao t, int contaOrigemId, double novoSaldoOrigem, Integer contaDestinoId, Double novoSaldoDestino) {
+    public static boolean registrarTransacao(Transacao t, int contaOrigemId, double novoSaldoOrigem, Integer contaDestinoId, Double novoSaldoDestino) {
         String sqlTransacao = "INSERT INTO transacao (data_transacao, hora_transacao, valor, categoria, tipo_fluxo, metodo_pagamento, status, conta_origem_id, conta_destino_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlAtualizarSaldo = "UPDATE conta SET saldo = ? WHERE id = ?";
 
@@ -98,12 +99,14 @@ public class TransacaoBancoRepository {
             }
 
             conn.commit();
+            return true;
         } catch (SQLException e) {
             if (conn != null) { try { conn.rollback(); } catch (SQLException ex) {} }
             System.err.println("Erro ao registrar transação: " + e.getMessage());
         } finally {
             if (conn != null) { try { conn.close(); } catch (SQLException e) {} }
         }
+        return false;
     }
 
     /**

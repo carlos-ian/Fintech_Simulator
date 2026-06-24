@@ -196,7 +196,6 @@ public class AplicacaoBancaria {
 
                                 for (Investimento inv : conta.getListaInvestimentos()) {
                                     inv.aplicarRendimento();
-                                    InvestimentoBancoRepository.atualizarValorInvestimento(inv.getId(), inv.getValorAplicado());
                                 }
                             }
                         }

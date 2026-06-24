@@ -17,7 +17,7 @@ import java.util.ArrayList;
      * Classe abstrata responsável por representar uma conta bancária do sistema.
      * <p>Atributos e comportamentos básicos como saldo, agência, número da conta,
      * extrato de transações, cartões vinculados e investimentos realizados.
-     * Implementando regras específicas para cada tipo de conta.<p/>
+     * Implementando regras específicas para cada tipo de conta.</p>
      *
      * @author Ian Carlos
      * @version 1.0
@@ -61,7 +61,7 @@ public abstract class Conta {
     /**
      * Realiza uma operação financeira, próprias para processar transações.
      * <p>Esse é um método abstrato que servirá de base para formulação dos métodos
-     * de transação das classes que se estendem de conta.<p/>
+     * de transação das classes que se estendem de conta.</p>
      *
      * @param valor Valor da operação.
      * @param metodoPagamento Método utilizado para realizar o pagamento.
@@ -94,7 +94,7 @@ public abstract class Conta {
      *     <li>Categoria;</li>
      *     <li>Quantidade de dias;</li>
      *     <li>Data específica.</li>
-     *<ul/>
+     *</ul>
      *
      * @param fluxo Tipo de fluxo financeiro.
      * @param metodoPagamento Método utilizado na transação.

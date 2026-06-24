@@ -57,7 +57,7 @@ public abstract class Usuario {
 
     /**
      * Método que implementa o RF02: Autenticação.
-     * <p>Realiza a autenticação de um usuário no sistema.<p/>
+     * <p>Realiza a autenticação de um usuário no sistema.</p>
      *
      * <p>A autenticação é realizada a partir de uma busca utilizando o CPF
      * informado e,em seguida, a senha fornecida é comparada com a senha criptografada
@@ -83,7 +83,7 @@ public abstract class Usuario {
 
     /**
      * Método que implementa o RF10: Exclusão de Perfil.
-     * <p>Remove um perfil do sistema.<p/>
+     * <p>Remove um perfil do sistema.</p>
      *
      * <p>Antes de realizar a remoção, confere se a senha informada é valida,
      * caso o usuário seja um cliente, também é verificado se todas as contas
@@ -120,7 +120,7 @@ public abstract class Usuario {
 
     /**
      * Método que implementa o RF08: Alteração de Perfil.
-     * <p>Atualiza um dado cadastral do usuário.<p/>
+     * <p>Atualiza um dado cadastral do usuário.</p>
      * <p>Realiza a alteração de dados do usuário a partir do tipo de dado
      * ou do novo valor de intersse, após informado esses campos, é realizada
      * uma verificação de qual dado será alterado.É Permitido alterar nome,

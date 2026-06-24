@@ -84,6 +84,31 @@ public class AplicacaoBancaria {
      *             Não utilizados pela aplicação.
      */
 
+    /**
+     * Método principal da aplicação.
+     *
+     * <p>Representa o ponto de entrada do sistema fintech,
+     * sendo responsável pela inicialização dos recursos
+     * essenciais antes da interação do usuário.</p>
+     * <p>Durante a execução deste método são realizadas
+     * as seguintes etapas:</p>
+     *
+     * <ol>
+     *     <li>Inicialização do catálogo de investimentos disponíveis;</li>
+     *     <li>Carregamento dos usuários persistidos no banco de dados;</li>
+     *     <li>Execução das rotinas automáticas mensais do sistema;</li>
+     *     <li>Exibição do menu inicial da aplicação.</li>
+     * </ol>
+     *
+     * <p>Este método participa diretamente da inicialização dos
+     * requisitos funcionais relacionados à autenticação,
+     * gerenciamento de contas, investimentos e administração
+     * da fintech.</p>
+     *
+     * @param args Argumentos recebidos pela linha de comando.
+     *             Não utilizados pela aplicação.
+     */
+
     public static void main(String[] args) {
         inicializarCatalogoInvestimentos();
         UsuarioBancoRepository.carregarUsuarios(listaUsuarios);

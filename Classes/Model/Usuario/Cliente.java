@@ -41,7 +41,7 @@ public class Cliente extends Usuario {
 
     /**
      * Método que implementa o RF08: Alteração de Perfil.
-     * <p>Atualiza informações cadastrais do cliente.<p/>
+     * <p>Atualiza informações cadastrais do cliente.</p>
      *
      * <p>Sobrescreve o método "alterarDados" da classe Usuário ({@link Classes.Model.Usuario.Usuario}).
      * Por motivos de segurança e integridade dos dados, não é permitido alterar
@@ -66,7 +66,7 @@ public class Cliente extends Usuario {
      * Método que implementa o RF07: Visualização de Perfil.
      * <p>Método que implementa o RF04: Visualização da Lista de Contas.</p>
      *
-     * <p>Exibe os dados completos do cliente.<p/>
+     * <p>Exibe os dados completos do cliente.</p>
      *
      * <p>Além das informações básicas herdadas da classe
      * {@link Classes.Model.Usuario.Usuario}, também apresenta o status do cliente
@@ -95,7 +95,7 @@ public class Cliente extends Usuario {
 
     /**
      * Método que implementa o RF03: Abertura e Encerramento de Contas.
-     * <p>Abre uma nova conta bancária para o cliente.<p/>
+     * <p>Abre uma nova conta bancária para o cliente.</p>
      *
      * <p>O tipo de conta é informado, após isso é determinado qual tipo de classe
      * de Conta será instanciada. Após a criação, a conta é automaticamente adicionada
@@ -116,7 +116,7 @@ public class Cliente extends Usuario {
      * @param limiteChequeEspecial Limite da conta corrente.
      * @param cpfResponsavel CPF do responsável pela conta kids.
      * @param limiteMensal Limite mensal da conta kids.
-     * @param perfilRisco Perfil de risco da conta investimento.
+     * @param titularCPF Perfil de risco da conta investimento.
      *
      * @return A conta criada ou {@code null} caso o tipo informado
      * seja inválido.
@@ -151,7 +151,7 @@ public class Cliente extends Usuario {
 
     /**
      * Método que implementa o RF03: Abertura e Encerramento de Contas.
-     * <p>Realiza o encerramento de uma conta vinculada ao cliente.<p/>
+     * <p>Realiza o encerramento de uma conta vinculada ao cliente.</p>
      *
      * <p>É informada a Conta que o cliente deseja encerrar, após isso se a conta
      * possuir saldo igual a zero, ela poderá ser removida.</p>

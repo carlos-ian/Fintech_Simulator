@@ -39,7 +39,7 @@ package "Módulo Usuários" #EBF5FB {
         + Cliente(nome : String, cpf : String, email : String, senha : String, dataNascimento : String, telefone : String, tipoUsuario : String)
         + alterarDados(tipoDado : String, novoValor : String) : void 
         + visualizarDados() : String 
-        + abrirConta(numeroConta : String, agencia : String, saldo : double, tipoConta : String, limiteChequeEspecial : double, cpfResponsavel : String, limiteMensal : double, perfilRisco : String) : void
+        + abrirConta(numeroConta : String, agencia : String, saldo : double, tipoConta : String, limiteChequeEspecial : double, cpfResponsavel : String, limiteMensal : double, titularCPF : String) : void
         + fecharConta(conta : Conta) : boolean
         + obterContas() : ArrayList<Conta>
     }

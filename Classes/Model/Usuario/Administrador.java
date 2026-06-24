@@ -53,7 +53,7 @@ public class Administrador extends Usuario {
 
     /**
      * Método que implementa o RF08: Alteração de Perfil.
-     * <p>Atualiza informações cadastrais do administrador.<p/>
+     * <p>Atualiza informações cadastrais do administrador.</p>
      *
      * <p>Permite alterar todos os dados herdados da classe
      * {@link Classes.Model.Usuario.Usuario}, além da matrícula
@@ -82,7 +82,7 @@ public class Administrador extends Usuario {
 
     /**
      * Método que implementa o RF07: Visualização de Perfil.
-     * <p>Exibe os dados completos do administrador.<p/>
+     * <p>Exibe os dados completos do administrador.</p>
      *
      * <p>Além das informações básicas do perfil, apresenta
      * a matrícula funcional do administrador.</p>
@@ -99,10 +99,10 @@ public class Administrador extends Usuario {
 
     /**
      * Método que implementa o RF20: Gerenciamento de Clientes.
-     * <p>Procura um cliente cadastrado através do CPF.<p/>
+     * <p>Procura um cliente cadastrado através do CPF.</p>
      *
      * <p>O Método recebe os valores do cpf do cliente junto a lista
-     * de todos os clientes cadastrados na aplicação.<p/>
+     * de todos os clientes cadastrados na aplicação.</p>
      *
      * @param cpfBusca CPF do cliente a ser localizado.
      * @param bancoDeClientes Lista de clientes cadastrados.
@@ -122,7 +122,7 @@ public class Administrador extends Usuario {
 
     /**
      * Método que implementa o RF21: Gerenciamento de Contas.
-     * <p>Desativa uma conta bancária.<p/>
+     * <p>Desativa uma conta bancária.</p>
      *
      * <p>É informada a conta que deverá ser dessativada e uma justificativa para
      * essa ação. A operação exige obrigatóriamente a indicação de um motivo para
@@ -151,10 +151,10 @@ public class Administrador extends Usuario {
 
     /**
      * Método que implementa o RF21: Gerenciamento de Contas.
-     * <p>Reativa uma conta previamente desativada.<p/>
+     * <p>Reativa uma conta previamente desativada.</p>
      *
      * <p>A operação recebe a conta que deverá ser ativada
-     * e é executada sem nenhuma condição ou exeção.<p/>
+     * e é executada sem nenhuma condição ou exeção.</p>
      *
      * @param conta Conta a ser ativada.
      *
@@ -172,7 +172,7 @@ public class Administrador extends Usuario {
 
     /**
      * Método que implementa o RF20: Gerenciamento de Clientes.
-     * <p>Desativa o perfil de um cliente.<p/>
+     * <p>Desativa o perfil de um cliente.</p>
      *
      * <p>É informado o perfil de cliente que deverá ser removido.
      * A desativação somente pode ocorrer mediante justificativa
@@ -204,7 +204,7 @@ public class Administrador extends Usuario {
      * Reativa o perfil de um cliente.
      *
      * <p>A operação recebe o perfil que deverá ser ativado
-     * e é executada sem nenhuma condição ou exeção.<p/>
+     * e é executada sem nenhuma condição ou exeção.</p>
      *
      * @param cliente Cliente a ser reativado.
      *
@@ -222,10 +222,10 @@ public class Administrador extends Usuario {
 
     /**
      * Método que implementa o RF21: Gerenciamento de Contas.
-     * <p>Obtém o histórico completo de transações de uma conta.<p/>
+     * <p>Obtém o histórico completo de transações de uma conta.</p>
      *
      * <p>A operação recebe uma conta, e a partir dela puxa o
-     * extrato das transações realizadas por ela.<p/>
+     * extrato das transações realizadas por ela.</p>
      *
      * @param conta Conta consultada.
      *
@@ -242,7 +242,7 @@ public class Administrador extends Usuario {
 
     /**
      * Método que implementa o RF14: Visualização e Ajuste de Limite.
-     * <p>Analisa uma solicitação de aumento de limite de cartão.<p/>
+     * <p>Analisa uma solicitação de aumento de limite de cartão.</p>
      *
      * <p>É passado para a operação, o cartão, a respectiva conta
      * titular do mesmo junto ao novo limite do cartão.
@@ -281,7 +281,7 @@ public class Administrador extends Usuario {
 
     /**
      * Método que implementa o RF22: Relatório Geral
-     * <p>Gera um relatório geral da fintech.<p/>
+     * <p>Gera um relatório geral da fintech.</p>
      *
      * <p>O relatório apresenta informações consolidadas sobre:</p>
      *

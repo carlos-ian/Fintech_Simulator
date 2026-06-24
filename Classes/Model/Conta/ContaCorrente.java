@@ -149,7 +149,7 @@ public class ContaCorrente extends Conta {
     /**
      * Método que implementa o RF06: Visualização de Dados da Conta.
      *
-     * <p>Exibe os dados da conta corrente.<p/>
+     * <p>Exibe os dados da conta corrente.</p>
      *
      * <p>Além das informações básicas fornecidas pela classe
      * {@link Classes.Model.Conta.Conta}, também apresenta o valor disponível

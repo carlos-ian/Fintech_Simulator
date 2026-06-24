@@ -48,7 +48,7 @@ public class ContaPoupanca extends Conta {
     /**
      * Método que implementa o RF23: Conta Poupança.
      *
-     * <p>Aplica o rendimento da poupança sobre o saldo atual.<p/>
+     * <p>Aplica o rendimento da poupança sobre o saldo atual.</p>
      *
      * <p>O valor do rendimento é calculado utilizando a taxa
      * definida para a conta e adicionado ao saldo disponível.</p>

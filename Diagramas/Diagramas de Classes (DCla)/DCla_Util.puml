@@ -1,0 +1,80 @@
+@startuml
+package "Classes.Util" {
+
+    class ConexaoBanco {
+        - {static} dotenv : Dotenv
+        - {static} HOST : String
+        - {static} PORTA : String
+        - {static} BANCO : String
+        - {static} USUARIO : String
+        - {static} SENHA : String
+        - {static} URL : String
+        + {static} main(args : String[]) : void
+        + {static} conectar() : Connection
+    }
+
+    class SwingUtil {
+        + {static} exibirFormulario(titulo : String, mensagem : String, campos : String[]) : String[]
+        + {static} exibirMenuSelecao(titulo : String, mensagem : String, opcoes : String[]) : String
+        + {static} exibirMenuBotoes(titulo : String, mensagem : String, botoes : String[]) : int
+        + {static} exibirFormularioTransacao(cartoes : ArrayList<Cartao>) : Object[]
+    }
+
+    class UsuarioBancoRepository {
+        + {static} carregarUsuarios(listaMemoria : ArrayList<Usuario>) : void
+        + {static} deletarUsuario(id : int) : void
+        + {static} salvarUsuario(usuario : Usuario) : boolean
+        + {static} atualizarUsuario(id : int, tipoDado : String, novoValor : String) : void
+    }
+
+    class ContaBancoRepository {
+        + {static} salvarConta(conta : Conta, usuarioId : int) : void
+        + {static} carregarContas(cliente : Cliente) : void
+        + {static} deletarConta(numeroConta : String) : void
+        + {static} buscarContaDestino(cpfDestino : String, numeroContaDestino : String) : Conta
+        + {static} atualizarStatusConta(idConta : int, novoStatus : Status) : void
+        + {static} atualizarSaldoConta(contaId : int, novoSaldo : double) : void
+    }
+
+    class CartaoBancoRepository {
+        + {static} salvarCartao(cartao : Cartao, contaId : int) : boolean
+        + {static} atualizarBloqueioCartao(numeroCartao : String, estaBloqueado : boolean) : void
+        + {static} atualizarLimitesCartao(numeroCartao : String, limiteTotal : double, limiteDisponivel : double) : void
+        + {static} carregarCartoes(contaId : int, listaCartoesMemoria : ArrayList<Cartao>) : void
+    }
+
+    class TransacaoBancoRepository {
+        + {static} registrarTransacao(t : Transacao, contaOrigemId : int, novoSaldoOrigem : double, contaDestinoId : Integer, novoSaldoDestino : Double) : boolean
+        + {static} carregarTransacoes(contaAtual : Conta, listaExtratoMemoria : ArrayList<Transacao>) : void
+    }
+
+    class InvestimentoBancoRepository {
+        + {static} registrarInvestimento(conta : Conta, produto : Investimento, valor : double, data : String) : boolean
+        + {static} resgatarInvestimento(conta : Conta, nomeProduto : String, valorAntigo : double) : void
+        + {static} carregarInvestimentos(conta : Conta) : void
+        + {static} atualizarValorInvestimento(investimentoId : int, novoValor : double) : void
+    }
+}
+
+package "Classes.Controller" {
+    class AplicacaoBancaria {
+        __ (Sem atributos/métodos expostos) __
+    }
+}
+
+' Relacionamentos de dependência dos Repositories com a Conexão
+UsuarioBancoRepository ..> ConexaoBanco : usa
+ContaBancoRepository ..> ConexaoBanco : usa
+CartaoBancoRepository ..> ConexaoBanco : usa
+TransacaoBancoRepository ..> ConexaoBanco : usa
+InvestimentoBancoRepository ..> ConexaoBanco : usa
+
+' AplicacaoBancaria orquestra tudo, chamando os utilitários e persistência
+AplicacaoBancaria ..> SwingUtil : chama formulários
+AplicacaoBancaria ..> UsuarioBancoRepository : persiste dados
+AplicacaoBancaria ..> ContaBancoRepository : persiste dados
+AplicacaoBancaria ..> CartaoBancoRepository : persiste dados
+AplicacaoBancaria ..> TransacaoBancoRepository : persiste dados
+AplicacaoBancaria ..> InvestimentoBancoRepository : persiste dados
+
+@enduml

@@ -13,6 +13,18 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
+    /**
+     * Classe abstrata responsável por representar uma conta bancária do sistema.
+     * <p>Atributos e comportamentos básicos como saldo, agência, número da conta,
+     * extrato de transações, cartões vinculados e investimentos realizados.
+     * Implementando regras específicas para cada tipo de conta.<p/>
+     *
+     * @author Ian Carlos
+     * @version 1.0
+     *
+     * @since 2026
+     */
+
 public abstract class Conta {
     protected ArrayList<Transacao> extrato = new ArrayList<>();
     protected ArrayList<Cartao> cartoes = new ArrayList<>();
@@ -27,6 +39,16 @@ public abstract class Conta {
     protected String tipoConta;
     protected Status statusConta;
 
+
+    /**
+     * Cria uma nova conta bancária.
+     *
+     * @param numeroConta Número identificador da conta.
+     * @param agencia Agência responsável pela conta.
+     * @param saldo Saldo inicial.
+     * @param tipoConta Tipo da conta criada.
+     */
+
     Conta(String numeroConta, String agencia, double saldo, String tipoConta) {
         this.numeroConta = numeroConta;
         this.agencia = agencia;
@@ -36,8 +58,52 @@ public abstract class Conta {
         this.id = codigoSequencial++;
     }
 
+    /**
+     * Realiza uma operação financeira, próprias para processar transações.
+     * <p>Esse é um método abstrato que servirá de base para formulação dos métodos
+     * de transação das classes que se estendem de conta.<p/>
+     *
+     * @param valor Valor da operação.
+     * @param metodoPagamento Método utilizado para realizar o pagamento.
+     * @param cartaoEscolhido Cartão utilizado na operação.
+     * @param category Categoria da movimentação financeira.
+     * @param destino Conta de destino da transferência.
+     * @return true caso a operação seja concluída com sucesso.
+     *
+     * @throws ContaInativaException Quando a conta estiver inativa.
+     * @throws SaldoInsuficienteException Quando o saldo for insuficiente.
+     * @throws LimiteInsuficienteException Quando o limite disponível for insuficiente.
+     */
+
     public abstract boolean realizarTransacao(double valor, String metodoPagamento, Cartao cartaoEscolhido, String category, Conta destino)
             throws ContaInativaException, SaldoInsuficienteException, LimiteInsuficienteException;
+
+
+    /**
+     * Método que implementa o RF16: Visualização de Extratos.
+     *
+     * <p>Consulta o extrato da conta aplicando filtros opcionais.</p>
+     *
+     * <p>A partir dos parâmetros recebidos, realiza uma sequência de comparações,
+     * de modo que ao final do processo, apenas os extratos correspondentes aos
+     * filtros selecionados estejam visíveis.</p>
+     *
+     * <ul>
+     *     <li>Fluxo financeiro (Entrada ou Saída);</li>
+     *     <li>Método de pagamento;</li>
+     *     <li>Categoria;</li>
+     *     <li>Quantidade de dias;</li>
+     *     <li>Data específica.</li>
+     *<ul/>
+     *
+     * @param fluxo Tipo de fluxo financeiro.
+     * @param metodoPagamento Método utilizado na transação.
+     * @param categoria Categoria da transação.
+     * @param diasPeriodo Período em dias para consulta.
+     * @param dataEspecifica Data específica da pesquisa.
+     *
+     * @return Lista contendo apenas as transações que atendem aos filtros.
+     */
 
     public ArrayList<Transacao> visualizarExtrato(String fluxo, String metodoPagamento, String categoria, Integer diasPeriodo, String dataEspecifica) {
         ArrayList<Transacao> transacoesFiltradas = new ArrayList<>();
@@ -94,6 +160,16 @@ public abstract class Conta {
         return transacoesFiltradas;
     }
 
+
+    /**
+     * Método que implementa o RF06: Visualização de Dados da Conta.
+     *
+     * <p>Exibe as informações básicas da conta.</p>
+     *
+     * @return String formatada contendo agência, número, tipo,
+     * status e saldo da conta.
+     */
+
     public String visualizarDadosConta() {
         return String.format(
                 "===================================\n" +
@@ -106,6 +182,9 @@ public abstract class Conta {
         );
     }
 
+    /**  ==========================
+     *       GETTERS E SETTERS
+     *   ========================== */
 
     public double getSaldo() {return saldo;}
     public String getAgencia() {return agencia;}

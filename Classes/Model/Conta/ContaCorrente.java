@@ -9,13 +9,85 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+    /**
+     * Representa uma conta-corrente da fintech.
+     *
+     * <p>A conta-corrente permite realizar transações financeiras utilizando
+     * PIX, cartão de débito ou cartão de crédito. Além do saldo disponível,
+     * o cliente também pode utilizar um limite de cheque especial quando
+     * necessário.</p>
+     *
+     * <p>Esta classe herda as funcionalidades básicas da classe
+     * {@link Classes.Model.Conta.Conta} e implementa regras específicas para movimentações
+     * financeiras em contas correntes.</p>
+     *
+     * @author Joel Antônio
+     * @version 1.0
+     * @since 2026
+     */
+
 public class ContaCorrente extends Conta {
     private double limiteChequeEspecial;
+
+    /**
+     * Cria uma nova conta-corrente.
+     *
+     * @param numeroConta Número identificador da conta.
+     * @param agencia Agência à qual a conta pertence.
+     * @param saldo Saldo inicial da conta.
+     * @param tipoConta Tipo da conta.
+     * @param limiteChequeEspecial Limite disponível para cheque especial.
+     */
 
     public ContaCorrente(String numeroConta, String agencia, double saldo, String tipoConta, double limiteChequeEspecial) {
         super(numeroConta, agencia, saldo, tipoConta);
         this.limiteChequeEspecial = limiteChequeEspecial;
     }
+
+    /**
+     * Método que implementa o RF15: Realização de Transações.
+     *
+     * <p>Realiza uma transação financeira.</p>
+     *
+     * <p>As transações podem ser efetuadas utilizando:</p>
+     *
+     * <ul>
+     *     <li>PIX;</li>
+     *     <li>Cartão de Débito;</li>
+     *     <li>Cartão de Crédito.</li>
+     * </ul>
+     *
+     * <p>Quando a operação é realizada por PIX ou Débito,
+     * o valor é descontado diretamente do saldo da conta,
+     * podendo utilizar o limite do cheque especial caso
+     * necessário.</p>
+     *
+     * <p>Nas operações por Crédito, o valor é descontado
+     * do limite disponível do cartão selecionado.</p>
+     *
+     * <p>Após a conclusão da operação, uma transação de saída
+     * é registrada na conta de origem e uma transação de entrada
+     * é registrada na conta de destino.</p>
+     *
+     * @param valor Valor da transação.
+     * @param metodoPagamento Método utilizado para pagamento.
+     * @param cartaoEscolhido Cartão utilizado na operação.
+     * @param categoria Categoria da movimentação financeira.
+     * @param destino Conta que receberá o valor transferido.
+     *
+     * @return {@code true} caso a transação seja concluída com sucesso.
+     *
+     * @throws Classes.Exceptions.ContaInativaException Caso a conta de origem ou destino
+     * esteja inativa.
+     *
+     * @throws Classes.Exceptions.SaldoInsuficienteException Caso o saldo somado ao limite
+     * do cheque especial seja insuficiente.
+     *
+     * @throws Classes.Exceptions.LimiteInsuficienteException Caso o limite do cartão seja
+     * insuficiente para a operação.
+     *
+     * @throws IllegalArgumentException Caso algum parâmetro seja inválido.
+     */
 
     @Override
     public boolean realizarTransacao(double valor, String metodoPagamento, Cartao cartaoEscolhido, String categoria, Conta destino)
@@ -73,6 +145,18 @@ public class ContaCorrente extends Conta {
 
         return true;
     }
+
+    /**
+     * Método que implementa o RF06: Visualização de Dados da Conta.
+     *
+     * <p>Exibe os dados da conta corrente.<p/>
+     *
+     * <p>Além das informações básicas fornecidas pela classe
+     * {@link Classes.Model.Conta.Conta}, também apresenta o valor disponível
+     * para utilização no cheque especial.</p>
+     *
+     * @return String formatada contendo os dados da conta.
+     */
 
     @Override
     public String visualizarDadosConta() {

@@ -2,6 +2,21 @@ package Classes.Model.Operacoes;
 
 import Classes.Model.Conta.Conta;
 
+    /**
+     * Representa uma transação financeira realizada no sistema.
+     *
+     * <p>Uma transação registra a movimentação de valores entre contas,
+     * armazenando informações como data, horário, valor, categoria,
+     * método de pagamento, tipo de fluxo e status da operação.</p>
+     *
+     * <p>As transações são utilizadas para compor o extrato das contas
+     * e permitir consultas ao histórico financeiro dos usuários.</p>
+     *
+     * @author Ian Carlos
+     * @version 1.0
+     * @since 2026
+     */
+
 public class Transacao {
     private static int codigoSequencial = 0;
 
@@ -16,6 +31,20 @@ public class Transacao {
     private Conta origem;
     private Conta destino;
 
+    /**
+     * Cria uma nova transação financeira.
+     *
+     * @param data Data da transação.
+     * @param hora Horário da transação.
+     * @param valor Valor movimentado.
+     * @param categoria Categoria da transação.
+     * @param tipoFluxo Tipo de fluxo financeiro (Entrada ou Saída).
+     * @param metodoPagamento Método de pagamento utilizado.
+     * @param status Situação da transação.
+     * @param origem Conta de origem da movimentação.
+     * @param destino Conta de destino da movimentação.
+     */
+
     public Transacao(String data, String hora, double valor, String categoria, String tipoFluxo, String metodoPagamento, String status, Conta origem, Conta destino) {
         this.id = ++codigoSequencial;
         this.data = data;
@@ -28,6 +57,12 @@ public class Transacao {
         this.origem = origem;
         this.destino = destino;
     }
+
+    /**
+     *   ======================
+     *     GETTERS E SETTERS
+     *   ======================
+     */
 
     public  String getData () {return this.data;}
     public  String getCategoria () {return this.categoria;}

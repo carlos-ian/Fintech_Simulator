@@ -5,6 +5,23 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+    /**
+     * Classe responsável por gerir a conexão da aplicação
+     * com o banco de dados PostgreSQL.
+     *
+     * <p>As informações de conexão são carregadas a partir de
+     * variáveis de ambiente definidas num arquivo <code>.env</code>,
+     * utilizando a biblioteca Dotenv.</p>
+     *
+     * <p>Esta classe centraliza a criação de conexões com o banco,
+     * permitindo que os repositórios da aplicação realizem operações
+     * de persistência de forma padronizada.</p>
+     *
+     * @author Ian Carlos
+     * @version 1.0
+     * @since 2026
+     */
+
 public class ConexaoBanco {
     private static final Dotenv dotenv;
     static {
@@ -25,6 +42,16 @@ public class ConexaoBanco {
 
     private static final String URL = "jdbc:postgresql://" + HOST + ":" + PORTA + "/" + BANCO + "?sslmode=require";
 
+        /**
+         * Método utilizado para testar a conexão com o banco.
+         *
+         * <p>Ao executar esta classe diretamente, será realizada
+         * uma tentativa de conexão com o PostgreSQL. Em caso de
+         * sucesso, uma mensagem será exibida no console.</p>
+         *
+         * @param args Argumentos de linha de comando.
+         */
+
     public static void main(String[] args) {
         try {
             Connection conn = conectar();
@@ -37,6 +64,20 @@ public class ConexaoBanco {
             e.printStackTrace();
         }
     }
+
+        /**
+         * Cria e retorna uma conexão com o banco de dados.
+         *
+         * <p>O método realiza o carregamento do driver JDBC do
+         * PostgreSQL e utiliza os dados obtidos do arquivo
+         * <code>.env</code> para estabelecer a conexão.</p>
+         *
+         * <p>Caso ocorra algum erro durante o processo,
+         * o método retorna {@code null}.</p>
+         *
+         * @return Objeto {@link Connection} representando a conexão
+         * com o banco de dados ou {@code null} em caso de falha.
+         */
 
     public static Connection conectar() {
         try {

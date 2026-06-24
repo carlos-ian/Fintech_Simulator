@@ -6,7 +6,43 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
+    /**
+     * Classe utilitária responsável pela criação e exibição de componentes
+     * gráficos da interface utilizando Swing.
+     *
+     * <p>Esta classe centraliza a exibição de formulários, menus e caixas
+     * de diálogo utilizados pela aplicação, facilitando a interação do
+     * usuário com o sistema bancário.</p>
+     *
+     * <p>Todos os métodos são estáticos, não sendo necessária a criação
+     * de objetos desta classe.</p>
+     *
+     * @author Ian Carlos
+     * @version 1.0
+     * @since 2026
+     */
+
 public class SwingUtil {
+
+    /**
+     * Exibe um formulário dinâmico contendo os campos informados.
+     *
+     * <p>Os campos são criados automaticamente a partir dos nomes
+     * recebidos como parâmetro. Caso o nome de um campo contenha
+     * a palavra "senha", será utilizado um {@link JPasswordField}
+     * para ocultar os caracteres digitados.</p>
+     *
+     * <p>Ao confirmar o formulário, os valores preenchidos são
+     * retornados em um vetor de Strings na mesma ordem dos campos.
+     * Caso o usuário cancele a operação, o método retorna {@code null}.</p>
+     *
+     * @param titulo Título da janela exibida.
+     * @param mensagem Mensagem informativa apresentada ao usuário.
+     * @param campos Lista de campos que serão exibidos no formulário.
+     * @return Vetor contendo os dados informados ou {@code null}
+     * caso a operação seja cancelada.
+     */
+
     public static String[] exibirFormulario(String titulo, String mensagem, String... campos) {
         JPanel painelPrincipal = new JPanel();
         painelPrincipal.setLayout(new BoxLayout(painelPrincipal, BoxLayout.Y_AXIS));
@@ -54,14 +90,68 @@ public class SwingUtil {
         return null;
     }
 
+    /**
+     * Exibe um menu de seleção baseado numa lista de opções.
+     *
+     * <p>O usuário poderá escolher apenas uma das opções disponíveis
+     * por meio de uma caixa de seleção.</p>
+     *
+     * @param titulo Título da janela.
+     * @param mensagem Mensagem exibida ao usuário.
+     * @param opcoes Opções disponíveis para seleção.
+     * @return Opção selecionada pelo usuário ou {@code null}
+     * caso a janela seja cancelada ou não existam opções.
+     */
+
     public static String exibirMenuSelecao(String titulo, String mensagem, String... opcoes) {
         if (opcoes == null || opcoes.length == 0) return null;
         return (String) JOptionPane.showInputDialog(null, mensagem, titulo, JOptionPane.QUESTION_MESSAGE, null, opcoes, opcoes[0]);
     }
 
+    /**
+     * Exibe uma janela contendo botões personalizados.
+     *
+     * <p>O índice do botão selecionado é retornado para que a aplicação
+     * possa identificar qual ação o usuário escolheu.</p>
+     *
+     * @param titulo Título da janela.
+     * @param mensagem Mensagem apresentada ao usuário.
+     * @param botoes Botões que serão exibidos.
+     * @return Índice do botão selecionado ou valor negativo
+     * caso a janela seja fechada.
+     */
+
     public static int exibirMenuBotoes(String titulo, String mensagem, String... botoes) {
         return JOptionPane.showOptionDialog(null, mensagem, titulo, JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, botoes, botoes[0]);
     }
+
+        /**
+         * Exibe um formulário completo para cadastro de uma nova transação
+         * financeira.
+         *
+         * <p>O formulário permite informar:</p>
+         *
+         * <ul>
+         *     <li>Valor da operação;</li>
+         *     <li>Método de pagamento;</li>
+         *     <li>Cartão utilizado;</li>
+         *     <li>Categoria da despesa;</li>
+         *     <li>CPF do destinatário;</li>
+         *     <li>Número da conta de destino.</li>
+         * </ul>
+         *
+         * <p>Os cartões recebidos são exibidos em formato mascarado,
+         * mostrando apenas os quatro últimos dígitos.</p>
+         *
+         * <p>Ao confirmar o formulário, os dados preenchidos são retornados
+         * em um vetor de objetos. Caso a operação seja cancelada,
+         * o método retorna {@code null}.</p>
+         *
+         * @param cartoes Lista de cartões disponíveis para utilização
+         * durante a transação.
+         * @return Vetor contendo os dados da transação ou {@code null}
+         * caso o usuário cancele a operação.
+         */
 
     public static Object[] exibirFormularioTransacao(ArrayList<Cartao> cartoes) {
         JTextField txtValor = new JTextField();

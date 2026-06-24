@@ -5,8 +5,45 @@ import Classes.Model.Operacoes.Transacao;
 import java.sql.*;
 import java.util.ArrayList;
 
+    /**
+     * Classe responsável pela persistência e recuperação de transações
+     * financeiras no banco de dados.
+     *
+     * <p>Fornece métodos para registrar transações realizadas entre contas,
+     * atualizar os saldos envolvidos e carregar o histórico de movimentações
+     * de uma conta para a memória da aplicação.</p>
+     *
+     * <p>Todas as operações de gravação são executadas dentro de uma transação
+     * de banco de dados, garantindo a consistência dos dados em caso de falhas.</p>
+     *
+     * @author Ian Carlos
+     * @version 1.0
+     * @since 2026
+     */
+
 public class TransacaoBancoRepository {
-    public static boolean registrarTransacao(Transacao t, int contaOrigemId, double novoSaldoOrigem, Integer contaDestinoId, Double novoSaldoDestino) {
+
+    /**
+     * Registra uma transação financeira no banco de dados e atualiza os
+     * saldos das contas envolvidas.
+     *
+     * <p>O método grava a movimentação da conta de origem, atualiza seu saldo
+     * e, quando existir uma conta de destino, atualiza também o saldo da conta
+     * destinatária e registra a movimentação de entrada correspondente.</p>
+     *
+     * <p>Todas as operações são executadas dentro de uma única transação SQL,
+     * sendo revertidas automaticamente em caso de erro.</p>
+     *
+     * @param t objeto contendo os dados da transação realizada.
+     * @param contaOrigemId identificador da conta de origem.
+     * @param novoSaldoOrigem saldo atualizado da conta de origem após a operação.
+     * @param contaDestinoId identificador da conta de destino. Pode ser
+     *                       {@code null} quando não houver destinatário.
+     * @param novoSaldoDestino saldo atualizado da conta de destino.
+     *                         Pode ser {@code null} quando não houver destinatário.
+     */
+
+    public static void registrarTransacao(Transacao t, int contaOrigemId, double novoSaldoOrigem, Integer contaDestinoId, Double novoSaldoDestino) {
         String sqlTransacao = "INSERT INTO transacao (data_transacao, hora_transacao, valor, categoria, tipo_fluxo, metodo_pagamento, status, conta_origem_id, conta_destino_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlAtualizarSaldo = "UPDATE conta SET saldo = ? WHERE id = ?";
 
@@ -61,15 +98,24 @@ public class TransacaoBancoRepository {
             }
 
             conn.commit();
-            return true;
         } catch (SQLException e) {
             if (conn != null) { try { conn.rollback(); } catch (SQLException ex) {} }
             System.err.println("Erro ao registrar transação: " + e.getMessage());
-            return false;
         } finally {
             if (conn != null) { try { conn.close(); } catch (SQLException e) {} }
         }
     }
+
+    /**
+     * Carrega do banco de dados todas as transações associadas à conta
+     * informada e adiciona os registros à lista de extrato em memória.
+     *
+     * <p>As transações recuperadas são convertidas para objetos
+     * {@link Transacao} e armazenadas na coleção fornecida.</p>
+     *
+     * @param contaAtual conta cujas transações serão carregadas.
+     * @param listaExtratoMemoria lista que receberá as transações recuperadas.
+     */
 
     public static void carregarTransacoes(Conta contaAtual, ArrayList<Transacao> listaExtratoMemoria) {
         String sql = "SELECT * FROM transacao WHERE conta_origem_id = ?";

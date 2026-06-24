@@ -9,8 +9,50 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+    /**
+     * Classe responsável pela persistência e recuperação dos investimentos
+     * realizados pelos clientes da fintech.
+     *
+     * <p>Esta classe implementa o padrão Repository e centraliza todas as
+     * operações relacionadas aos investimentos armazenados no banco de dados,
+     * incluindo:</p>
+     *
+     * <ul>
+     *     <li>Registro de novas aplicações financeiras;</li>
+     *     <li>Processamento de resgates de investimentos;</li>
+     *     <li>Carregamento dos investimentos vinculados a uma conta.</li>
+     * </ul>
+     *
+     * <p>Os investimentos recuperados do banco são convertidos para objetos
+     * da classe {@link Investimento} e adicionados à lista de investimentos
+     * da conta correspondente.</p>
+     *
+     * @author Ian Carlos
+     * @version 1.0
+     * @since 2026
+     */
+
 public class InvestimentoBancoRepository {
-    public static boolean registrarInvestimento(Conta conta, Investimento produto, double valor, String data) {
+
+    /**
+     * Registra uma nova aplicação financeira no banco de dados.
+     *
+     * <p>O método realiza duas operações dentro de uma transação:</p>
+     * <ul>
+     *     <li>Insere o investimento na tabela de aplicações;</li>
+     *     <li>Atualiza o saldo da conta após o investimento.</li>
+     * </ul>
+     *
+     * <p>Caso ambas as operações sejam concluídas com sucesso,
+     * as alterações são confirmadas no banco.</p>
+     *
+     * @param conta Conta responsável pela aplicação.
+     * @param produto Produto financeiro selecionado.
+     * @param valor Valor aplicado no investimento.
+     * @param data Data da aplicação.
+     */
+
+    public static void registrarInvestimento(Conta conta, Investimento produto, double valor, String data) {
         String sqlAplicacao = "INSERT INTO investimento_conta (conta_id, nome_produto, valor_aplicado, data_aplicacao) VALUES (?, ?, ?, ?)";
         String sqlAtualizarSaldo = "UPDATE conta SET saldo = ? WHERE id = ?";
 
@@ -33,12 +75,24 @@ public class InvestimentoBancoRepository {
 
             conn.commit();
             System.out.println("DEBUG: Aplicação de " + produto.getNomeProduto() + " salva com sucesso!");
-            return true;
         } catch (SQLException e) {
             System.err.println("Erro ao registrar aplicação no banco: " + e.getMessage());
-            return false;
         }
     }
+
+    /**
+     * Processa o resgate de um investimento registrado na conta.
+     *
+     * <p>O método remove o investimento da tabela de aplicações
+     * e atualiza o saldo da conta com o valor resgatado.</p>
+     *
+     * <p>As operações são executadas dentro de uma transação para
+     * garantir a integridade dos dados.</p>
+     *
+     * @param conta Conta que receberá o valor resgatado.
+     * @param nomeProduto Nome do produto financeiro a ser resgatado.
+     * @param valorAntigo Valor originalmente aplicado no investimento.
+     */
 
     public static void resgatarInvestimento(Conta conta, String nomeProduto, double valorAntigo) {
         String sqlDeletar = "DELETE FROM investimento_conta WHERE id = " +
@@ -67,6 +121,26 @@ public class InvestimentoBancoRepository {
             System.err.println("Erro ao processar resgate no banco: " + e.getMessage());
         }
     }
+
+    /**
+     * Carrega todos os investimentos associados a uma conta.
+     *
+     * <p>Para cada registro encontrado no banco de dados, é criado
+     * um objeto {@link Investimento} contendo:</p>
+     *
+     * <ul>
+     *     <li>Identificador do investimento;</li>
+     *     <li>Nome do produto financeiro;</li>
+     *     <li>Valor aplicado;</li>
+     *     <li>Data da aplicação;</li>
+     *     <li>Taxa de rendimento correspondente ao produto.</li>
+     * </ul>
+     *
+     * <p>Antes do carregamento, a lista atual de investimentos
+     * da conta é limpa para evitar duplicidades.</p>
+     *
+     * @param conta Conta cujos investimentos serão carregados.
+     */
 
     public static void carregarInvestimentos(Conta conta) {
         conta.getListaInvestimentos().clear();
@@ -99,20 +173,6 @@ public class InvestimentoBancoRepository {
             }
         } catch (SQLException e) {
             System.err.println("Erro ao carregar investimentos da conta: " + e.getMessage());
-        }
-    }
-
-    public static void atualizarValorInvestimento(int investimentoId, double novoValor) {
-        String sql = "UPDATE investimento_conta SET valor_aplicado = ? WHERE id = ?";
-        try (Connection conn = ConexaoBanco.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setDouble(1, novoValor);
-            stmt.setInt(2, investimentoId);
-            stmt.executeUpdate();
-            System.out.println("DEBUG: Valor do investimento ID " + investimentoId + " atualizado para R$ " + novoValor);
-        } catch (SQLException e) {
-            System.err.println("Erro ao atualizar valor do investimento: " + e.getMessage());
         }
     }
 }

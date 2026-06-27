@@ -30,8 +30,9 @@ public class CartaoBancoRepository {
      * <code>cartao</code> e associados à conta informada
      * por meio da chave estrangeira <code>conta_id</code>.</p>
      *
-     * @param cartao Cartão que será persistido.
+     * @param cartao  Cartão que será persistido.
      * @param contaId Identificador da conta à qual o cartão pertence.
+     * @return
      */
 
     public static boolean salvarCartao(Cartao cartao, int contaId) {
@@ -54,6 +55,7 @@ public class CartaoBancoRepository {
             System.err.println("Erro ao salvar cartão no banco: " + e.getMessage());
             return false; // <-- Adicionado: Se caiu na exceção, retorna falso!
         }
+        return false;
     }
 
         /**

@@ -46,10 +46,11 @@ public class InvestimentoBancoRepository {
      * <p>Caso ambas as operações sejam concluídas com sucesso,
      * as alterações são confirmadas no banco.</p>
      *
-     * @param conta Conta responsável pela aplicação.
+     * @param conta   Conta responsável pela aplicação.
      * @param produto Produto financeiro selecionado.
-     * @param valor Valor aplicado no investimento.
-     * @param data Data da aplicação.
+     * @param valor   Valor aplicado no investimento.
+     * @param data    Data da aplicação.
+     * @return
      */
 
     public static boolean registrarInvestimento(Conta conta, Investimento produto, double valor, String data) {
@@ -81,6 +82,7 @@ public class InvestimentoBancoRepository {
             System.err.println("Erro ao registrar aplicação no banco: " + e.getMessage());
             return false; // <-- Adicionado: Se ocorreu alguma exceção no banco, retorna falso!
         }
+        return false;
     }
 
     /**

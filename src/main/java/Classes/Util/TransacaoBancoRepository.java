@@ -34,13 +34,14 @@ public class TransacaoBancoRepository {
      * <p>Todas as operações são executadas dentro de uma única transação SQL,
      * sendo revertidas automaticamente em caso de erro.</p>
      *
-     * @param t objeto contendo os dados da transação realizada.
-     * @param contaOrigemId identificador da conta de origem.
-     * @param novoSaldoOrigem saldo atualizado da conta de origem após a operação.
-     * @param contaDestinoId identificador da conta de destino. Pode ser
-     *                       {@code null} quando não houver destinatário.
+     * @param t                objeto contendo os dados da transação realizada.
+     * @param contaOrigemId    identificador da conta de origem.
+     * @param novoSaldoOrigem  saldo atualizado da conta de origem após a operação.
+     * @param contaDestinoId   identificador da conta de destino. Pode ser
+     *                         {@code null} quando não houver destinatário.
      * @param novoSaldoDestino saldo atualizado da conta de destino.
      *                         Pode ser {@code null} quando não houver destinatário.
+     * @return
      */
 
     public static boolean registrarTransacao(Transacao t, int contaOrigemId, double novoSaldoOrigem, Integer contaDestinoId, Double novoSaldoDestino) {
@@ -108,6 +109,7 @@ public class TransacaoBancoRepository {
         } finally {
             if (conn != null) { try { conn.close(); } catch (SQLException e) {} }
         }
+        return false;
     }
 
     /**

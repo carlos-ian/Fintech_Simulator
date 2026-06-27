@@ -52,7 +52,7 @@ public class InvestimentoBancoRepository {
      * @param data Data da aplicação.
      */
 
-    public static void registrarInvestimento(Conta conta, Investimento produto, double valor, String data) {
+    public static boolean registrarInvestimento(Conta conta, Investimento produto, double valor, String data) {
         String sqlAplicacao = "INSERT INTO investimento_conta (conta_id, nome_produto, valor_aplicado, data_aplicacao) VALUES (?, ?, ?, ?)";
         String sqlAtualizarSaldo = "UPDATE conta SET saldo = ? WHERE id = ?";
 
@@ -75,8 +75,11 @@ public class InvestimentoBancoRepository {
 
             conn.commit();
             System.out.println("DEBUG: Aplicação de " + produto.getNomeProduto() + " salva com sucesso!");
+            return true; // <-- Adicionado: Se concluiu o commit com sucesso, retorna verdadeiro!
+            
         } catch (SQLException e) {
             System.err.println("Erro ao registrar aplicação no banco: " + e.getMessage());
+            return false; // <-- Adicionado: Se ocorreu alguma exceção no banco, retorna falso!
         }
     }
 

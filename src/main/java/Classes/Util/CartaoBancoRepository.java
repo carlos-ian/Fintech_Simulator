@@ -34,7 +34,7 @@ public class CartaoBancoRepository {
      * @param contaId Identificador da conta à qual o cartão pertence.
      */
 
-    public static void salvarCartao(Cartao cartao, int contaId) {
+    public static boolean salvarCartao(Cartao cartao, int contaId) {
         String sql = "INSERT INTO cartao (numero_cartao, titular, tipo_cartao, limite_total, limite_disponivel, esta_bloqueado, conta_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = ConexaoBanco.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -48,8 +48,11 @@ public class CartaoBancoRepository {
             stmt.setInt(7, contaId);
 
             stmt.executeUpdate();
+            return true; // <-- Adicionado: Se executou o update sem erros, retorna verdadeiro!
+            
         } catch (SQLException e) {
             System.err.println("Erro ao salvar cartão no banco: " + e.getMessage());
+            return false; // <-- Adicionado: Se caiu na exceção, retorna falso!
         }
     }
 

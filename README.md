@@ -91,7 +91,7 @@ O projeto segue estritamente a seguinte distribuição de diretórios e pacotes 
 
 ```text
 Fintech_Simulator/
-├── Classes/                      # Diretório raíz do código-fonte Java
+├── src/main/java/Classes/        # Diretório do código-fonte Java
 │   ├── Exceptions/               # Classes de exceções customizadas do sistema
 │   │   ├── ContaInativaException.java
 │   │   ├── LimiteInsuficienteException.java
@@ -103,6 +103,8 @@ Fintech_Simulator/
 │   ├── Util/                     # Classes de utilitários, auxílio à interface gráfica e banco de dados
 │   └── AplicacaoBancaria.java    # Classe Executável Principal (Ponto de entrada do sistema)
 │
+|── src/test/java                 # Diretório das classes de testes
+|
 ├── Diagramas/                    # Modelagens e documentação visual arquitetural
     ├── Diagrama de Classes Conceituais
     ├── Diagramas de Casos de Uso (DCdu)
@@ -116,7 +118,7 @@ O projeto foi construído utilizando um ecossistema nativo Java focado em perfor
 
 **Interface Gráfica Desktop:** Java Swing (via SwingUtil) e JOptionPane.
 
-**Persistência de Dados Relacional:** PostgreSQL e JDBC API pura (padrão Repository).
+**Persistência de Dados Relacional:** PostgreSQL e JDBC API pura.
 
 **Automação de Build e Dependências:** Maven (pom.xml).
 
@@ -125,10 +127,6 @@ O projeto foi construído utilizando um ecossistema nativo Java focado em perfor
 **Segurança e Configuração:** Arquivo .env para isolamento de credenciais do banco.
 
 **Documentação:** Javadoc.
-
-## ⚙️ Como Executar o Projeto
-Siga os passos abaixo para configurar o ambiente e rodar o simulador bancário na sua máquina local:
-
 
 ## ✒️ Autores
 Brenno Soares de Aguiar |
